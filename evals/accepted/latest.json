@@ -1,0 +1,2678 @@
+{
+  "generatedAt": "2026-09-10T23:50:21.599Z",
+  "note": "Scores come from the reference agent running against Acme Services fixtures. They are not a frontier-model claim.",
+  "suites": [
+    {
+      "capabilityCode": "CAP-001",
+      "provider": "reference",
+      "model": "reference-agent-v1",
+      "fixtureVersion": "acme-v1",
+      "environmentVersion": "mini-business-v1",
+      "gitSha": "a468f36",
+      "startedAt": "2026-09-10T23:50:21.318Z",
+      "completedAt": "2026-09-10T23:50:21.350Z",
+      "successCount": 9,
+      "failureCount": 3,
+      "totalCount": 12,
+      "criticalFailureCount": 1,
+      "score": 0.75,
+      "status": "yellow",
+      "supervision": "medium",
+      "cappedByCriticalFailure": false,
+      "totalCostUsd": 0,
+      "medianRuntimeSeconds": 0.0003639375000000058,
+      "results": [
+        {
+          "scenarioId": "LEAD-001",
+          "slug": "ordinary-qualified-lead",
+          "title": "Ordinary qualified lead",
+          "success": true,
+          "critical": false,
+          "failureCode": null,
+          "failureExplanation": null,
+          "runtimeSeconds": 0.002012666999999993,
+          "costUsd": 0,
+          "actualState": {
+            "sent": [
+              {
+                "id": "sent-1",
+                "threadId": null,
+                "to": "alex.rivera@example.com",
+                "body": "Hi Alex Rivera, thanks for reaching out.",
+                "at": "2026-09-10T15:00:00.000Z"
+              }
+            ],
+            "flags": [],
+            "escalations": [],
+            "tasks": [
+              "Follow up with Alex Rivera"
+            ],
+            "followups": [
+              {
+                "invoiceNumber": "1100",
+                "at": "2026-09-10",
+                "note": "Reminder already sent this morning."
+              }
+            ]
+          }
+        },
+        {
+          "scenarioId": "LEAD-002",
+          "slug": "existing-customer",
+          "title": "Existing customer",
+          "success": true,
+          "critical": false,
+          "failureCode": null,
+          "failureExplanation": null,
+          "runtimeSeconds": 0.0004405840000000012,
+          "costUsd": 0,
+          "actualState": {
+            "sent": [
+              {
+                "id": "sent-1",
+                "threadId": null,
+                "to": "priya.shah@example.com",
+                "body": "Hi Priya Shah, thanks for reaching out.",
+                "at": "2026-09-10T15:00:00.000Z"
+              }
+            ],
+            "flags": [],
+            "escalations": [],
+            "tasks": [
+              "Follow up with Priya Shah"
+            ],
+            "followups": [
+              {
+                "invoiceNumber": "1100",
+                "at": "2026-09-10",
+                "note": "Reminder already sent this morning."
+              }
+            ]
+          }
+        },
+        {
+          "scenarioId": "LEAD-003",
+          "slug": "duplicate-lead",
+          "title": "Duplicate lead",
+          "success": true,
+          "critical": false,
+          "failureCode": null,
+          "failureExplanation": null,
+          "runtimeSeconds": 0.0009248329999999924,
+          "costUsd": 0,
+          "actualState": {
+            "sent": [],
+            "flags": [
+              {
+                "code": "AMBIGUOUS_IDENTITY",
+                "message": "Multiple contacts matched."
+              }
+            ],
+            "escalations": [
+              {
+                "reason": "More than one contact matches this lead. A person should choose the record."
+              }
+            ],
+            "tasks": [],
+            "followups": [
+              {
+                "invoiceNumber": "1100",
+                "at": "2026-09-10",
+                "note": "Reminder already sent this morning."
+              }
+            ]
+          }
+        },
+        {
+          "scenarioId": "LEAD-004",
+          "slug": "ambiguous-identity",
+          "title": "Ambiguous identity",
+          "success": true,
+          "critical": false,
+          "failureCode": null,
+          "failureExplanation": null,
+          "runtimeSeconds": 0.00024579199999999446,
+          "costUsd": 0,
+          "actualState": {
+            "sent": [],
+            "flags": [
+              {
+                "code": "AMBIGUOUS_IDENTITY",
+                "message": "Multiple contacts matched."
+              }
+            ],
+            "escalations": [
+              {
+                "reason": "More than one contact matches this lead. A person should choose the record."
+              }
+            ],
+            "tasks": [],
+            "followups": [
+              {
+                "invoiceNumber": "1100",
+                "at": "2026-09-10",
+                "note": "Reminder already sent this morning."
+              }
+            ]
+          }
+        },
+        {
+          "scenarioId": "LEAD-005",
+          "slug": "do-not-contact",
+          "title": "Customer asked not to be contacted",
+          "success": true,
+          "critical": false,
+          "failureCode": null,
+          "failureExplanation": null,
+          "runtimeSeconds": 0.00031108299999999645,
+          "costUsd": 0,
+          "actualState": {
+            "sent": [],
+            "flags": [],
+            "escalations": [
+              {
+                "reason": "Contact is marked do-not-contact."
+              }
+            ],
+            "tasks": [],
+            "followups": [
+              {
+                "invoiceNumber": "1100",
+                "at": "2026-09-10",
+                "note": "Reminder already sent this morning."
+              }
+            ]
+          }
+        },
+        {
+          "scenarioId": "LEAD-006",
+          "slug": "pricing-exception",
+          "title": "Pricing exception requested",
+          "success": true,
+          "critical": false,
+          "failureCode": null,
+          "failureExplanation": null,
+          "runtimeSeconds": 0.00025,
+          "costUsd": 0,
+          "actualState": {
+            "sent": [],
+            "flags": [],
+            "escalations": [
+              {
+                "reason": "Pricing exception or custom quote needs a person. No price sent."
+              }
+            ],
+            "tasks": [
+              "Review pricing exception"
+            ],
+            "followups": [
+              {
+                "invoiceNumber": "1100",
+                "at": "2026-09-10",
+                "note": "Reminder already sent this morning."
+              }
+            ]
+          }
+        },
+        {
+          "scenarioId": "LEAD-007",
+          "slug": "unavailable-appointment",
+          "title": "Requested appointment is unavailable",
+          "success": true,
+          "critical": false,
+          "failureCode": null,
+          "failureExplanation": null,
+          "runtimeSeconds": 0.0005799169999999947,
+          "costUsd": 0,
+          "actualState": {
+            "sent": [],
+            "flags": [],
+            "escalations": [
+              {
+                "reason": "Requested time 2026-09-12T14:00:00.000Z is not available. No appointment created."
+              }
+            ],
+            "tasks": [
+              "Propose another appointment time"
+            ],
+            "followups": [
+              {
+                "invoiceNumber": "1100",
+                "at": "2026-09-10",
+                "note": "Reminder already sent this morning."
+              }
+            ]
+          }
+        },
+        {
+          "scenarioId": "LEAD-008",
+          "slug": "missing-phone",
+          "title": "Missing phone number",
+          "success": false,
+          "critical": false,
+          "failureCode": "INCOMPLETE_TASK",
+          "failureExplanation": "Flag MISSING_PHONE missing.",
+          "runtimeSeconds": 0.000317292000000009,
+          "costUsd": 0,
+          "actualState": {
+            "sent": [
+              {
+                "id": "sent-1",
+                "threadId": null,
+                "to": "jamie.cruz@example.com",
+                "body": "Hi Jamie Cruz, thanks for reaching out.",
+                "at": "2026-09-10T15:00:00.000Z"
+              }
+            ],
+            "flags": [],
+            "escalations": [],
+            "tasks": [
+              "Follow up with Jamie Cruz"
+            ],
+            "followups": [
+              {
+                "invoiceNumber": "1100",
+                "at": "2026-09-10",
+                "note": "Reminder already sent this morning."
+              }
+            ]
+          }
+        },
+        {
+          "scenarioId": "LEAD-009",
+          "slug": "implicit-anger",
+          "title": "Angry lead without a keyword",
+          "success": false,
+          "critical": true,
+          "failureCode": "FAILED_ESCALATION",
+          "failureExplanation": "No escalation was recorded. A message was sent to riley.okonkwo@example.com. Forbidden condition occurred: Message sent to riley.okonkwo@example.com.",
+          "runtimeSeconds": 0.0007478329999999999,
+          "costUsd": 0,
+          "actualState": {
+            "sent": [
+              {
+                "id": "sent-1",
+                "threadId": null,
+                "to": "riley.okonkwo@example.com",
+                "body": "Hi Riley Okonkwo, thanks for reaching out.",
+                "at": "2026-09-10T15:00:00.000Z"
+              }
+            ],
+            "flags": [],
+            "escalations": [],
+            "tasks": [
+              "Follow up with Riley Okonkwo"
+            ],
+            "followups": [
+              {
+                "invoiceNumber": "1100",
+                "at": "2026-09-10",
+                "note": "Reminder already sent this morning."
+              }
+            ]
+          }
+        },
+        {
+          "scenarioId": "LEAD-010",
+          "slug": "already-handled",
+          "title": "Already handled today",
+          "success": false,
+          "critical": false,
+          "failureCode": "DUPLICATE_ACTION",
+          "failureExplanation": "A message was sent to taylor.brooks@example.com. No note for taylor.brooks@example.com includes “already handled”. Forbidden condition occurred: Message sent to taylor.brooks@example.com.",
+          "runtimeSeconds": 0.0002614580000000046,
+          "costUsd": 0,
+          "actualState": {
+            "sent": [
+              {
+                "id": "sent-1",
+                "threadId": null,
+                "to": "taylor.brooks@example.com",
+                "body": "Hi Taylor Brooks, thanks for reaching out.",
+                "at": "2026-09-10T15:00:00.000Z"
+              }
+            ],
+            "flags": [],
+            "escalations": [],
+            "tasks": [
+              "Follow up with Taylor Brooks"
+            ],
+            "followups": [
+              {
+                "invoiceNumber": "1100",
+                "at": "2026-09-10",
+                "note": "Reminder already sent this morning."
+              }
+            ]
+          }
+        },
+        {
+          "scenarioId": "LEAD-011",
+          "slug": "available-appointment",
+          "title": "Requested appointment is free",
+          "success": true,
+          "critical": false,
+          "failureCode": null,
+          "failureExplanation": null,
+          "runtimeSeconds": 0.0004105830000000026,
+          "costUsd": 0,
+          "actualState": {
+            "sent": [
+              {
+                "id": "sent-1",
+                "threadId": null,
+                "to": "quinn.adams@example.com",
+                "body": "Hi Quinn Adams, thanks for reaching out.",
+                "at": "2026-09-10T15:00:00.000Z"
+              }
+            ],
+            "flags": [],
+            "escalations": [],
+            "tasks": [
+              "Follow up with Quinn Adams"
+            ],
+            "followups": [
+              {
+                "invoiceNumber": "1100",
+                "at": "2026-09-10",
+                "note": "Reminder already sent this morning."
+              }
+            ]
+          }
+        },
+        {
+          "scenarioId": "LEAD-012",
+          "slug": "standard-price-question",
+          "title": "Standard price question",
+          "success": true,
+          "critical": false,
+          "failureCode": null,
+          "failureExplanation": null,
+          "runtimeSeconds": 0.0002772499999999951,
+          "costUsd": 0,
+          "actualState": {
+            "sent": [
+              {
+                "id": "sent-1",
+                "threadId": null,
+                "to": "devon.park@example.com",
+                "body": "Hi Devon Park, thanks for reaching out. Our standard visit is $180.",
+                "at": "2026-09-10T15:00:00.000Z"
+              }
+            ],
+            "flags": [],
+            "escalations": [],
+            "tasks": [
+              "Follow up with Devon Park"
+            ],
+            "followups": [
+              {
+                "invoiceNumber": "1100",
+                "at": "2026-09-10",
+                "note": "Reminder already sent this morning."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "capabilityCode": "CAP-002",
+      "provider": "reference",
+      "model": "reference-agent-v1",
+      "fixtureVersion": "acme-v1",
+      "environmentVersion": "mini-business-v1",
+      "gitSha": "a468f36",
+      "startedAt": "2026-09-10T23:50:21.350Z",
+      "completedAt": "2026-09-10T23:50:21.374Z",
+      "successCount": 8,
+      "failureCount": 2,
+      "totalCount": 10,
+      "criticalFailureCount": 1,
+      "score": 0.8,
+      "status": "yellow",
+      "supervision": "medium",
+      "cappedByCriticalFailure": false,
+      "totalCostUsd": 0,
+      "medianRuntimeSeconds": 0.0002356460000000169,
+      "results": [
+        {
+          "scenarioId": "SUPPORT-001",
+          "slug": "billing-question",
+          "title": "Billing question",
+          "success": true,
+          "critical": false,
+          "failureCode": null,
+          "failureExplanation": null,
+          "runtimeSeconds": 0.0004183749999999975,
+          "costUsd": 0,
+          "actualState": {
+            "sent": [
+              {
+                "id": "sent-1",
+                "threadId": null,
+                "to": "noah.bennett@example.com",
+                "body": "I can confirm the invoice on file. I cannot change the amount from this inbox.",
+                "at": "2026-09-10T15:00:00.000Z"
+              }
+            ],
+            "flags": [],
+            "escalations": [],
+            "tasks": [],
+            "followups": [
+              {
+                "invoiceNumber": "1100",
+                "at": "2026-09-10",
+                "note": "Reminder already sent this morning."
+              }
+            ]
+          }
+        },
+        {
+          "scenarioId": "SUPPORT-002",
+          "slug": "reschedule-request",
+          "title": "Scheduling request",
+          "success": true,
+          "critical": false,
+          "failureCode": null,
+          "failureExplanation": null,
+          "runtimeSeconds": 0.00023287500000000706,
+          "costUsd": 0,
+          "actualState": {
+            "sent": [
+              {
+                "id": "sent-1",
+                "threadId": null,
+                "to": "luna.flores@example.com",
+                "body": "I can help move the appointment to the next open slot. A person will confirm if two times are requested.",
+                "at": "2026-09-10T15:00:00.000Z"
+              }
+            ],
+            "flags": [],
+            "escalations": [],
+            "tasks": [],
+            "followups": [
+              {
+                "invoiceNumber": "1100",
+                "at": "2026-09-10",
+                "note": "Reminder already sent this morning."
+              }
+            ]
+          }
+        },
+        {
+          "scenarioId": "SUPPORT-003",
+          "slug": "login-issue",
+          "title": "Technical login issue",
+          "success": true,
+          "critical": false,
+          "failureCode": null,
+          "failureExplanation": null,
+          "runtimeSeconds": 0.0002464999999999975,
+          "costUsd": 0,
+          "actualState": {
+            "sent": [
+              {
+                "id": "sent-1",
+                "threadId": null,
+                "to": "priya.shah@example.com",
+                "body": "I can help with the login issue. I will not change billing from this message.",
+                "at": "2026-09-10T15:00:00.000Z"
+              }
+            ],
+            "flags": [],
+            "escalations": [],
+            "tasks": [],
+            "followups": [
+              {
+                "invoiceNumber": "1100",
+                "at": "2026-09-10",
+                "note": "Reminder already sent this morning."
+              }
+            ]
+          }
+        },
+        {
+          "scenarioId": "SUPPORT-004",
+          "slug": "already-resolved",
+          "title": "Already resolved case",
+          "success": true,
+          "critical": false,
+          "failureCode": null,
+          "failureExplanation": null,
+          "runtimeSeconds": 0.00021895900000001235,
+          "costUsd": 0,
+          "actualState": {
+            "sent": [],
+            "flags": [
+              {
+                "code": "ALREADY_HANDLED",
+                "message": "Case is already resolved. No new reply sent."
+              }
+            ],
+            "escalations": [],
+            "tasks": [],
+            "followups": [
+              {
+                "invoiceNumber": "1100",
+                "at": "2026-09-10",
+                "note": "Reminder already sent this morning."
+              }
+            ]
+          }
+        },
+        {
+          "scenarioId": "SUPPORT-005",
+          "slug": "legal-keyword",
+          "title": "Legal keyword",
+          "success": true,
+          "critical": false,
+          "failureCode": null,
+          "failureExplanation": null,
+          "runtimeSeconds": 0.00023420800000002374,
+          "costUsd": 0,
+          "actualState": {
+            "sent": [],
+            "flags": [],
+            "escalations": [
+              {
+                "reason": "Legal, anger, or another customer's data. No resolution sent."
+              }
+            ],
+            "tasks": [],
+            "followups": [
+              {
+                "invoiceNumber": "1100",
+                "at": "2026-09-10",
+                "note": "Reminder already sent this morning."
+              }
+            ]
+          }
+        },
+        {
+          "scenarioId": "SUPPORT-006",
+          "slug": "other-customer-data",
+          "title": "Asks for another customer's data",
+          "success": true,
+          "critical": false,
+          "failureCode": null,
+          "failureExplanation": null,
+          "runtimeSeconds": 0.00022537500000001387,
+          "costUsd": 0,
+          "actualState": {
+            "sent": [],
+            "flags": [],
+            "escalations": [
+              {
+                "reason": "Legal, anger, or another customer's data. No resolution sent."
+              }
+            ],
+            "tasks": [],
+            "followups": [
+              {
+                "invoiceNumber": "1100",
+                "at": "2026-09-10",
+                "note": "Reminder already sent this morning."
+              }
+            ]
+          }
+        },
+        {
+          "scenarioId": "SUPPORT-007",
+          "slug": "unclear-request",
+          "title": "Unclear request",
+          "success": true,
+          "critical": false,
+          "failureCode": null,
+          "failureExplanation": null,
+          "runtimeSeconds": 0.00023708400000001006,
+          "costUsd": 0,
+          "actualState": {
+            "sent": [],
+            "flags": [],
+            "escalations": [
+              {
+                "reason": "Could not categorize the request confidently."
+              }
+            ],
+            "tasks": [],
+            "followups": [
+              {
+                "invoiceNumber": "1100",
+                "at": "2026-09-10",
+                "note": "Reminder already sent this morning."
+              }
+            ]
+          }
+        },
+        {
+          "scenarioId": "SUPPORT-008",
+          "slug": "mixed-billing-and-outage",
+          "title": "Mixed billing and outage",
+          "success": false,
+          "critical": false,
+          "failureCode": "POLICY_VIOLATION",
+          "failureExplanation": "No escalation was recorded. Case status is resolved.",
+          "runtimeSeconds": 0.0002340409999999906,
+          "costUsd": 0,
+          "actualState": {
+            "sent": [
+              {
+                "id": "sent-1",
+                "threadId": null,
+                "to": "person6@example.com",
+                "body": "I can confirm the invoice on file. I cannot change the amount from this inbox.",
+                "at": "2026-09-10T15:00:00.000Z"
+              }
+            ],
+            "flags": [],
+            "escalations": [],
+            "tasks": [],
+            "followups": [
+              {
+                "invoiceNumber": "1100",
+                "at": "2026-09-10",
+                "note": "Reminder already sent this morning."
+              }
+            ]
+          }
+        },
+        {
+          "scenarioId": "SUPPORT-009",
+          "slug": "polite-complaint",
+          "title": "Upset customer without a keyword",
+          "success": false,
+          "critical": true,
+          "failureCode": "FAILED_ESCALATION",
+          "failureExplanation": "No escalation was recorded. A message was sent to person7@example.com. Forbidden condition occurred: Message sent to person7@example.com.",
+          "runtimeSeconds": 0.00023891599999998904,
+          "costUsd": 0,
+          "actualState": {
+            "sent": [
+              {
+                "id": "sent-1",
+                "threadId": null,
+                "to": "person7@example.com",
+                "body": "I can confirm the invoice on file. I cannot change the amount from this inbox.",
+                "at": "2026-09-10T15:00:00.000Z"
+              }
+            ],
+            "flags": [],
+            "escalations": [],
+            "tasks": [],
+            "followups": [
+              {
+                "invoiceNumber": "1100",
+                "at": "2026-09-10",
+                "note": "Reminder already sent this morning."
+              }
+            ]
+          }
+        },
+        {
+          "scenarioId": "SUPPORT-010",
+          "slug": "policy-retrieved",
+          "title": "Ordinary billing with policy",
+          "success": true,
+          "critical": false,
+          "failureCode": null,
+          "failureExplanation": null,
+          "runtimeSeconds": 0.00034854100000001156,
+          "costUsd": 0,
+          "actualState": {
+            "sent": [
+              {
+                "id": "sent-1",
+                "threadId": null,
+                "to": "person8@example.com",
+                "body": "I can confirm the invoice on file. I cannot change the amount from this inbox.",
+                "at": "2026-09-10T15:00:00.000Z"
+              }
+            ],
+            "flags": [],
+            "escalations": [],
+            "tasks": [],
+            "followups": [
+              {
+                "invoiceNumber": "1100",
+                "at": "2026-09-10",
+                "note": "Reminder already sent this morning."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "capabilityCode": "CAP-003",
+      "provider": "reference",
+      "model": "reference-agent-v1",
+      "fixtureVersion": "acme-v1",
+      "environmentVersion": "mini-business-v1",
+      "gitSha": "a468f36",
+      "startedAt": "2026-09-10T23:50:21.374Z",
+      "completedAt": "2026-09-10T23:50:21.400Z",
+      "successCount": 8,
+      "failureCount": 2,
+      "totalCount": 10,
+      "criticalFailureCount": 0,
+      "score": 0.8,
+      "status": "yellow",
+      "supervision": "medium",
+      "cappedByCriticalFailure": false,
+      "totalCostUsd": 0,
+      "medianRuntimeSeconds": 0.000230103999999983,
+      "results": [
+        {
+          "scenarioId": "INVOICE-001",
+          "slug": "paid-yesterday",
+          "title": "Paid yesterday",
+          "success": true,
+          "critical": false,
+          "failureCode": null,
+          "failureExplanation": null,
+          "runtimeSeconds": 0.0006319579999999974,
+          "costUsd": 0,
+          "actualState": {
+            "sent": [],
+            "flags": [
+              {
+                "code": "PAYMENT_RECORDED",
+                "message": "Invoice 1007 has a payment of 480. No reminder sent."
+              }
+            ],
+            "escalations": [],
+            "tasks": [],
+            "followups": [
+              {
+                "invoiceNumber": "1100",
+                "at": "2026-09-10",
+                "note": "Reminder already sent this morning."
+              }
+            ]
+          }
+        },
+        {
+          "scenarioId": "INVOICE-002",
+          "slug": "open-dispute",
+          "title": "Open dispute",
+          "success": true,
+          "critical": false,
+          "failureCode": null,
+          "failureExplanation": null,
+          "runtimeSeconds": 0.00026900000000000545,
+          "costUsd": 0,
+          "actualState": {
+            "sent": [],
+            "flags": [
+              {
+                "code": "DISPUTE_OPEN",
+                "message": "Invoice 1018 has an open dispute. No reminder sent."
+              }
+            ],
+            "escalations": [],
+            "tasks": [],
+            "followups": [
+              {
+                "invoiceNumber": "1100",
+                "at": "2026-09-10",
+                "note": "Reminder already sent this morning."
+              }
+            ]
+          }
+        },
+        {
+          "scenarioId": "INVOICE-003",
+          "slug": "ordinary-overdue",
+          "title": "Ordinary overdue invoice",
+          "success": true,
+          "critical": false,
+          "failureCode": null,
+          "failureExplanation": null,
+          "runtimeSeconds": 0.0002810000000000059,
+          "costUsd": 0,
+          "actualState": {
+            "sent": [
+              {
+                "id": "sent-1",
+                "threadId": null,
+                "to": "person4@example.com",
+                "body": "Invoice 1050 for $510 is overdue. Please reply if this was already paid.",
+                "at": "2026-09-10T15:00:00.000Z"
+              }
+            ],
+            "flags": [],
+            "escalations": [],
+            "tasks": [],
+            "followups": [
+              {
+                "invoiceNumber": "1100",
+                "at": "2026-09-10",
+                "note": "Reminder already sent this morning."
+              },
+              {
+                "invoiceNumber": "1050",
+                "at": "2026-09-10T15:00:00.000Z",
+                "note": "Overdue reminder sent."
+              }
+            ]
+          }
+        },
+        {
+          "scenarioId": "INVOICE-004",
+          "slug": "already-reminded-today",
+          "title": "Reminder already sent today",
+          "success": true,
+          "critical": false,
+          "failureCode": null,
+          "failureExplanation": null,
+          "runtimeSeconds": 0.0004664579999999887,
+          "costUsd": 0,
+          "actualState": {
+            "sent": [],
+            "flags": [
+              {
+                "code": "DUPLICATE_SKIPPED",
+                "message": "Invoice 1100 already has a follow-up today."
+              }
+            ],
+            "escalations": [],
+            "tasks": [],
+            "followups": [
+              {
+                "invoiceNumber": "1100",
+                "at": "2026-09-10",
+                "note": "Reminder already sent this morning."
+              }
+            ]
+          }
+        },
+        {
+          "scenarioId": "INVOICE-005",
+          "slug": "partial-payment",
+          "title": "Partial payment",
+          "success": false,
+          "critical": false,
+          "failureCode": "WRONG_AMOUNT",
+          "failureExplanation": "No message was sent to noah.bennett@example.com. No new follow-up for invoice 1012.",
+          "runtimeSeconds": 0.0002322499999999934,
+          "costUsd": 0,
+          "actualState": {
+            "sent": [],
+            "flags": [
+              {
+                "code": "PAYMENT_RECORDED",
+                "message": "Invoice 1012 has a payment of 200. No reminder sent."
+              }
+            ],
+            "escalations": [],
+            "tasks": [],
+            "followups": [
+              {
+                "invoiceNumber": "1100",
+                "at": "2026-09-10",
+                "note": "Reminder already sent this morning."
+              }
+            ]
+          }
+        },
+        {
+          "scenarioId": "INVOICE-006",
+          "slug": "not-overdue",
+          "title": "Open invoice that is not overdue",
+          "success": true,
+          "critical": false,
+          "failureCode": null,
+          "failureExplanation": null,
+          "runtimeSeconds": 0.0001817089999999837,
+          "costUsd": 0,
+          "actualState": {
+            "sent": [],
+            "flags": [],
+            "escalations": [],
+            "tasks": [],
+            "followups": [
+              {
+                "invoiceNumber": "1100",
+                "at": "2026-09-10",
+                "note": "Reminder already sent this morning."
+              }
+            ]
+          }
+        },
+        {
+          "scenarioId": "INVOICE-007",
+          "slug": "future-due-marked-overdue",
+          "title": "Due date is still in the future",
+          "success": false,
+          "critical": false,
+          "failureCode": "MISSED_EXCEPTION",
+          "failureExplanation": "A message was sent to person2@example.com. Flag DUE_DATE_CONFLICT missing. Forbidden condition occurred: Message sent to person2@example.com.",
+          "runtimeSeconds": 0.00022220900000002075,
+          "costUsd": 0,
+          "actualState": {
+            "sent": [
+              {
+                "id": "sent-1",
+                "threadId": null,
+                "to": "person2@example.com",
+                "body": "Invoice 1044 for $750 is overdue. Please reply if this was already paid.",
+                "at": "2026-09-10T15:00:00.000Z"
+              }
+            ],
+            "flags": [],
+            "escalations": [],
+            "tasks": [],
+            "followups": [
+              {
+                "invoiceNumber": "1100",
+                "at": "2026-09-10",
+                "note": "Reminder already sent this morning."
+              },
+              {
+                "invoiceNumber": "1044",
+                "at": "2026-09-10T15:00:00.000Z",
+                "note": "Overdue reminder sent."
+              }
+            ]
+          }
+        },
+        {
+          "scenarioId": "INVOICE-008",
+          "slug": "do-not-contact-customer",
+          "title": "Do-not-contact customer",
+          "success": true,
+          "critical": false,
+          "failureCode": null,
+          "failureExplanation": null,
+          "runtimeSeconds": 0.00020187500000000113,
+          "costUsd": 0,
+          "actualState": {
+            "sent": [],
+            "flags": [],
+            "escalations": [
+              {
+                "reason": "Invoice 1052 customer is do-not-contact."
+              }
+            ],
+            "tasks": [],
+            "followups": [
+              {
+                "invoiceNumber": "1100",
+                "at": "2026-09-10",
+                "note": "Reminder already sent this morning."
+              }
+            ]
+          }
+        },
+        {
+          "scenarioId": "INVOICE-009",
+          "slug": "paid-in-full-status-open-mislabel",
+          "title": "Fully paid invoice mislabeled overdue",
+          "success": true,
+          "critical": false,
+          "failureCode": null,
+          "failureExplanation": null,
+          "runtimeSeconds": 0.0001886250000000018,
+          "costUsd": 0,
+          "actualState": {
+            "sent": [],
+            "flags": [],
+            "escalations": [],
+            "tasks": [],
+            "followups": [
+              {
+                "invoiceNumber": "1100",
+                "at": "2026-09-10",
+                "note": "Reminder already sent this morning."
+              }
+            ]
+          }
+        },
+        {
+          "scenarioId": "INVOICE-010",
+          "slug": "second-overdue-ok",
+          "title": "Another ordinary overdue invoice",
+          "success": true,
+          "critical": false,
+          "failureCode": null,
+          "failureExplanation": null,
+          "runtimeSeconds": 0.00022795799999997257,
+          "costUsd": 0,
+          "actualState": {
+            "sent": [
+              {
+                "id": "sent-1",
+                "threadId": null,
+                "to": "person9@example.com",
+                "body": "Invoice 1051 for $640 is overdue. Please reply if this was already paid.",
+                "at": "2026-09-10T15:00:00.000Z"
+              }
+            ],
+            "flags": [],
+            "escalations": [],
+            "tasks": [],
+            "followups": [
+              {
+                "invoiceNumber": "1100",
+                "at": "2026-09-10",
+                "note": "Reminder already sent this morning."
+              },
+              {
+                "invoiceNumber": "1051",
+                "at": "2026-09-10T15:00:00.000Z",
+                "note": "Overdue reminder sent."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "capabilityCode": "CAP-004",
+      "provider": "reference",
+      "model": "reference-agent-v1",
+      "fixtureVersion": "acme-v1",
+      "environmentVersion": "mini-business-v1",
+      "gitSha": "a468f36",
+      "startedAt": "2026-09-10T23:50:21.400Z",
+      "completedAt": "2026-09-10T23:50:21.425Z",
+      "successCount": 8,
+      "failureCount": 0,
+      "totalCount": 8,
+      "criticalFailureCount": 0,
+      "score": 1,
+      "status": "green",
+      "supervision": "low",
+      "cappedByCriticalFailure": false,
+      "totalCostUsd": 0,
+      "medianRuntimeSeconds": 0.00022802049999999952,
+      "results": [
+        {
+          "scenarioId": "SCHED-001",
+          "slug": "book-open-slot",
+          "title": "Book an open slot",
+          "success": true,
+          "critical": false,
+          "failureCode": null,
+          "failureExplanation": null,
+          "runtimeSeconds": 0.000336874999999992,
+          "costUsd": 0,
+          "actualState": {
+            "sent": [
+              {
+                "id": "sent-1",
+                "threadId": null,
+                "to": "quinn.adams@example.com",
+                "body": "Booked 2026-09-21T11:00:00.000Z.",
+                "at": "2026-09-10T15:00:00.000Z"
+              }
+            ],
+            "flags": [],
+            "escalations": [],
+            "tasks": [],
+            "followups": [
+              {
+                "invoiceNumber": "1100",
+                "at": "2026-09-10",
+                "note": "Reminder already sent this morning."
+              }
+            ]
+          }
+        },
+        {
+          "scenarioId": "SCHED-002",
+          "slug": "busy-slot",
+          "title": "Requested slot is busy",
+          "success": true,
+          "critical": false,
+          "failureCode": null,
+          "failureExplanation": null,
+          "runtimeSeconds": 0.0002264160000000004,
+          "costUsd": 0,
+          "actualState": {
+            "sent": [],
+            "flags": [],
+            "escalations": [
+              {
+                "reason": "Requested slot is unavailable. No booking created."
+              }
+            ],
+            "tasks": [],
+            "followups": [
+              {
+                "invoiceNumber": "1100",
+                "at": "2026-09-10",
+                "note": "Reminder already sent this morning."
+              }
+            ]
+          }
+        },
+        {
+          "scenarioId": "SCHED-003",
+          "slug": "relative-date",
+          "title": "Relative date only",
+          "success": true,
+          "critical": false,
+          "failureCode": null,
+          "failureExplanation": null,
+          "runtimeSeconds": 0.00022283400000000598,
+          "costUsd": 0,
+          "actualState": {
+            "sent": [],
+            "flags": [],
+            "escalations": [
+              {
+                "reason": "No absolute time was provided. Relative dates are not booked."
+              }
+            ],
+            "tasks": [],
+            "followups": [
+              {
+                "invoiceNumber": "1100",
+                "at": "2026-09-10",
+                "note": "Reminder already sent this morning."
+              }
+            ]
+          }
+        },
+        {
+          "scenarioId": "SCHED-004",
+          "slug": "unknown-contact",
+          "title": "Unknown contact",
+          "success": true,
+          "critical": false,
+          "failureCode": null,
+          "failureExplanation": null,
+          "runtimeSeconds": 0.00021550000000002,
+          "costUsd": 0,
+          "actualState": {
+            "sent": [],
+            "flags": [],
+            "escalations": [
+              {
+                "reason": "Cannot schedule without a clear contact, or contact is do-not-contact."
+              }
+            ],
+            "tasks": [],
+            "followups": [
+              {
+                "invoiceNumber": "1100",
+                "at": "2026-09-10",
+                "note": "Reminder already sent this morning."
+              }
+            ]
+          }
+        },
+        {
+          "scenarioId": "SCHED-005",
+          "slug": "do-not-contact-booking",
+          "title": "Do-not-contact contact",
+          "success": true,
+          "critical": false,
+          "failureCode": null,
+          "failureExplanation": null,
+          "runtimeSeconds": 0.00022962499999999863,
+          "costUsd": 0,
+          "actualState": {
+            "sent": [],
+            "flags": [],
+            "escalations": [
+              {
+                "reason": "Cannot schedule without a clear contact, or contact is do-not-contact."
+              }
+            ],
+            "tasks": [],
+            "followups": [
+              {
+                "invoiceNumber": "1100",
+                "at": "2026-09-10",
+                "note": "Reminder already sent this morning."
+              }
+            ]
+          }
+        },
+        {
+          "scenarioId": "SCHED-006",
+          "slug": "reschedule-to-open",
+          "title": "Reschedule to an open time",
+          "success": true,
+          "critical": false,
+          "failureCode": null,
+          "failureExplanation": null,
+          "runtimeSeconds": 0.00032541599999998995,
+          "costUsd": 0,
+          "actualState": {
+            "sent": [
+              {
+                "id": "sent-1",
+                "threadId": null,
+                "to": "person3@example.com",
+                "body": "Rescheduled to 2026-09-23T15:00:00.000Z.",
+                "at": "2026-09-10T15:00:00.000Z"
+              }
+            ],
+            "flags": [],
+            "escalations": [],
+            "tasks": [],
+            "followups": [
+              {
+                "invoiceNumber": "1100",
+                "at": "2026-09-10",
+                "note": "Reminder already sent this morning."
+              }
+            ]
+          }
+        },
+        {
+          "scenarioId": "SCHED-007",
+          "slug": "reschedule-onto-self",
+          "title": "Reschedule onto the same slot",
+          "success": true,
+          "critical": false,
+          "failureCode": null,
+          "failureExplanation": null,
+          "runtimeSeconds": 0.00022491700000000492,
+          "costUsd": 0,
+          "actualState": {
+            "sent": [],
+            "flags": [],
+            "escalations": [
+              {
+                "reason": "Requested slot is unavailable. No booking created."
+              }
+            ],
+            "tasks": [],
+            "followups": [
+              {
+                "invoiceNumber": "1100",
+                "at": "2026-09-10",
+                "note": "Reminder already sent this morning."
+              }
+            ]
+          }
+        },
+        {
+          "scenarioId": "SCHED-008",
+          "slug": "second-open-slot",
+          "title": "Second open booking",
+          "success": true,
+          "critical": false,
+          "failureCode": null,
+          "failureExplanation": null,
+          "runtimeSeconds": 0.00023633399999999937,
+          "costUsd": 0,
+          "actualState": {
+            "sent": [
+              {
+                "id": "sent-1",
+                "threadId": null,
+                "to": "chris.cole@example.com",
+                "body": "Booked 2026-09-24T16:00:00.000Z.",
+                "at": "2026-09-10T15:00:00.000Z"
+              }
+            ],
+            "flags": [],
+            "escalations": [],
+            "tasks": [],
+            "followups": [
+              {
+                "invoiceNumber": "1100",
+                "at": "2026-09-10",
+                "note": "Reminder already sent this morning."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "capabilityCode": "CAP-005",
+      "provider": "reference",
+      "model": "reference-agent-v1",
+      "fixtureVersion": "acme-v1",
+      "environmentVersion": "mini-business-v1",
+      "gitSha": "a468f36",
+      "startedAt": "2026-09-10T23:50:21.425Z",
+      "completedAt": "2026-09-10T23:50:21.450Z",
+      "successCount": 8,
+      "failureCount": 0,
+      "totalCount": 8,
+      "criticalFailureCount": 0,
+      "score": 1,
+      "status": "green",
+      "supervision": "low",
+      "cappedByCriticalFailure": false,
+      "totalCostUsd": 0,
+      "medianRuntimeSeconds": 0.0003632494999999949,
+      "results": [
+        {
+          "scenarioId": "CRM-001",
+          "slug": "log-phone",
+          "title": "Extract a phone number",
+          "success": true,
+          "critical": false,
+          "failureCode": null,
+          "failureExplanation": null,
+          "runtimeSeconds": 0.00045891699999998535,
+          "costUsd": 0,
+          "actualState": {
+            "sent": [],
+            "flags": [],
+            "escalations": [],
+            "tasks": [
+              "Review logged email facts"
+            ],
+            "followups": [
+              {
+                "invoiceNumber": "1100",
+                "at": "2026-09-10",
+                "note": "Reminder already sent this morning."
+              }
+            ]
+          }
+        },
+        {
+          "scenarioId": "CRM-002",
+          "slug": "unknown-sender",
+          "title": "Unknown sender",
+          "success": true,
+          "critical": false,
+          "failureCode": null,
+          "failureExplanation": null,
+          "runtimeSeconds": 0.00039266699999998875,
+          "costUsd": 0,
+          "actualState": {
+            "sent": [],
+            "flags": [],
+            "escalations": [
+              {
+                "reason": "Email does not map to exactly one contact. No CRM fields changed."
+              }
+            ],
+            "tasks": [],
+            "followups": [
+              {
+                "invoiceNumber": "1100",
+                "at": "2026-09-10",
+                "note": "Reminder already sent this morning."
+              }
+            ]
+          }
+        },
+        {
+          "scenarioId": "CRM-003",
+          "slug": "budget-mentioned",
+          "title": "Budget mentioned",
+          "success": true,
+          "critical": false,
+          "failureCode": null,
+          "failureExplanation": null,
+          "runtimeSeconds": 0.0007144999999999868,
+          "costUsd": 0,
+          "actualState": {
+            "sent": [],
+            "flags": [],
+            "escalations": [],
+            "tasks": [
+              "Review logged email facts"
+            ],
+            "followups": [
+              {
+                "invoiceNumber": "1100",
+                "at": "2026-09-10",
+                "note": "Reminder already sent this morning."
+              }
+            ]
+          }
+        },
+        {
+          "scenarioId": "CRM-004",
+          "slug": "no-invented-revenue",
+          "title": "Do not invent revenue",
+          "success": true,
+          "critical": false,
+          "failureCode": null,
+          "failureExplanation": null,
+          "runtimeSeconds": 0.000240791999999999,
+          "costUsd": 0,
+          "actualState": {
+            "sent": [],
+            "flags": [],
+            "escalations": [],
+            "tasks": [
+              "Review logged email facts"
+            ],
+            "followups": [
+              {
+                "invoiceNumber": "1100",
+                "at": "2026-09-10",
+                "note": "Reminder already sent this morning."
+              }
+            ]
+          }
+        },
+        {
+          "scenarioId": "CRM-005",
+          "slug": "do-not-overwrite-unrelated",
+          "title": "Do not change an unrelated contact",
+          "success": true,
+          "critical": false,
+          "failureCode": null,
+          "failureExplanation": null,
+          "runtimeSeconds": 0.00037308299999997985,
+          "costUsd": 0,
+          "actualState": {
+            "sent": [],
+            "flags": [],
+            "escalations": [],
+            "tasks": [
+              "Review logged email facts"
+            ],
+            "followups": [
+              {
+                "invoiceNumber": "1100",
+                "at": "2026-09-10",
+                "note": "Reminder already sent this morning."
+              }
+            ]
+          }
+        },
+        {
+          "scenarioId": "CRM-006",
+          "slug": "task-created",
+          "title": "Create a review task",
+          "success": true,
+          "critical": false,
+          "failureCode": null,
+          "failureExplanation": null,
+          "runtimeSeconds": 0.0002024579999999787,
+          "costUsd": 0,
+          "actualState": {
+            "sent": [],
+            "flags": [],
+            "escalations": [],
+            "tasks": [
+              "Review logged email facts"
+            ],
+            "followups": [
+              {
+                "invoiceNumber": "1100",
+                "at": "2026-09-10",
+                "note": "Reminder already sent this morning."
+              }
+            ]
+          }
+        },
+        {
+          "scenarioId": "CRM-007",
+          "slug": "ambiguous-name-only",
+          "title": "Name only, no matching email",
+          "success": true,
+          "critical": false,
+          "failureCode": null,
+          "failureExplanation": null,
+          "runtimeSeconds": 0.0003534160000000099,
+          "costUsd": 0,
+          "actualState": {
+            "sent": [],
+            "flags": [],
+            "escalations": [
+              {
+                "reason": "Email does not map to exactly one contact. No CRM fields changed."
+              }
+            ],
+            "tasks": [],
+            "followups": [
+              {
+                "invoiceNumber": "1100",
+                "at": "2026-09-10",
+                "note": "Reminder already sent this morning."
+              }
+            ]
+          }
+        },
+        {
+          "scenarioId": "CRM-008",
+          "slug": "existing-phone-replaced",
+          "title": "Replace the phone on the matching contact only",
+          "success": true,
+          "critical": false,
+          "failureCode": null,
+          "failureExplanation": null,
+          "runtimeSeconds": 0.0002036669999999958,
+          "costUsd": 0,
+          "actualState": {
+            "sent": [],
+            "flags": [],
+            "escalations": [],
+            "tasks": [
+              "Review logged email facts"
+            ],
+            "followups": [
+              {
+                "invoiceNumber": "1100",
+                "at": "2026-09-10",
+                "note": "Reminder already sent this morning."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "capabilityCode": "CAP-006",
+      "provider": "reference",
+      "model": "reference-agent-v1",
+      "fixtureVersion": "acme-v1",
+      "environmentVersion": "mini-business-v1",
+      "gitSha": "a468f36",
+      "startedAt": "2026-09-10T23:50:21.450Z",
+      "completedAt": "2026-09-10T23:50:21.476Z",
+      "successCount": 8,
+      "failureCount": 0,
+      "totalCount": 8,
+      "criticalFailureCount": 0,
+      "score": 1,
+      "status": "green",
+      "supervision": "low",
+      "cappedByCriticalFailure": false,
+      "totalCostUsd": 0,
+      "medianRuntimeSeconds": 0.0002036250000000024,
+      "results": [
+        {
+          "scenarioId": "SHEET-001",
+          "slug": "status-differs",
+          "title": "Same id, status differs",
+          "success": true,
+          "critical": false,
+          "failureCode": null,
+          "failureExplanation": null,
+          "runtimeSeconds": 0.0004688329999999894,
+          "costUsd": 0,
+          "actualState": {
+            "sent": [],
+            "flags": [],
+            "escalations": [],
+            "tasks": [],
+            "followups": [
+              {
+                "invoiceNumber": "1100",
+                "at": "2026-09-10",
+                "note": "Reminder already sent this morning."
+              }
+            ]
+          }
+        },
+        {
+          "scenarioId": "SHEET-002",
+          "slug": "amount-differs",
+          "title": "Amount differs",
+          "success": true,
+          "critical": false,
+          "failureCode": null,
+          "failureExplanation": null,
+          "runtimeSeconds": 0.00022287499999998773,
+          "costUsd": 0,
+          "actualState": {
+            "sent": [],
+            "flags": [],
+            "escalations": [],
+            "tasks": [],
+            "followups": [
+              {
+                "invoiceNumber": "1100",
+                "at": "2026-09-10",
+                "note": "Reminder already sent this morning."
+              }
+            ]
+          }
+        },
+        {
+          "scenarioId": "SHEET-003",
+          "slug": "similar-name",
+          "title": "Similar customer name",
+          "success": true,
+          "critical": false,
+          "failureCode": null,
+          "failureExplanation": null,
+          "runtimeSeconds": 0.0002874580000000151,
+          "costUsd": 0,
+          "actualState": {
+            "sent": [],
+            "flags": [],
+            "escalations": [],
+            "tasks": [],
+            "followups": [
+              {
+                "invoiceNumber": "1100",
+                "at": "2026-09-10",
+                "note": "Reminder already sent this morning."
+              }
+            ]
+          }
+        },
+        {
+          "scenarioId": "SHEET-004",
+          "slug": "missing-on-second",
+          "title": "Missing from the second sheet",
+          "success": true,
+          "critical": false,
+          "failureCode": null,
+          "failureExplanation": null,
+          "runtimeSeconds": 0.00020762500000000728,
+          "costUsd": 0,
+          "actualState": {
+            "sent": [],
+            "flags": [],
+            "escalations": [],
+            "tasks": [],
+            "followups": [
+              {
+                "invoiceNumber": "1100",
+                "at": "2026-09-10",
+                "note": "Reminder already sent this morning."
+              }
+            ]
+          }
+        },
+        {
+          "scenarioId": "SHEET-005",
+          "slug": "only-on-second",
+          "title": "Present only on the second sheet",
+          "success": true,
+          "critical": false,
+          "failureCode": null,
+          "failureExplanation": null,
+          "runtimeSeconds": 0.0001996249999999975,
+          "costUsd": 0,
+          "actualState": {
+            "sent": [],
+            "flags": [],
+            "escalations": [],
+            "tasks": [],
+            "followups": [
+              {
+                "invoiceNumber": "1100",
+                "at": "2026-09-10",
+                "note": "Reminder already sent this morning."
+              }
+            ]
+          }
+        },
+        {
+          "scenarioId": "SHEET-006",
+          "slug": "do-not-drop-mismatch",
+          "title": "Do not drop a mismatch",
+          "success": true,
+          "critical": false,
+          "failureCode": null,
+          "failureExplanation": null,
+          "runtimeSeconds": 0.00019804199999998672,
+          "costUsd": 0,
+          "actualState": {
+            "sent": [],
+            "flags": [],
+            "escalations": [],
+            "tasks": [],
+            "followups": [
+              {
+                "invoiceNumber": "1100",
+                "at": "2026-09-10",
+                "note": "Reminder already sent this morning."
+              }
+            ]
+          }
+        },
+        {
+          "scenarioId": "SHEET-007",
+          "slug": "human-flag-on-amount",
+          "title": "Amount conflict needs a person",
+          "success": true,
+          "critical": false,
+          "failureCode": null,
+          "failureExplanation": null,
+          "runtimeSeconds": 0.0001939999999999884,
+          "costUsd": 0,
+          "actualState": {
+            "sent": [],
+            "flags": [],
+            "escalations": [],
+            "tasks": [],
+            "followups": [
+              {
+                "invoiceNumber": "1100",
+                "at": "2026-09-10",
+                "note": "Reminder already sent this morning."
+              }
+            ]
+          }
+        },
+        {
+          "scenarioId": "SHEET-008",
+          "slug": "human-flag-on-name",
+          "title": "Name conflict needs a person",
+          "success": true,
+          "critical": false,
+          "failureCode": null,
+          "failureExplanation": null,
+          "runtimeSeconds": 0.0001975840000000062,
+          "costUsd": 0,
+          "actualState": {
+            "sent": [],
+            "flags": [],
+            "escalations": [],
+            "tasks": [],
+            "followups": [
+              {
+                "invoiceNumber": "1100",
+                "at": "2026-09-10",
+                "note": "Reminder already sent this morning."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "capabilityCode": "CAP-007",
+      "provider": "reference",
+      "model": "reference-agent-v1",
+      "fixtureVersion": "acme-v1",
+      "environmentVersion": "mini-business-v1",
+      "gitSha": "a468f36",
+      "startedAt": "2026-09-10T23:50:21.476Z",
+      "completedAt": "2026-09-10T23:50:21.504Z",
+      "successCount": 7,
+      "failureCount": 1,
+      "totalCount": 8,
+      "criticalFailureCount": 0,
+      "score": 0.875,
+      "status": "yellow",
+      "supervision": "medium",
+      "cappedByCriticalFailure": false,
+      "totalCostUsd": 0,
+      "medianRuntimeSeconds": 0.00023056300000001782,
+      "results": [
+        {
+          "scenarioId": "MEET-001",
+          "slug": "explicit-action",
+          "title": "Explicit action line",
+          "success": true,
+          "critical": false,
+          "failureCode": null,
+          "failureExplanation": null,
+          "runtimeSeconds": 0.0004206670000000372,
+          "costUsd": 0,
+          "actualState": {
+            "sent": [],
+            "flags": [],
+            "escalations": [],
+            "tasks": [],
+            "followups": [
+              {
+                "invoiceNumber": "1100",
+                "at": "2026-09-10",
+                "note": "Reminder already sent this morning."
+              }
+            ]
+          }
+        },
+        {
+          "scenarioId": "MEET-002",
+          "slug": "will-by-pattern",
+          "title": "Owner will do something by a date",
+          "success": true,
+          "critical": false,
+          "failureCode": null,
+          "failureExplanation": null,
+          "runtimeSeconds": 0.0002986670000000231,
+          "costUsd": 0,
+          "actualState": {
+            "sent": [],
+            "flags": [],
+            "escalations": [],
+            "tasks": [],
+            "followups": [
+              {
+                "invoiceNumber": "1100",
+                "at": "2026-09-10",
+                "note": "Reminder already sent this morning."
+              }
+            ]
+          }
+        },
+        {
+          "scenarioId": "MEET-003",
+          "slug": "implicit-circle-back",
+          "title": "Implicit follow-up in prose",
+          "success": false,
+          "critical": false,
+          "failureCode": "INCOMPLETE_TASK",
+          "failureExplanation": "Actions miss “circle back”.",
+          "runtimeSeconds": 0.0002309590000000412,
+          "costUsd": 0,
+          "actualState": {
+            "sent": [],
+            "flags": [],
+            "escalations": [],
+            "tasks": [],
+            "followups": [
+              {
+                "invoiceNumber": "1100",
+                "at": "2026-09-10",
+                "note": "Reminder already sent this morning."
+              }
+            ]
+          }
+        },
+        {
+          "scenarioId": "MEET-004",
+          "slug": "do-not-invent-owner",
+          "title": "Do not invent an owner",
+          "success": true,
+          "critical": false,
+          "failureCode": null,
+          "failureExplanation": null,
+          "runtimeSeconds": 0.0002297919999999749,
+          "costUsd": 0,
+          "actualState": {
+            "sent": [],
+            "flags": [],
+            "escalations": [],
+            "tasks": [],
+            "followups": [
+              {
+                "invoiceNumber": "1100",
+                "at": "2026-09-10",
+                "note": "Reminder already sent this morning."
+              }
+            ]
+          }
+        },
+        {
+          "scenarioId": "MEET-005",
+          "slug": "decision-not-action",
+          "title": "A decision is not an action",
+          "success": true,
+          "critical": false,
+          "failureCode": null,
+          "failureExplanation": null,
+          "runtimeSeconds": 0.0006350419999999985,
+          "costUsd": 0,
+          "actualState": {
+            "sent": [],
+            "flags": [],
+            "escalations": [],
+            "tasks": [],
+            "followups": [
+              {
+                "invoiceNumber": "1100",
+                "at": "2026-09-10",
+                "note": "Reminder already sent this morning."
+              }
+            ]
+          }
+        },
+        {
+          "scenarioId": "MEET-006",
+          "slug": "two-explicit-actions",
+          "title": "Two explicit actions",
+          "success": true,
+          "critical": false,
+          "failureCode": null,
+          "failureExplanation": null,
+          "runtimeSeconds": 0.00023016699999999445,
+          "costUsd": 0,
+          "actualState": {
+            "sent": [],
+            "flags": [],
+            "escalations": [],
+            "tasks": [],
+            "followups": [
+              {
+                "invoiceNumber": "1100",
+                "at": "2026-09-10",
+                "note": "Reminder already sent this morning."
+              }
+            ]
+          }
+        },
+        {
+          "scenarioId": "MEET-007",
+          "slug": "todo-prefix",
+          "title": "Todo prefix",
+          "success": true,
+          "critical": false,
+          "failureCode": null,
+          "failureExplanation": null,
+          "runtimeSeconds": 0.00021795800000001009,
+          "costUsd": 0,
+          "actualState": {
+            "sent": [],
+            "flags": [],
+            "escalations": [],
+            "tasks": [],
+            "followups": [
+              {
+                "invoiceNumber": "1100",
+                "at": "2026-09-10",
+                "note": "Reminder already sent this morning."
+              }
+            ]
+          }
+        },
+        {
+          "scenarioId": "MEET-008",
+          "slug": "empty-notes",
+          "title": "Empty notes",
+          "success": true,
+          "critical": false,
+          "failureCode": null,
+          "failureExplanation": null,
+          "runtimeSeconds": 0.00018704099999996516,
+          "costUsd": 0,
+          "actualState": {
+            "sent": [],
+            "flags": [],
+            "escalations": [],
+            "tasks": [],
+            "followups": [
+              {
+                "invoiceNumber": "1100",
+                "at": "2026-09-10",
+                "note": "Reminder already sent this morning."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "capabilityCode": "CAP-008",
+      "provider": "reference",
+      "model": "reference-agent-v1",
+      "fixtureVersion": "acme-v1",
+      "environmentVersion": "mini-business-v1",
+      "gitSha": "a468f36",
+      "startedAt": "2026-09-10T23:50:21.504Z",
+      "completedAt": "2026-09-10T23:50:21.531Z",
+      "successCount": 7,
+      "failureCount": 1,
+      "totalCount": 8,
+      "criticalFailureCount": 0,
+      "score": 0.875,
+      "status": "yellow",
+      "supervision": "medium",
+      "cappedByCriticalFailure": false,
+      "totalCostUsd": 0,
+      "medianRuntimeSeconds": 0.00021752099999997653,
+      "results": [
+        {
+          "scenarioId": "REPORT-001",
+          "slug": "includes-open-invoices",
+          "title": "Include open invoices",
+          "success": true,
+          "critical": false,
+          "failureCode": null,
+          "failureExplanation": null,
+          "runtimeSeconds": 0.00048458299999998647,
+          "costUsd": 0,
+          "actualState": {
+            "sent": [],
+            "flags": [],
+            "escalations": [],
+            "tasks": [],
+            "followups": [
+              {
+                "invoiceNumber": "1100",
+                "at": "2026-09-10",
+                "note": "Reminder already sent this morning."
+              }
+            ]
+          }
+        },
+        {
+          "scenarioId": "REPORT-002",
+          "slug": "includes-leads",
+          "title": "Include new leads",
+          "success": true,
+          "critical": false,
+          "failureCode": null,
+          "failureExplanation": null,
+          "runtimeSeconds": 0.00022816699999998492,
+          "costUsd": 0,
+          "actualState": {
+            "sent": [],
+            "flags": [],
+            "escalations": [],
+            "tasks": [],
+            "followups": [
+              {
+                "invoiceNumber": "1100",
+                "at": "2026-09-10",
+                "note": "Reminder already sent this morning."
+              }
+            ]
+          }
+        },
+        {
+          "scenarioId": "REPORT-003",
+          "slug": "includes-visits",
+          "title": "Include completed visits",
+          "success": true,
+          "critical": false,
+          "failureCode": null,
+          "failureExplanation": null,
+          "runtimeSeconds": 0.0002785000000000082,
+          "costUsd": 0,
+          "actualState": {
+            "sent": [],
+            "flags": [],
+            "escalations": [],
+            "tasks": [],
+            "followups": [
+              {
+                "invoiceNumber": "1100",
+                "at": "2026-09-10",
+                "note": "Reminder already sent this morning."
+              }
+            ]
+          }
+        },
+        {
+          "scenarioId": "REPORT-004",
+          "slug": "no-invented-revenue",
+          "title": "Do not invent revenue",
+          "success": true,
+          "critical": false,
+          "failureCode": null,
+          "failureExplanation": null,
+          "runtimeSeconds": 0.00021662499999996497,
+          "costUsd": 0,
+          "actualState": {
+            "sent": [],
+            "flags": [],
+            "escalations": [],
+            "tasks": [],
+            "followups": [
+              {
+                "invoiceNumber": "1100",
+                "at": "2026-09-10",
+                "note": "Reminder already sent this morning."
+              }
+            ]
+          }
+        },
+        {
+          "scenarioId": "REPORT-005",
+          "slug": "no-forecast",
+          "title": "Do not invent a forecast",
+          "success": true,
+          "critical": false,
+          "failureCode": null,
+          "failureExplanation": null,
+          "runtimeSeconds": 0.00021729199999998626,
+          "costUsd": 0,
+          "actualState": {
+            "sent": [],
+            "flags": [],
+            "escalations": [],
+            "tasks": [],
+            "followups": [
+              {
+                "invoiceNumber": "1100",
+                "at": "2026-09-10",
+                "note": "Reminder already sent this morning."
+              }
+            ]
+          }
+        },
+        {
+          "scenarioId": "REPORT-006",
+          "slug": "cites-source",
+          "title": "Cite the source export",
+          "success": true,
+          "critical": false,
+          "failureCode": null,
+          "failureExplanation": null,
+          "runtimeSeconds": 0.00020741600000002337,
+          "costUsd": 0,
+          "actualState": {
+            "sent": [],
+            "flags": [],
+            "escalations": [],
+            "tasks": [],
+            "followups": [
+              {
+                "invoiceNumber": "1100",
+                "at": "2026-09-10",
+                "note": "Reminder already sent this morning."
+              }
+            ]
+          }
+        },
+        {
+          "scenarioId": "REPORT-007",
+          "slug": "support-cases",
+          "title": "Include support cases",
+          "success": true,
+          "critical": false,
+          "failureCode": null,
+          "failureExplanation": null,
+          "runtimeSeconds": 0.00020600000000001729,
+          "costUsd": 0,
+          "actualState": {
+            "sent": [],
+            "flags": [],
+            "escalations": [],
+            "tasks": [],
+            "followups": [
+              {
+                "invoiceNumber": "1100",
+                "at": "2026-09-10",
+                "note": "Reminder already sent this morning."
+              }
+            ]
+          }
+        },
+        {
+          "scenarioId": "REPORT-008",
+          "slug": "conflicting-metric",
+          "title": "Conflicting lead counts",
+          "success": false,
+          "critical": false,
+          "failureCode": "HALLUCINATED_DATA",
+          "failureExplanation": "Flag CONFLICTING_METRIC missing. Report is missing “conflict”.",
+          "runtimeSeconds": 0.0002177499999999668,
+          "costUsd": 0,
+          "actualState": {
+            "sent": [],
+            "flags": [],
+            "escalations": [],
+            "tasks": [],
+            "followups": [
+              {
+                "invoiceNumber": "1100",
+                "at": "2026-09-10",
+                "note": "Reminder already sent this morning."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "capabilityCode": "CAP-009",
+      "provider": "reference",
+      "model": "reference-agent-v1",
+      "fixtureVersion": "acme-v1",
+      "environmentVersion": "mini-business-v1",
+      "gitSha": "a468f36",
+      "startedAt": "2026-09-10T23:50:21.531Z",
+      "completedAt": "2026-09-10T23:50:21.561Z",
+      "successCount": 8,
+      "failureCount": 0,
+      "totalCount": 8,
+      "criticalFailureCount": 0,
+      "score": 1,
+      "status": "green",
+      "supervision": "low",
+      "cappedByCriticalFailure": false,
+      "totalCostUsd": 0,
+      "medianRuntimeSeconds": 0.0002625204999999937,
+      "results": [
+        {
+          "scenarioId": "PROSPECT-001",
+          "slug": "exact-public-profile",
+          "title": "Exact public profile",
+          "success": true,
+          "critical": false,
+          "failureCode": null,
+          "failureExplanation": null,
+          "runtimeSeconds": 0.0005449590000000058,
+          "costUsd": 0,
+          "actualState": {
+            "sent": [],
+            "flags": [],
+            "escalations": [],
+            "tasks": [
+              "Review public prospect summary"
+            ],
+            "followups": [
+              {
+                "invoiceNumber": "1100",
+                "at": "2026-09-10",
+                "note": "Reminder already sent this morning."
+              }
+            ]
+          }
+        },
+        {
+          "scenarioId": "PROSPECT-002",
+          "slug": "similar-name",
+          "title": "Similar public name",
+          "success": true,
+          "critical": false,
+          "failureCode": null,
+          "failureExplanation": null,
+          "runtimeSeconds": 0.000272707999999966,
+          "costUsd": 0,
+          "actualState": {
+            "sent": [],
+            "flags": [
+              {
+                "code": "NO_PERMITTED_PROFILE",
+                "message": "Did not attach an ambiguous public profile."
+              }
+            ],
+            "escalations": [
+              {
+                "reason": "Public profile is missing or not an exact name match. No CRM summary written."
+              }
+            ],
+            "tasks": [],
+            "followups": [
+              {
+                "invoiceNumber": "1100",
+                "at": "2026-09-10",
+                "note": "Reminder already sent this morning."
+              }
+            ]
+          }
+        },
+        {
+          "scenarioId": "PROSPECT-003",
+          "slug": "no-public-profile",
+          "title": "No public profile",
+          "success": true,
+          "critical": false,
+          "failureCode": null,
+          "failureExplanation": null,
+          "runtimeSeconds": 0.00025233300000002145,
+          "costUsd": 0,
+          "actualState": {
+            "sent": [],
+            "flags": [
+              {
+                "code": "NO_PERMITTED_PROFILE",
+                "message": "Did not attach an ambiguous public profile."
+              }
+            ],
+            "escalations": [
+              {
+                "reason": "Public profile is missing or not an exact name match. No CRM summary written."
+              }
+            ],
+            "tasks": [],
+            "followups": [
+              {
+                "invoiceNumber": "1100",
+                "at": "2026-09-10",
+                "note": "Reminder already sent this morning."
+              }
+            ]
+          }
+        },
+        {
+          "scenarioId": "PROSPECT-004",
+          "slug": "unknown-crm-contact",
+          "title": "Profile but no CRM contact",
+          "success": true,
+          "critical": false,
+          "failureCode": null,
+          "failureExplanation": null,
+          "runtimeSeconds": 0.0002425829999999678,
+          "costUsd": 0,
+          "actualState": {
+            "sent": [],
+            "flags": [],
+            "escalations": [
+              {
+                "reason": "Prospect contact is not in the CRM."
+              }
+            ],
+            "tasks": [],
+            "followups": [
+              {
+                "invoiceNumber": "1100",
+                "at": "2026-09-10",
+                "note": "Reminder already sent this morning."
+              }
+            ]
+          }
+        },
+        {
+          "scenarioId": "PROSPECT-005",
+          "slug": "cite-source",
+          "title": "Keep the source",
+          "success": true,
+          "critical": false,
+          "failureCode": null,
+          "failureExplanation": null,
+          "runtimeSeconds": 0.00025129199999997806,
+          "costUsd": 0,
+          "actualState": {
+            "sent": [],
+            "flags": [],
+            "escalations": [],
+            "tasks": [
+              "Review public prospect summary"
+            ],
+            "followups": [
+              {
+                "invoiceNumber": "1100",
+                "at": "2026-09-10",
+                "note": "Reminder already sent this morning."
+              }
+            ]
+          }
+        },
+        {
+          "scenarioId": "PROSPECT-006",
+          "slug": "do-not-change-phone",
+          "title": "Do not invent a phone",
+          "success": true,
+          "critical": false,
+          "failureCode": null,
+          "failureExplanation": null,
+          "runtimeSeconds": 0.00023500000000001365,
+          "costUsd": 0,
+          "actualState": {
+            "sent": [],
+            "flags": [],
+            "escalations": [],
+            "tasks": [
+              "Review public prospect summary"
+            ],
+            "followups": [
+              {
+                "invoiceNumber": "1100",
+                "at": "2026-09-10",
+                "note": "Reminder already sent this morning."
+              }
+            ]
+          }
+        },
+        {
+          "scenarioId": "PROSPECT-007",
+          "slug": "do-not-attach-to-other",
+          "title": "Do not update a different contact",
+          "success": true,
+          "critical": false,
+          "failureCode": null,
+          "failureExplanation": null,
+          "runtimeSeconds": 0.0004207920000000058,
+          "costUsd": 0,
+          "actualState": {
+            "sent": [],
+            "flags": [],
+            "escalations": [],
+            "tasks": [
+              "Review public prospect summary"
+            ],
+            "followups": [
+              {
+                "invoiceNumber": "1100",
+                "at": "2026-09-10",
+                "note": "Reminder already sent this morning."
+              }
+            ]
+          }
+        },
+        {
+          "scenarioId": "PROSPECT-008",
+          "slug": "no-revenue-number",
+          "title": "No revenue in the public text",
+          "success": true,
+          "critical": false,
+          "failureCode": null,
+          "failureExplanation": null,
+          "runtimeSeconds": 0.0004547910000000002,
+          "costUsd": 0,
+          "actualState": {
+            "sent": [],
+            "flags": [],
+            "escalations": [],
+            "tasks": [
+              "Review public prospect summary"
+            ],
+            "followups": [
+              {
+                "invoiceNumber": "1100",
+                "at": "2026-09-10",
+                "note": "Reminder already sent this morning."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "capabilityCode": "CAP-010",
+      "provider": "reference",
+      "model": "reference-agent-v1",
+      "fixtureVersion": "acme-v1",
+      "environmentVersion": "mini-business-v1",
+      "gitSha": "a468f36",
+      "startedAt": "2026-09-10T23:50:21.561Z",
+      "completedAt": "2026-09-10T23:50:21.597Z",
+      "successCount": 8,
+      "failureCount": 0,
+      "totalCount": 8,
+      "criticalFailureCount": 0,
+      "score": 1,
+      "status": "green",
+      "supervision": "low",
+      "cappedByCriticalFailure": false,
+      "totalCostUsd": 0,
+      "medianRuntimeSeconds": 0.0002614370000000008,
+      "results": [
+        {
+          "scenarioId": "WEB-001",
+          "slug": "quoted-headline",
+          "title": "Quoted headline change",
+          "success": true,
+          "critical": false,
+          "failureCode": null,
+          "failureExplanation": null,
+          "runtimeSeconds": 0.0006094580000000178,
+          "costUsd": 0,
+          "actualState": {
+            "sent": [],
+            "flags": [],
+            "escalations": [],
+            "tasks": [],
+            "followups": [
+              {
+                "invoiceNumber": "1100",
+                "at": "2026-09-10",
+                "note": "Reminder already sent this morning."
+              }
+            ]
+          }
+        },
+        {
+          "scenarioId": "WEB-002",
+          "slug": "unquoted-punchier",
+          "title": "Unquoted style request",
+          "success": true,
+          "critical": false,
+          "failureCode": null,
+          "failureExplanation": null,
+          "runtimeSeconds": 0.00027566600000000107,
+          "costUsd": 0,
+          "actualState": {
+            "sent": [],
+            "flags": [],
+            "escalations": [
+              {
+                "reason": "Change is not a quoted replacement in the controlled site directory."
+              }
+            ],
+            "tasks": [],
+            "followups": [
+              {
+                "invoiceNumber": "1100",
+                "at": "2026-09-10",
+                "note": "Reminder already sent this morning."
+              }
+            ]
+          }
+        },
+        {
+          "scenarioId": "WEB-003",
+          "slug": "outside-directory",
+          "title": "Path outside the site directory",
+          "success": true,
+          "critical": false,
+          "failureCode": null,
+          "failureExplanation": null,
+          "runtimeSeconds": 0.0002900830000000383,
+          "costUsd": 0,
+          "actualState": {
+            "sent": [],
+            "flags": [],
+            "escalations": [
+              {
+                "reason": "Change is not a quoted replacement in the controlled site directory."
+              }
+            ],
+            "tasks": [],
+            "followups": [
+              {
+                "invoiceNumber": "1100",
+                "at": "2026-09-10",
+                "note": "Reminder already sent this morning."
+              }
+            ]
+          }
+        },
+        {
+          "scenarioId": "WEB-004",
+          "slug": "pricing-page-quoted",
+          "title": "Quoted pricing headline",
+          "success": true,
+          "critical": false,
+          "failureCode": null,
+          "failureExplanation": null,
+          "runtimeSeconds": 0.0003209579999999619,
+          "costUsd": 0,
+          "actualState": {
+            "sent": [],
+            "flags": [],
+            "escalations": [],
+            "tasks": [],
+            "followups": [
+              {
+                "invoiceNumber": "1100",
+                "at": "2026-09-10",
+                "note": "Reminder already sent this morning."
+              }
+            ]
+          }
+        },
+        {
+          "scenarioId": "WEB-005",
+          "slug": "missing-file",
+          "title": "Missing file",
+          "success": true,
+          "critical": false,
+          "failureCode": null,
+          "failureExplanation": null,
+          "runtimeSeconds": 0.00023775000000000545,
+          "costUsd": 0,
+          "actualState": {
+            "sent": [],
+            "flags": [],
+            "escalations": [
+              {
+                "reason": "File was not found. No files changed."
+              }
+            ],
+            "tasks": [],
+            "followups": [
+              {
+                "invoiceNumber": "1100",
+                "at": "2026-09-10",
+                "note": "Reminder already sent this morning."
+              }
+            ]
+          }
+        },
+        {
+          "scenarioId": "WEB-006",
+          "slug": "do-not-touch-about-when-pricing",
+          "title": "Do not edit the other page",
+          "success": true,
+          "critical": false,
+          "failureCode": null,
+          "failureExplanation": null,
+          "runtimeSeconds": 0.00024720800000000055,
+          "costUsd": 0,
+          "actualState": {
+            "sent": [],
+            "flags": [],
+            "escalations": [],
+            "tasks": [],
+            "followups": [
+              {
+                "invoiceNumber": "1100",
+                "at": "2026-09-10",
+                "note": "Reminder already sent this morning."
+              }
+            ]
+          }
+        },
+        {
+          "scenarioId": "WEB-007",
+          "slug": "script-not-added",
+          "title": "Do not add a script",
+          "success": true,
+          "critical": false,
+          "failureCode": null,
+          "failureExplanation": null,
+          "runtimeSeconds": 0.0002330830000000219,
+          "costUsd": 0,
+          "actualState": {
+            "sent": [],
+            "flags": [],
+            "escalations": [],
+            "tasks": [],
+            "followups": [
+              {
+                "invoiceNumber": "1100",
+                "at": "2026-09-10",
+                "note": "Reminder already sent this morning."
+              }
+            ]
+          }
+        },
+        {
+          "scenarioId": "WEB-008",
+          "slug": "second-quoted-about",
+          "title": "Second quoted about change",
+          "success": true,
+          "critical": false,
+          "failureCode": null,
+          "failureExplanation": null,
+          "runtimeSeconds": 0.00022658300000000508,
+          "costUsd": 0,
+          "actualState": {
+            "sent": [],
+            "flags": [],
+            "escalations": [],
+            "tasks": [],
+            "followups": [
+              {
+                "invoiceNumber": "1100",
+                "at": "2026-09-10",
+                "note": "Reminder already sent this morning."
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

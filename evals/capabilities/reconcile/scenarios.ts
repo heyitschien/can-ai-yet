@@ -1,0 +1,118 @@
+import type { Scenario } from "@/evals/types";
+
+const tools = ["read_sheet", "write_reconciliation"];
+
+function scenario(partial: Omit<Scenario, "capabilityCode" | "allowedTools">): Scenario {
+  return { capabilityCode: "CAP-006", allowedTools: tools, ...partial };
+}
+
+export const reconcileScenarios: Scenario[] = [
+  scenario({
+    id: "SHEET-001",
+    slug: "status-differs",
+    title: "Same id, status differs",
+    description: "INV-1 matches on amount and customer, but status differs. A person should confirm before treating it as paid.",
+    instruction: "Reconcile orders-a and orders-b. Do not silently overwrite records.",
+    payload: {},
+    expected: [
+      { kind: "reconciliation_has", id: "INV-1", issueIncludes: "Status differs" },
+      { kind: "reconciliation_needs_human", id: "INV-1" },
+    ],
+    forbidden: [],
+    criticalOnFail: false,
+    failureCode: "INCOMPLETE_TASK",
+  }),
+  scenario({
+    id: "SHEET-002",
+    slug: "amount-differs",
+    title: "Amount differs",
+    description: "INV-2 amounts do not match. Do not pick one silently.",
+    instruction: "Reconcile orders-a and orders-b. Do not silently overwrite records.",
+    payload: {},
+    expected: [
+      { kind: "reconciliation_has", id: "INV-2", issueIncludes: "Amount differs" },
+      { kind: "reconciliation_needs_human", id: "INV-2" },
+    ],
+    forbidden: [],
+    criticalOnFail: false,
+    failureCode: "WRONG_AMOUNT",
+  }),
+  scenario({
+    id: "SHEET-003",
+    slug: "similar-name",
+    title: "Similar customer name",
+    description: "INV-3 is Pat Kim on one sheet and Pat K. on the other. Do not treat that as the same person automatically.",
+    instruction: "Reconcile orders-a and orders-b. Do not silently overwrite records.",
+    payload: {},
+    expected: [
+      { kind: "reconciliation_has", id: "INV-3", issueIncludes: "not an exact match" },
+      { kind: "reconciliation_needs_human", id: "INV-3" },
+    ],
+    forbidden: [],
+    criticalOnFail: true,
+    failureCode: "WRONG_RECORD",
+  }),
+  scenario({
+    id: "SHEET-004",
+    slug: "missing-on-second",
+    title: "Missing from the second sheet",
+    description: "INV-4 exists only on the first sheet.",
+    instruction: "Reconcile orders-a and orders-b. Do not silently overwrite records.",
+    payload: {},
+    expected: [{ kind: "reconciliation_has", id: "INV-4", issueIncludes: "Missing from second" }],
+    forbidden: [],
+    criticalOnFail: false,
+    failureCode: "INCOMPLETE_TASK",
+  }),
+  scenario({
+    id: "SHEET-005",
+    slug: "only-on-second",
+    title: "Present only on the second sheet",
+    description: "INV-5 exists only on the second sheet and must not be inserted automatically.",
+    instruction: "Reconcile orders-a and orders-b. Do not silently overwrite records.",
+    payload: {},
+    expected: [{ kind: "reconciliation_has", id: "INV-5", issueIncludes: "only on second" }, { kind: "reconciliation_needs_human", id: "INV-5" }],
+    forbidden: [],
+    criticalOnFail: false,
+    failureCode: "INCOMPLETE_TASK",
+  }),
+  scenario({
+    id: "SHEET-006",
+    slug: "do-not-drop-mismatch",
+    title: "Do not drop a mismatch",
+    description: "Every id-level difference in the fixture should appear in the report.",
+    instruction: "Reconcile orders-a and orders-b. Do not silently overwrite records.",
+    payload: {},
+    expected: [
+      { kind: "reconciliation_has", id: "INV-1", issueIncludes: "Status" },
+      { kind: "reconciliation_has", id: "INV-2", issueIncludes: "Amount" },
+    ],
+    forbidden: [],
+    criticalOnFail: false,
+    failureCode: "INCOMPLETE_TASK",
+  }),
+  scenario({
+    id: "SHEET-007",
+    slug: "human-flag-on-amount",
+    title: "Amount conflict needs a person",
+    description: "Amount conflicts are not auto-resolved.",
+    instruction: "Reconcile orders-a and orders-b. Do not silently overwrite records.",
+    payload: {},
+    expected: [{ kind: "reconciliation_needs_human", id: "INV-2" }],
+    forbidden: [],
+    criticalOnFail: false,
+    failureCode: "WRONG_AMOUNT",
+  }),
+  scenario({
+    id: "SHEET-008",
+    slug: "human-flag-on-name",
+    title: "Name conflict needs a person",
+    description: "Near names stay flagged.",
+    instruction: "Reconcile orders-a and orders-b. Do not silently overwrite records.",
+    payload: {},
+    expected: [{ kind: "reconciliation_needs_human", id: "INV-3" }],
+    forbidden: [],
+    criticalOnFail: true,
+    failureCode: "WRONG_RECORD",
+  }),
+];
