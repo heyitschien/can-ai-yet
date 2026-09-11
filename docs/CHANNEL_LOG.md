@@ -25,7 +25,9 @@ Branch: `codex/cay-20260910-07-rereview` (review artifacts only; PR #2 untouched
 
 Report: [CAY-20260910-07](reviews/CAY-20260910-07.md)
 
-Handoff: Issue #1, receipt `CAY-20260910-07`; review commit and draft evidence PR linked in the verdict.
+Commit: `2549629`  
+PR: https://github.com/heyitschien/can-ai-yet/pull/5 (draft, review evidence only)  
+Handoff: Issue #1, receipt `CAY-20260910-07`
 
 Next: coordinator review and bounded corrections. Paid-smoke-test readiness NO. No merge, paid call, production migration, publication, or Issue #4 work.
 
