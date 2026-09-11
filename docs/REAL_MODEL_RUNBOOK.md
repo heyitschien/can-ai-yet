@@ -172,7 +172,7 @@ Expected observed range: about $0.36 to $0.50. Planning ceiling: about $1.00. Cl
 
 The $0.08 reserve is above the largest saved Sonnet request ($0.012861) and below the $1.00 cap. A single reply above $0.08 stops the run. That stop is not a 12-scenario score.
 
-Preflight on 2026-09-11, before any paid request: `anthropic/claude-sonnet-4.6` was listed, the `anthropic` pin was available, and that route was $3/M input and $15/M output. The local key still had a $0.25 weekly limit and about $0.006 remaining. That fails the $1.50 remaining-credit rule. Do not execute this command until a later receipt shows remaining key credit of at least $1.50.
+The first preflight failed because the old key still had a $0.25 weekly limit. A later key with a $2 limit and $2 remaining passed the same price and pin check. That one authorized run was then executed and saved. Do not run this command again without a new spend receipt.
 
 ## What not to do
 

@@ -83,12 +83,13 @@ Cost engineering may shorten redundant context or stop a loop. It must not chang
 
 ### Observed signal, not a percentage
 
-On 2026-09-11, `anthropic/claude-sonnet-4.6` pinned to Anthropic completed LEAD-001 twice under closely related heads:
+On 2026-09-11, `anthropic/claude-sonnet-4.6` pinned to Anthropic completed LEAD-001 three times under related heads:
 
 - qualification on `6b1959e`: valid pass, $0.04122, 4 requests;
-- later full-suite trial on `d7d4d0d`: valid fail, missing the follow-up task, $0.030465, 3 requests.
+- later full-suite trial on `d7d4d0d`: valid fail, missing the follow-up task, $0.030465, 3 requests;
+- full-suite trial on `d7504c0`: valid fail, missing the follow-up note, $0.031935, 3 requests.
 
-That is `1 pass / 2 observed LEAD-001 trials`. The git SHAs differ by the tool-trace commit, so they are not one frozen experiment. Report them as two observations. Do not write a reliability percentage from them.
+That is `1 pass / 3 observed LEAD-001 trials`. The git SHAs are not one frozen experiment. Report them as three observations. Do not write a reliability percentage from them.
 
 This is why CanAIYet has to measure task outcome, repeatability, failure mode, cost, tokens, and runtime together. Capability is not the same as reliability.
 
