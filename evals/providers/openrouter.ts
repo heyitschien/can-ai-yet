@@ -409,7 +409,7 @@ export class OpenRouterProvider implements AgentProvider {
         tool_calls: parsed.choice.toolCalls.length > 0 ? parsed.choice.toolCalls : undefined,
       });
       if (parsed.choice.toolCalls.length === 0) {
-        return { toolsCalled, finished: true, usage };
+        return { toolsCalled, finished: true, usage, toolTrace };
       }
       if (turn === this.config.maxTurns) {
         const message = "Stopped at the turn budget with unanswered tool calls. Those calls were not applied. This is a scored unfinished run, not a broken experiment.";
