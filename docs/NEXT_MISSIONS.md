@@ -78,6 +78,8 @@ The canonical product promise is not “we designed tests.” It is “we test r
 
 Implement one provider correctly. The architecture already anticipates provider adapters; there is no need to build a multi-model router yet.
 
+Preparation status: an OpenRouter CAP-001 adapter, dry-run command, and unpublished persistence path exist. No paid run has been executed or accepted. See `REAL_MODEL_RUNBOOK.md`.
+
 ## Acceptance
 
 All CAP-001 scenarios can execute against a real model through the common provider boundary, and the result is reproducible and distinguishable from the reference baseline.

@@ -15,6 +15,19 @@ Two lists. Do not treat them as the same thing.
 
 `ORIGIN_AND_DECISION_TRAIL.md` and `EXPLAINED_LIKE_IM_FIVE.md` are explanation, not authority. `FOUR_AGENT_SYSTEM_SUMMARY.md` is a refresher, not a second architecture. `can-ai-yet-status.pdf` is a dated human snapshot, not a work order.
 
+## Human reading order
+
+These explain the product. They do not outrank the authority list above.
+
+1. `ARCHITECTURE.md` — how the website, lab, model, judge, and evidence fit together.
+2. `ACME_SERVICES_LAB.md` — the fictional company and tools.
+3. `METHODOLOGY.md` — how a scenario is graded.
+4. `MODEL_EVALUATION_STRATEGY.md` — which configurations to test, and why one gateway is enough.
+5. `EVIDENCE_SOURCE_OF_TRUTH_PLAN.md` — why headline and detail must come from the same accepted run.
+6. `REAL_MODEL_RUNBOOK.md` — how a human runs or refuses a CAP-001 OpenRouter test.
+7. `FOUR_AGENT_SYSTEM.md` — who scouts, runs, judges, and publishes.
+8. `NEXT_MISSIONS.md` — what should happen next.
+
 ## First read for a fresh agent
 
 1. This index.
@@ -32,6 +45,8 @@ The canonical lab roles are **Scout, Test Runner, Judge, and Publisher**. The op
 ## Operational memory
 
 GitHub Issue #1 — **Agent Communication Channel — CanAIYet Mission Control** — is the live cross-agent ledger for current work orders, ACKs, evidence, review verdicts, blockers, and accepted handoffs.
+
+`CHANNEL_LOG.md` is the short scan log. Newest entry first. It does not replace Issue #1.
 
 ## Stable rule
 

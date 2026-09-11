@@ -154,13 +154,27 @@ The reviewer should verify, where applicable:
 
 Acceptance belongs in Issue #1 with an explicit `ACCEPTED` verdict and receipt ID.
 
-## 10. Communication hygiene
+## 10. Finish the slice before you stop
+
+Do this at the end of every bounded slice. Do not wait for the human to ask.
+
+1. Commit the work. Do not commit secrets.
+2. Push the branch.
+3. Open or update a **draft** PR. Do not merge.
+4. Post the handoff on Issue #1 using the receipt template. Include branch, SHA, and PR link.
+5. Append one short entry to `docs/CHANNEL_LOG.md` (newest first).
+
+Chat is not the record. If it is not in the commit, the issue, and the channel log, it did not happen.
+
+Builder still stops at `READY_FOR_REVIEW`. Acceptance stays a separate Issue #1 verdict. Merge, publish, secrets, and paid model runs stay human gates.
+
+## 11. Communication hygiene
 
 Issue #1 is the operational ledger, not a dumping ground. Keep comments concise enough for another agent to read quickly, but include links/SHAs and failure details needed to independently verify the work.
 
 If discussion becomes a separate product decision, create a dedicated document or issue and link it back to Issue #1. The persistent channel should always retain the current state and the next handoff.
 
-## 11. Durable shared memory
+## 12. Durable shared memory
 
 No agent should depend on another agent's private conversational memory to know project state.
 
@@ -170,6 +184,7 @@ Project memory is reconstructed from:
 canonical docs
 + agent-system docs
 + GitHub Issue #1 receipts
++ docs/CHANNEL_LOG.md
 + commits / PRs
 + accepted evaluation artifacts / Supabase rows
 ```

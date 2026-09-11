@@ -1,0 +1,16 @@
+---
+description: Finish every slice with commit, push, handoff, and channel log
+alwaysApply: true
+---
+
+# Finish the slice
+
+When a bounded slice is ready, do not stop in chat. Do this before you tell the human you are done:
+
+1. Commit the work. Never commit secrets.
+2. Push the branch.
+3. Open or update a draft PR. Do not merge.
+4. Post the handoff on GitHub Issue #1 with receipt, SHA, and PR link.
+5. Append one newest-first entry to `docs/CHANNEL_LOG.md`.
+
+If it is not in the commit, the issue, and the channel log, it did not happen. Acceptance and merge stay human gates.

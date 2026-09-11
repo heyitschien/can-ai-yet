@@ -37,6 +37,9 @@ yarn-error.log*
 # vercel
 .vercel
 
+# real-model review artifacts (not accepted evidence)
+/evals/runs/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
