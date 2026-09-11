@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Can AI Yet — what we built</title>
+  <style>
+    @page { size: letter; margin: 0.62in 0.7in; }
+    :root {
+      --ink: #1a2332;
+      --ink-soft: #3d4f63;
+      --ink-muted: #5c6b7a;
+      --paper: #faf9f6;
+      --paper-warm: #f3f0ea;
+      --line: #e2ddd4;
+      --primary: #0f766e;
+      --primary-soft: #e7f4f1;
+      --highlight: #0f766e;
+      --accent: #b45309;
+      --accent-bg: #fef3e2;
+      --danger: #b42318;
+      --danger-bg: #fef2f2;
+      --success: #047857;
+      --success-bg: #ecfdf5;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+      font-size: 10.5pt;
+      line-height: 1.5;
+      color: var(--ink);
+      background: var(--paper);
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    .doc { max-width: 7.3in; margin: 0 auto; }
+    .cover {
+      background: linear-gradient(135deg, #134e4a 0%, #0f766e 55%, #155e75 100%);
+      color: white;
+      border-radius: 14px;
+      padding: 22px 24px 18px;
+      margin-bottom: 14px;
+    }
+    .eyebrow, .chip, .section-num, .card-label, .legend span, .footer-note, .status-pill {
+      font-family: "Avenir Next", "Segoe UI", sans-serif;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .eyebrow { font-size: 8pt; opacity: 0.85; margin-bottom: 6px; }
+    .cover h1 { font-family: "Avenir Next", "Segoe UI", sans-serif; font-size: 22pt; line-height: 1.15; font-weight: 700; }
+    .cover p { margin-top: 8px; font-size: 11pt; max-width: 36em; }
+    .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+    .chip { background: rgba(255,255,255,0.16); border: 1px solid rgba(255,255,255,0.25); border-radius: 999px; padding: 3px 9px; font-size: 7.5pt; }
+    .one-liner {
+      background: var(--paper-warm);
+      border-left: 4px solid var(--primary);
+      padding: 10px 14px;
+      margin: 0 0 14px;
+      font-size: 12pt;
+    }
+    .legend { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 16px; }
+    .legend div { border-radius: 8px; padding: 8px 10px; font-size: 9pt; }
+    .legend span { display: block; font-size: 7.5pt; font-weight: 700; margin-bottom: 2px; }
+    .ok { background: var(--success-bg); }
+    .watch { background: var(--accent-bg); }
+    .no { background: var(--danger-bg); }
+    .section { margin: 0 0 16px; page-break-inside: avoid; }
+    .section-head { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+    .section-num {
+      background: var(--primary);
+      color: white;
+      width: 22px; height: 22px;
+      border-radius: 999px;
+      display: inline-flex; align-items: center; justify-content: center;
+      font-size: 8pt; font-weight: 700;
+    }
+    .section-title {
+      font-family: "Avenir Next", "Segoe UI", sans-serif;
+      font-size: 12.5pt;
+      font-weight: 700;
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 3px;
+      flex: 1;
+    }
+    p { margin: 0 0 8px; }
+    strong, .key { font-weight: 700; color: var(--highlight); }
+    ul { margin: 0 0 8px 1.1em; }
+    li { margin: 0 0 4px; }
+    .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .card {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 10px 12px;
+      background: white;
+      page-break-inside: avoid;
+    }
+    .card h3 { font-family: "Avenir Next", "Segoe UI", sans-serif; font-size: 10.5pt; margin-bottom: 4px; }
+    .card p, .card li { font-size: 9.6pt; }
+    .status-pill { display: inline-block; font-size: 7pt; font-weight: 700; border-radius: 999px; padding: 2px 7px; margin-bottom: 5px; }
+    .pill-ok { background: var(--success-bg); color: var(--success); }
+    .pill-watch { background: var(--accent-bg); color: var(--accent); }
+    .pill-no { background: var(--danger-bg); color: var(--danger); }
+    table { width: 100%; border-collapse: collapse; font-size: 9.3pt; margin-top: 4px; }
+    th, td { text-align: left; padding: 5px 6px; border-bottom: 1px solid var(--line); vertical-align: top; }
+    th { font-family: "Avenir Next", "Segoe UI", sans-serif; font-size: 7.5pt; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-muted); }
+    .tag { font-family: "Avenir Next", "Segoe UI", sans-serif; font-size: 8pt; font-weight: 700; }
+    .tag.g { color: var(--success); }
+    .tag.y { color: var(--accent); }
+    .footer-note { margin-top: 16px; padding-top: 8px; border-top: 1px solid var(--line); font-size: 7.5pt; color: var(--ink-muted); text-align: center; letter-spacing: 0.06em; }
+  </style>
+</head>
+<body>
+<div class="doc">
+  <header class="cover">
+    <div class="eyebrow">Dated snapshot · September 10, 2026 · not a work order</div>
+    <h1>What we built, in plain words</h1>
+    <p>A public site that answers one question: can a computer do this job yet? It is live. The scores on it are real runs, but they come from a practice robot, not a famous AI.</p>
+    <div class="chips">
+      <span class="chip">canaiyet.com</span>
+      <span class="chip">10 jobs tested</span>
+      <span class="chip">Practice scores only</span>
+      <span class="chip">No model bill</span>
+    </div>
+  </header>
+
+  <p class="one-liner">Think of it as a report card for chores. The school is open. The grades are honest. They were not given by the star student yet.</p>
+
+  <div class="legend">
+    <div class="ok"><span>Real</span>Built, live, or a score that actually ran.</div>
+    <div class="watch"><span>Labeled pretend</span>True inside a toy office. Not a promise about ChatGPT.</div>
+    <div class="no"><span>Not done</span>Do not tell anyone this part is finished.</div>
+  </div>
+
+  <section class="section">
+    <div class="section-head"><span class="section-num">1</span><h2 class="section-title">The one-sentence story</h2></div>
+    <p>We built <strong>Can AI Yet</strong>, a public website that lists everyday business chores and says whether a tested helper can do them. Visitors can search, read a result, and ask for a new test. The house is built and the lights are on at <strong>https://canaiyet.com</strong>.</p>
+  </section>
+
+  <section class="section">
+    <div class="section-head"><span class="section-num">2</span><h2 class="section-title">What is real</h2></div>
+    <div class="cards">
+      <div class="card">
+        <span class="status-pill pill-ok">Live</span>
+        <h3>The public site</h3>
+        <p>Home, search, capability pages, method, updates, and a request form. Someone can type “follow up with sales leads” and get a real match.</p>
+      </div>
+      <div class="card">
+        <span class="status-pill pill-ok">Live</span>
+        <h3>The name on the door</h3>
+        <p><strong>canaiyet.com</strong> points at the site. The padlock works. <strong>www</strong> sends people to the main address. Link previews use a branded Can AI Yet card. A yellow note in Vercel only asks for a newer address. The current one still works.</p>
+      </div>
+      <div class="card">
+        <span class="status-pill pill-ok">Real run</span>
+        <h3>The 10 report cards</h3>
+        <p>Each score came from a run. Nothing was invented to look good. The site says the evidence is a <strong>simulation</strong>.</p>
+      </div>
+      <div class="card">
+        <span class="status-pill pill-ok">Saved</span>
+        <h3>The filing cabinet</h3>
+        <p>The public results live in a database. Strangers cannot rewrite them. The request form can add a request without opening the private drawer.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head"><span class="section-num">3</span><h2 class="section-title">What the scores really mean</h2></div>
+    <p>We did <strong>not</strong> pay ChatGPT, Claude, or Gemini to take these tests. A small <strong>practice robot</strong> walked through a fake company called Acme and we graded what it did. Cost so far: <strong>$0</strong>.</p>
+    <p>Green means the practice robot passed every case, with only light watching. Yellow means it missed some, so a person should still check the work. No score was copied from a marketing page.</p>
+    <table>
+      <thead>
+        <tr><th>Job</th><th>Result</th><th>Passed</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Follow up with a sales lead</td><td class="tag y">Yellow</td><td>9 of 12, one serious miss</td></tr>
+        <tr><td>Triage a support email</td><td class="tag y">Yellow</td><td>8 of 10, one serious miss</td></tr>
+        <tr><td>Follow up on an overdue invoice</td><td class="tag y">Yellow</td><td>8 of 10</td></tr>
+        <tr><td>Schedule or reschedule</td><td class="tag g">Green</td><td>8 of 8</td></tr>
+        <tr><td>Update a CRM from email</td><td class="tag g">Green</td><td>8 of 8</td></tr>
+        <tr><td>Reconcile two spreadsheets</td><td class="tag g">Green</td><td>8 of 8</td></tr>
+        <tr><td>Turn meeting notes into actions</td><td class="tag y">Yellow</td><td>7 of 8</td></tr>
+        <tr><td>Write a weekly status report</td><td class="tag y">Yellow</td><td>7 of 8</td></tr>
+        <tr><td>Research a prospect</td><td class="tag g">Green</td><td>8 of 8</td></tr>
+        <tr><td>Change a quoted website line</td><td class="tag g">Green</td><td>8 of 8</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="section">
+    <div class="section-head"><span class="section-num">4</span><h2 class="section-title">What is pretend, on purpose</h2></div>
+    <ul>
+      <li>The office is fake. Emails, customers, invoices, and calendars are <strong>practice props</strong>, not your real business.</li>
+      <li>The helper is a <strong>reference agent</strong>. It is a stand-in, not a frontier model.</li>
+      <li>Search matches words. It does not use the smarter “meaning” search yet.</li>
+      <li>Spreadsheet tests use simple tables in memory, not real Excel files.</li>
+    </ul>
+  </section>
+
+  <section class="section">
+    <div class="section-head"><span class="section-num">5</span><h2 class="section-title">What is not finished</h2></div>
+    <div class="cards">
+      <div class="card">
+        <span class="status-pill pill-no">Still open</span>
+        <h3>A real AI has not taken the test</h3>
+        <p>Until that run happens, do not say “ChatGPT can do this.” Say “our practice robot scored this, in a toy office.”</p>
+      </div>
+      <div class="card">
+        <span class="status-pill pill-watch">Needs a key</span>
+        <h3>The private inbox and nightly jobs</h3>
+        <p>The public site can read. The admin request list and scheduled writes still need the hidden database key. Do not treat the back office as finished.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head"><span class="section-num">6</span><h2 class="section-title">Where to look</h2></div>
+    <ul>
+      <li>Site: <strong>https://canaiyet.com</strong></li>
+      <li>Backup address: <strong>https://can-ai-yet.vercel.app</strong></li>
+      <li>Code: <strong>github.com/heyitschien/can-ai-yet</strong></li>
+      <li>Live work list: GitHub Issue <strong>#1</strong></li>
+    </ul>
+    <p>This page is a snapshot for a person to read. If it disagrees with the build spec or Issue #1, those win. You do not need to change the domain tonight.</p>
+  </section>
+
+  <p class="footer-note">Can AI Yet · dated snapshot, not a work order · scores are practice runs</p>
+</div>
+</body>
+</html>

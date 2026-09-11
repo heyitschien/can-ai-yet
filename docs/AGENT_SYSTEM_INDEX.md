@@ -13,7 +13,7 @@ Two lists. Do not treat them as the same thing.
 5. Accepted evidence and the exact repository state.
 6. GitHub Issue #1 — the live work order.
 
-`ORIGIN_AND_DECISION_TRAIL.md` and `EXPLAINED_LIKE_IM_FIVE.md` are explanation, not authority. `FOUR_AGENT_SYSTEM_SUMMARY.md` is a refresher, not a second architecture.
+`ORIGIN_AND_DECISION_TRAIL.md` and `EXPLAINED_LIKE_IM_FIVE.md` are explanation, not authority. `FOUR_AGENT_SYSTEM_SUMMARY.md` is a refresher, not a second architecture. `can-ai-yet-status.pdf` is a dated human snapshot, not a work order.
 
 ## First read for a fresh agent
 
