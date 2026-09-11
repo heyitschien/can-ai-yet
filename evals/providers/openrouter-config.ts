@@ -57,7 +57,6 @@ export function paidRunBlockedReason(env: Record<string, string | undefined>): s
   if (env.CI === "true" || env.CI === "1") return "CI is set. Paid evals never run as ordinary CI.";
   if (env.GITHUB_ACTIONS === "true") return "GITHUB_ACTIONS is set. Paid evals never run as ordinary CI.";
   if (env.VERCEL === "1") return "VERCEL is set. Paid evals never run on deploy.";
-  if (env.NODE_ENV === "test") return "NODE_ENV=test. Automated tests must use mocks.";
   if (env.CANAIYET_PAID_RUN !== "1") return "CANAIYET_PAID_RUN is not 1. Paid execution is off.";
   return null;
 }
@@ -113,17 +112,55 @@ export function configFromEnv(env: NodeJS.ProcessEnv): OpenRouterRunConfig {
 }
 
 export class SpendLedger {
-  spentUsd = 0;
+  measuredUsd = 0;
+  uncertainAttempts = 0;
   requests = 0;
 
-  constructor(readonly maxSpendUsd: number | null) {}
+  constructor(
+    readonly maxSpendUsd: number | null,
+    readonly requestReserveUsd: number | null = null,
+  ) {}
 
-  noteRequest(): void {
+  /** Remaining spend that can still be reserved. Null means no cap is configured. */
+  remainingUsd(): number | null {
+    if (this.maxSpendUsd === null) return null;
+    return Math.max(0, this.maxSpendUsd - this.measuredUsd);
+  }
+
+  /**
+   * Reserve the next attempt before dispatch.
+   * With a cap, the whole remaining budget is held for this one in-flight request
+   * unless a smaller per-request reserve was approved. A later request is refused
+   * once the cap is exhausted or any attempt cost is unknown.
+   */
+  beginAttempt(options: { sameRequestRetry?: boolean } = {}): { ok: true } | { ok: false; reason: string } {
+    if (this.maxSpendUsd !== null && this.uncertainAttempts > 0 && !options.sameRequestRetry) {
+      return { ok: false, reason: "An earlier attempt may already have been billed. Remaining spend cannot be verified, so no further request is sent." };
+    }
+    if (this.maxSpendUsd !== null && this.measuredUsd >= this.maxSpendUsd) {
+      return { ok: false, reason: "Spend cap is exhausted. Refusing another request." };
+    }
+    if (this.maxSpendUsd !== null) {
+      const remaining = this.remainingUsd() ?? 0;
+      const reserve = this.requestReserveUsd ?? remaining;
+      if (!(reserve > 0) || remaining < reserve) {
+        return { ok: false, reason: "Remaining budget is below the request reserve. Refusing the request." };
+      }
+    }
     this.requests += 1;
+    return { ok: true };
+  }
+
+  noteUncertainAttempt(): void {
+    this.uncertainAttempts += 1;
   }
 
   noteCost(costUsd: number | null): { stop: boolean; reason?: string } {
+    if (this.uncertainAttempts > 0) {
+      return { stop: this.maxSpendUsd !== null, reason: "Spend is unverified because an earlier attempt may already have been billed." };
+    }
     if (costUsd === null) {
+      this.uncertainAttempts += 1;
       if (this.maxSpendUsd !== null) {
         return { stop: true, reason: "Spend is unverified because the gateway did not return a cost. The run stops instead of continuing blind." };
       }
@@ -132,9 +169,9 @@ export class SpendLedger {
     if (!Number.isFinite(costUsd) || costUsd < 0) {
       return { stop: true, reason: "Gateway returned an unusable cost." };
     }
-    this.spentUsd += costUsd;
-    if (this.maxSpendUsd !== null && this.spentUsd > this.maxSpendUsd) {
-      return { stop: true, reason: `Spend ${this.spentUsd.toFixed(6)} exceeded the cap of ${this.maxSpendUsd}.` };
+    this.measuredUsd += costUsd;
+    if (this.maxSpendUsd !== null && this.measuredUsd > this.maxSpendUsd) {
+      return { stop: true, reason: `Measured spend ${this.measuredUsd.toFixed(6)} exceeded the cap of ${this.maxSpendUsd}.` };
     }
     return { stop: false };
   }

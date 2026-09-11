@@ -54,6 +54,15 @@ export type AgentRunInput = {
   payload: Record<string, unknown>;
 };
 
+export type ProviderAttempt = {
+  generationId: string | null;
+  servedModel: string | null;
+  servedProvider: string | null;
+  costUsd: number | null;
+  uncertain: boolean;
+  finishReason: string | null;
+};
+
 export type ProviderUsage = {
   inputTokens: number;
   outputTokens: number;
@@ -62,7 +71,9 @@ export type ProviderUsage = {
   requestedModel: string;
   servedModel: string | null;
   servedProvider: string | null;
+  servedProviders: string[];
   generationIds: string[];
+  attempts: ProviderAttempt[];
 };
 
 export type AgentRunResult = {
@@ -93,6 +104,7 @@ export type ScenarioResult = {
   inputTokens?: number;
   outputTokens?: number;
   benchmarkInvalid?: boolean;
+  provenance?: ProviderUsage;
   actualState: Record<string, unknown>;
 };
 
@@ -119,5 +131,12 @@ export type SuiteResult = {
   invalidReasons?: string[];
   inputTokens?: number;
   outputTokens?: number;
+  provenance?: {
+    requestedModel: string;
+    servedModels: string[];
+    servedProviders: string[];
+    generationIds: string[];
+    attempts: ProviderAttempt[];
+  };
   results: ScenarioResult[];
 };

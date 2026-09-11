@@ -59,14 +59,19 @@ export async function runScenario(scenario: Scenario, provider: AgentProvider): 
     inputTokens: agent.usage?.inputTokens,
     outputTokens: agent.usage?.outputTokens,
     benchmarkInvalid: agent.benchmarkInvalid === true,
+    provenance: agent.usage,
     actualState: {
       sent: world.sent,
       flags: world.flags,
       escalations: world.escalations,
-      tasks: world.tasks.map((task) => task.title),
+      tasks: world.tasks,
+      notes: world.notes,
+      deals: world.deals,
+      appointments: world.appointments,
       followups: world.followups,
       agentError: agent.error ?? null,
       toolsCalled: agent.toolsCalled,
+      provenance: agent.usage ?? null,
     },
   };
 }
@@ -120,6 +125,13 @@ function summarize(code: string, results: ScenarioResult[], startedAt: string, p
     invalidReasons,
     inputTokens: sumUsage(results, "inputTokens"),
     outputTokens: sumUsage(results, "outputTokens"),
+    provenance: {
+      requestedModel: provider.modelId ?? REFERENCE_MODEL,
+      servedModels: results.map((result) => result.provenance?.servedModel).filter((value): value is string => Boolean(value)),
+      servedProviders: results.flatMap((result) => result.provenance?.servedProviders ?? []),
+      generationIds: results.flatMap((result) => result.provenance?.generationIds ?? []),
+      attempts: results.flatMap((result) => result.provenance?.attempts ?? []),
+    },
     results,
   };
 }

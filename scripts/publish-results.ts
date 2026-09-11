@@ -1,5 +1,4 @@
 import { createClient } from "@supabase/supabase-js";
-import { decideAccept } from "@/evals/persistence/persist-run";
 
 function arg(name: string): string | null {
   const index = process.argv.indexOf(name);
@@ -30,6 +29,9 @@ function assertAcceptAllowed(): void {
   if (process.env.CANAIYET_ACCEPT_RUN !== "1") {
     throw new Error("CANAIYET_ACCEPT_RUN is not 1. Nothing was accepted.");
   }
+  if (!process.env.CANAIYET_REVIEWED_BY?.trim()) {
+    throw new Error("CANAIYET_REVIEWED_BY is required. Acceptance records who reviewed the run.");
+  }
   if (!process.env.SUPABASE_SECRET_KEY || !process.env.NEXT_PUBLIC_SUPABASE_URL) {
     throw new Error("Supabase URL and SUPABASE_SECRET_KEY are required to accept a run.");
   }
@@ -42,24 +44,13 @@ async function accept(): Promise<void> {
   const client = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL ?? "", process.env.SUPABASE_SECRET_KEY ?? "", {
     auth: { persistSession: false },
   });
-  const run = await client.from("test_runs").select("id, status, capability_id, published").eq("id", runId).maybeSingle();
-  if (run.error || !run.data) throw new Error(run.error?.message ?? "Run was not found.");
-  const row = run.data as { id: string; status: string; capability_id: string; published: boolean };
-  const capability = await client.from("capabilities").select("id, accepted_test_run_id").eq("id", row.capability_id).maybeSingle();
-  if (capability.error || !capability.data) throw new Error("Capability for this run was not found.");
-  const current = capability.data as { id: string; accepted_test_run_id: string | null };
-  const decision = decideAccept({
-    runId,
-    runStatus: row.status,
-    currentAcceptedRunId: current.accepted_test_run_id,
-    replaceAccepted: process.argv.includes("--replace-accepted"),
+  const accepted = await client.rpc("accept_benchmark_run", {
+    p_run_id: runId,
+    p_replace: process.argv.includes("--replace-accepted"),
+    p_verified_by: process.env.CANAIYET_REVIEWED_BY,
   });
-  if (!decision.allowed) throw new Error(decision.reason);
-  const published = await client.from("test_runs").update({ published: true }).eq("id", runId);
-  if (published.error) throw new Error(published.error.message);
-  const accepted = await client.from("capabilities").update({ accepted_test_run_id: runId }).eq("id", current.id);
   if (accepted.error) throw new Error(accepted.error.message);
-  console.log(`Accepted run ${runId}. Public pages should now read headline and detail from this run only.`);
+  console.log(`Accepted run ${runId} in one database transaction. Public pages should now read headline and detail from this run only.`);
 }
 
 async function main() {

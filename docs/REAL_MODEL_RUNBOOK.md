@@ -117,6 +117,20 @@ After acceptance, the public page reads the headline and the scenario list from 
 
 ---
 
+## After a fresh review accepts this path
+
+Do not pick the model or spend here. A human fills this in, then a separate approval starts the run.
+
+```text
+Exact OpenRouter model ID:
+CAP-001 scenario id (one only):
+Maximum spend USD:
+Request reserve USD:
+Persistence: unpublished review artifact only
+```
+
+The spend cap is a pre-dispatch reservation, not a promise that one request cannot overshoot if the gateway omits a price. If a cost is missing or a retry may already have been billed, the run stops and is not a measured score.
+
 ## What not to do
 
 - Do not run a paid eval from CI, preview deploy, cron, or seed.

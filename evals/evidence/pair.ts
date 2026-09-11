@@ -47,6 +47,9 @@ export type RemoteRun = {
   totalCostUsd: number | null;
   medianRuntimeSeconds: number | null;
   published: boolean;
+  status?: string;
+  benchmarkValid?: boolean;
+  capabilityCode?: string;
 };
 
 export type RemoteResult = {
@@ -118,7 +121,19 @@ function fromLocal(record: PublishedRecord): PairedEvidence {
 }
 
 function chainComplete(remote: RemoteCapability, run: RemoteRun | null, results: RemoteResult[] | null): boolean {
-  return Boolean(remote.acceptedRunId && run && run.id === remote.acceptedRunId && run.published && results);
+  if (!remote.acceptedRunId || !run || !results) return false;
+  if (run.id !== remote.acceptedRunId || !run.published) return false;
+  if (run.status && run.status !== "completed") return false;
+  if (run.benchmarkValid === false) return false;
+  if (run.capabilityCode && run.capabilityCode !== remote.code) return false;
+  if (results.length !== run.totalCount) return false;
+  const slugs = results.map((result) => result.slug);
+  if (new Set(slugs).size !== results.length) return false;
+  const successes = results.filter((result) => result.success).length;
+  const failures = results.length - successes;
+  const critical = results.filter((result) => result.critical).length;
+  if (successes !== run.successCount || failures !== run.failureCount || critical !== run.criticalFailureCount) return false;
+  return true;
 }
 
 export function pairEvidence(input: {

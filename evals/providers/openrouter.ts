@@ -5,6 +5,8 @@ import {
   GuardError,
   SpendLedger,
   assertExactModelId,
+  assertPaidExecutionAllowed,
+  paidRunBlockedReason,
   type OpenRouterRunConfig,
 } from "@/evals/providers/openrouter-config";
 import { schemasForAllowedTools, type ToolSchema } from "@/evals/providers/tool-schemas";
@@ -46,6 +48,8 @@ type ParsedChoice = {
 
 type ParsedResponse = {
   choice: ParsedChoice;
+  finishReason: string | null;
+  choiceError: string | null;
   servedModel: string | null;
   servedProvider: string | null;
   generationId: string | null;
@@ -53,6 +57,9 @@ type ParsedResponse = {
   outputTokens: number;
   costUsd: number | null;
 };
+
+const SUCCESSFUL_STOP = "stop";
+const SUCCESSFUL_TOOLS = "tool_calls";
 
 function asRecord(value: unknown): Record<string, unknown> | null {
   return value !== null && typeof value === "object" ? (value as Record<string, unknown>) : null;
@@ -78,11 +85,15 @@ export function parseOpenRouterResponse(payload: unknown): ParsedResponse {
     return { id, type: "function", function: { name, arguments: args } };
   });
   const usage = asRecord(root.usage);
+  const choiceError = choice ? asRecord(choice.error) : null;
+  const finishReason = typeof choice?.finish_reason === "string" ? choice.finish_reason : null;
   return {
     choice: {
-      toolCalls,
+      toolCalls: toolCalls.filter((call) => call.function.name.length > 0),
       content: typeof message.content === "string" ? message.content : null,
     },
+    finishReason,
+    choiceError: choiceError ? JSON.stringify(choiceError) : choice?.error ? "choice error" : null,
     servedModel: typeof root.model === "string" ? root.model : null,
     servedProvider: typeof root.provider === "string" ? root.provider : null,
     generationId: typeof root.id === "string" ? root.id : null,
@@ -90,6 +101,23 @@ export function parseOpenRouterResponse(payload: unknown): ParsedResponse {
     outputTokens: numberOrNull(usage?.completion_tokens) ?? 0,
     costUsd: numberOrNull(usage?.cost),
   };
+}
+
+export function terminalProblem(parsed: ParsedResponse): string | null {
+  if (parsed.choiceError) return "Gateway returned a choice error. This is not a completed benchmark turn.";
+  if (parsed.finishReason !== SUCCESSFUL_STOP && parsed.finishReason !== SUCCESSFUL_TOOLS) {
+    return `Gateway finish reason ${parsed.finishReason ?? "missing"} is not a completed turn.`;
+  }
+  if (parsed.finishReason === SUCCESSFUL_TOOLS && parsed.choice.toolCalls.length === 0) {
+    return "Gateway said tool calls finished, but none were usable.";
+  }
+  if (parsed.finishReason === SUCCESSFUL_STOP && parsed.choice.toolCalls.length > 0) {
+    return "Gateway stopped and also returned tool calls. The turn is ambiguous and is not counted.";
+  }
+  if (parsed.finishReason === SUCCESSFUL_STOP && parsed.choice.content === null && parsed.choice.toolCalls.length === 0) {
+    return "Gateway stopped without a message or tool call. The turn is incomplete.";
+  }
+  return null;
 }
 
 export function chatBody(config: OpenRouterRunConfig, messages: ChatMessage[], tools: ToolSchema[]): OpenRouterChatBody {
@@ -104,6 +132,28 @@ export function chatBody(config: OpenRouterRunConfig, messages: ChatMessage[], t
 }
 
 export async function fetchOpenRouterChat(body: OpenRouterChatBody, init: { timeoutMs: number; apiKey: string }): Promise<unknown> {
+  const blocked = paidRunBlockedReason(process.env);
+  if (blocked) throw new GuardError("PAID_BLOCKED", blocked);
+  if (!process.env.OPENROUTER_MAX_SPEND_USD || !(Number(process.env.OPENROUTER_MAX_SPEND_USD) > 0)) {
+    throw new GuardError("SPEND_CAP_REQUIRED", "OPENROUTER_MAX_SPEND_USD must be set before a real OpenRouter request.");
+  }
+  try {
+    assertPaidExecutionAllowed(process.env, {
+      model: body.model,
+      apiKey: init.apiKey,
+      maxTokens: body.max_tokens,
+      maxTurns: 1,
+      timeoutMs: init.timeoutMs,
+      maxRetries: 0,
+      maxSpendUsd: Number(process.env.OPENROUTER_MAX_SPEND_USD),
+      maxScenarios: 1,
+      appUrl: "https://can-ai-yet.local",
+      appTitle: "CanAIYet",
+    });
+  } catch (error) {
+    if (error instanceof GuardError) throw error;
+    throw new GuardError("PAID_BLOCKED", "Paid execution is not authorized.");
+  }
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), init.timeoutMs);
   try {
@@ -150,7 +200,9 @@ function emptyUsage(model: string): ProviderUsage {
     requestedModel: model,
     servedModel: null,
     servedProvider: null,
+    servedProviders: [],
     generationIds: [],
+    attempts: [],
   };
 }
 
@@ -216,8 +268,9 @@ export class OpenRouterProvider implements AgentProvider {
       }
       let payload: unknown;
       try {
-        payload = await this.requestWithRetry(body);
+        payload = await this.requestWithRetry(body, usage);
       } catch (error) {
+        if (this.ledger.uncertainAttempts > 0) usage.costUsd = null;
         const message = error instanceof Error ? error.message : "OpenRouter request failed.";
         this.halted = message;
         return { toolsCalled, finished: false, error: message, usage, benchmarkInvalid: true };
@@ -225,6 +278,11 @@ export class OpenRouterProvider implements AgentProvider {
       const parsed = this.account(payload, usage);
       if (typeof parsed === "string") {
         return { toolsCalled, finished: false, error: parsed, usage, benchmarkInvalid: true };
+      }
+      const incomplete = terminalProblem(parsed);
+      if (incomplete) {
+        this.halted = incomplete;
+        return { toolsCalled, finished: false, error: incomplete, usage, benchmarkInvalid: true };
       }
       messages.push({
         role: "assistant",
@@ -273,9 +331,18 @@ export class OpenRouterProvider implements AgentProvider {
     usage.requestCount += 1;
     if (parsed.generationId) usage.generationIds.push(parsed.generationId);
     usage.servedModel = parsed.servedModel;
+    if (parsed.servedProvider) usage.servedProviders.push(parsed.servedProvider);
     usage.servedProvider = parsed.servedProvider;
+    usage.attempts.push({
+      generationId: parsed.generationId,
+      servedModel: parsed.servedModel,
+      servedProvider: parsed.servedProvider,
+      costUsd: parsed.costUsd,
+      uncertain: this.ledger.uncertainAttempts > 0 || parsed.costUsd === null,
+      finishReason: parsed.finishReason,
+    });
     const cost = this.ledger.noteCost(parsed.costUsd);
-    if (parsed.costUsd === null) usage.costUsd = null;
+    if (this.ledger.uncertainAttempts > 0 || parsed.costUsd === null) usage.costUsd = null;
     else if (usage.costUsd !== null) usage.costUsd += parsed.costUsd;
     if (parsed.servedModel !== this.config.model) {
       const message = `Served model ${parsed.servedModel ?? "missing"} did not match requested ${this.config.model}. No fallback is allowed.`;
@@ -289,16 +356,24 @@ export class OpenRouterProvider implements AgentProvider {
     return parsed;
   }
 
-  private async requestWithRetry(body: OpenRouterChatBody): Promise<unknown> {
+  private async requestWithRetry(body: OpenRouterChatBody, usage: ProviderUsage): Promise<unknown> {
     const apiKey = this.config.apiKey;
     if (!apiKey) throw new GuardError("KEY_REQUIRED", "OPENROUTER_API_KEY is not set.");
     let last: unknown;
     for (let attempt = 0; attempt <= this.config.maxRetries; attempt += 1) {
-      this.ledger.noteRequest();
+      const reserved = this.ledger.beginAttempt({ sameRequestRetry: attempt > 0 });
+      if (!reserved.ok) {
+        this.halted = reserved.reason;
+        throw new GuardError("SPEND_CAP", reserved.reason);
+      }
       try {
         return await this.client(body, { timeoutMs: this.config.timeoutMs, apiKey });
       } catch (error) {
         last = error;
+        if (retryable(error)) {
+          this.ledger.noteUncertainAttempt();
+          usage.costUsd = null;
+        }
         const canRetry = attempt < this.config.maxRetries && retryable(error);
         if (!canRetry) throw error;
       }

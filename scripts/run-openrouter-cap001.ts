@@ -4,6 +4,7 @@ import { OpenRouterProvider } from "@/evals/providers/openrouter";
 import { SpendLedger, assertPaidExecutionAllowed, configFromEnv } from "@/evals/providers/openrouter-config";
 import { buildCap001DryRunPlan } from "@/evals/providers/openrouter-plan";
 import { persistIntentionalRun, writeLocalRunArtifact } from "@/evals/persistence/persist-run";
+import { resolveScenarioWrite, scenarioContentHash, type StoredScenario } from "@/evals/persistence/scenario-identity";
 import { createClient } from "@supabase/supabase-js";
 import type { EvidenceWriter, ResultPersistRow, RunPersistRow, ScenarioPersistRow } from "@/evals/persistence/persist-run";
 import type { ScenarioResult, SuiteResult } from "@/evals/types";
@@ -82,28 +83,45 @@ function supabaseWriter(): EvidenceWriter {
         const capability = await client.from("capabilities").select("id").eq("code", row.capabilityCode).maybeSingle();
         if (capability.error || !capability.data) throw new Error(`Capability ${row.capabilityCode} was not found.`);
         const capabilityId = (capability.data as { id: string }).id;
-        const saved = await client
+        const listed = await client.from("test_scenarios").select("id, slug, title, description, fixture_version, input_payload, expected_state, forbidden_state, critical").eq("capability_id", capabilityId);
+        if (listed.error) throw new Error(listed.error.message);
+        const existing: StoredScenario[] = ((listed.data ?? []) as Array<Record<string, unknown>>).map((item) => {
+          const definition: ScenarioPersistRow = {
+            capabilityCode: row.capabilityCode,
+            slug: String(item.slug),
+            title: String(item.title),
+            description: String(item.description),
+            fixtureVersion: String(item.fixture_version),
+            inputPayload: (item.input_payload ?? {}) as Record<string, unknown>,
+            expectedState: item.expected_state,
+            forbiddenState: item.forbidden_state,
+            critical: Boolean(item.critical),
+          };
+          return { id: String(item.id), slug: definition.slug, contentHash: scenarioContentHash(definition), definition };
+        });
+        const decision = resolveScenarioWrite(existing, row);
+        if (decision.action === "reuse") {
+          ids.set(row.slug, decision.id);
+          continue;
+        }
+        const inserted = await client
           .from("test_scenarios")
-          .upsert(
-            {
-              capability_id: capabilityId,
-              slug: row.slug,
-              title: row.title,
-              description: row.description,
-              fixture_version: row.fixtureVersion,
-              input_payload: row.inputPayload,
-              expected_state: row.expectedState,
-              forbidden_state: row.forbiddenState,
-              critical: row.critical,
-              active: true,
-            },
-            { onConflict: "capability_id,slug" },
-          )
+          .insert({
+            capability_id: capabilityId,
+            slug: decision.slug,
+            title: row.title,
+            description: row.description,
+            fixture_version: row.fixtureVersion,
+            input_payload: row.inputPayload,
+            expected_state: row.expectedState,
+            forbidden_state: row.forbiddenState,
+            critical: row.critical,
+            active: true,
+          })
           .select("id, slug")
           .single();
-        if (saved.error || !saved.data) throw new Error(saved.error?.message ?? "Could not upsert scenario.");
-        const data = saved.data as { id: string; slug: string };
-        ids.set(data.slug, data.id);
+        if (inserted.error || !inserted.data) throw new Error(inserted.error?.message ?? "Could not insert scenario version.");
+        ids.set(row.slug, (inserted.data as { id: string }).id);
       }
       return ids;
     },
@@ -148,7 +166,7 @@ function supabaseWriter(): EvidenceWriter {
           test_run_id: runId,
           scenario_id: scenarioId,
           success: row.success,
-          actual_state: row.actualState,
+          actual_state: { ...row.actualState, scenarioSnapshot: row.scenarioSnapshot ?? null, provenance: row.provenance ?? null },
           failure_code: row.failureCode,
           failure_explanation: row.failureExplanation,
           critical: row.critical,
@@ -159,6 +177,10 @@ function supabaseWriter(): EvidenceWriter {
       });
       const inserted = await client.from("test_results").insert(payload);
       if (inserted.error) throw new Error(inserted.error.message);
+    },
+    async markRunSettled(runId: string, status: "completed" | "failed") {
+      const updated = await client.from("test_runs").update({ status }).eq("id", runId).eq("status", "running");
+      if (updated.error) throw new Error(updated.error.message);
     },
   };
 }

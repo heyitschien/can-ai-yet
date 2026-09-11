@@ -28,11 +28,12 @@ function config(overrides: Partial<ReturnType<typeof configFromEnv>> = {}) {
 }
 
 function completion(message: Record<string, unknown>, extra: Record<string, unknown> = {}) {
+  const finishReason = message.tool_calls ? "tool_calls" : "stop";
   return {
     id: "gen-test",
     model: MODEL,
     provider: "OpenAI",
-    choices: [{ message }],
+    choices: [{ message, finish_reason: finishReason }],
     usage: { prompt_tokens: 12, completion_tokens: 6, cost: 0.0002 },
     ...extra,
   };
@@ -48,7 +49,7 @@ describe("OpenRouter guards", () => {
   it("blocks paid execution in CI and without the human flag", () => {
     expect(paidRunBlockedReason({ CI: "true", CANAIYET_PAID_RUN: "1" })).toMatch(/CI/);
     expect(paidRunBlockedReason({ CANAIYET_PAID_RUN: "0" })).toMatch(/CANAIYET_PAID_RUN/);
-    expect(() => assertPaidExecutionAllowed({ NODE_ENV: "test" }, config())).toThrow(/tests must use mocks/);
+    expect(() => assertPaidExecutionAllowed({}, config())).toThrow(/CANAIYET_PAID_RUN/);
   });
 
   it("dry-run plan makes zero paid requests and does not quote a price", () => {

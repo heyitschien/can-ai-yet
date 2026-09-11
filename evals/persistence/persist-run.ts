@@ -33,7 +33,7 @@ export type RunPersistRow = {
   medianRuntimeSeconds: number;
   inputTokens: number;
   outputTokens: number;
-  status: "completed" | "failed";
+  status: "running" | "completed" | "failed";
   notes: string;
   published: false;
 };
@@ -48,6 +48,8 @@ export type ResultPersistRow = {
   runtimeSeconds: number;
   costUsd: number | null;
   rawTracePath: null;
+  scenarioSnapshot?: unknown;
+  provenance?: unknown;
 };
 
 export type PersistPayload = {
@@ -84,9 +86,14 @@ export function buildPersistPayload(suite: SuiteResult, scenarios: Scenario[]): 
       toolConfiguration: {
         gateway: suite.provider,
         requestedModel: suite.model,
+        servedModels: suite.provenance?.servedModels ?? [],
+        servedProviders: suite.provenance?.servedProviders ?? [],
+        generationIds: suite.provenance?.generationIds ?? [],
+        attempts: suite.provenance?.attempts ?? [],
         allowFallbacks: false,
         benchmarkValid: suite.benchmarkValid !== false,
         invalidReasons: suite.invalidReasons ?? [],
+        intendedStatus: suite.benchmarkValid === false ? "failed" : "completed",
       },
       environmentVersion: suite.environmentVersion,
       fixtureVersion: suite.fixtureVersion,
@@ -102,7 +109,7 @@ export function buildPersistPayload(suite: SuiteResult, scenarios: Scenario[]): 
       medianRuntimeSeconds: suite.medianRuntimeSeconds,
       inputTokens: suite.inputTokens ?? 0,
       outputTokens: suite.outputTokens ?? 0,
-      status: suite.benchmarkValid === false ? "failed" : "completed",
+      status: "running",
       notes: "Intentional benchmark artifact. Not accepted and not published.",
       published: false,
     },
@@ -118,6 +125,17 @@ export function buildPersistPayload(suite: SuiteResult, scenarios: Scenario[]): 
         runtimeSeconds: result.runtimeSeconds,
         costUsd: result.costUsd,
         rawTracePath: null,
+        scenarioSnapshot: scenario
+          ? {
+              id: scenario.id,
+              slug: scenario.slug,
+              title: scenario.title,
+              expected: scenario.expected,
+              forbidden: scenario.forbidden,
+              payload: scenario.payload,
+            }
+          : null,
+        provenance: result.provenance ?? null,
       };
     }),
   };
@@ -136,13 +154,22 @@ export type EvidenceWriter = {
   upsertScenarios(rows: ScenarioPersistRow[]): Promise<Map<string, string>>;
   insertRun(row: RunPersistRow): Promise<string>;
   insertResults(runId: string, rows: ResultPersistRow[], scenarioIds: Map<string, string>): Promise<void>;
+  markRunSettled?(runId: string, status: "completed" | "failed"): Promise<void>;
 };
 
 export async function persistIntentionalRun(writer: EvidenceWriter, suite: SuiteResult, scenarios: Scenario[]): Promise<{ runId: string; accepted: false }> {
   const payload = buildPersistPayload(suite, scenarios);
+  if (payload.run.status !== "running") {
+    throw new Error("A new run must be inserted as running until every result is durable.");
+  }
   const scenarioIds = await writer.upsertScenarios(payload.scenarios);
   const runId = await writer.insertRun(payload.run);
   await writer.insertResults(runId, payload.results, scenarioIds);
+  if (payload.results.length !== scenarios.length) {
+    throw new Error("Refusing to settle a run that does not have one result per scenario.");
+  }
+  const settled = suite.benchmarkValid === false ? "failed" : "completed";
+  if (writer.markRunSettled) await writer.markRunSettled(runId, settled);
   return { runId, accepted: false };
 }
 
@@ -155,9 +182,22 @@ export function decideAccept(input: {
   runStatus: string;
   currentAcceptedRunId: string | null;
   replaceAccepted: boolean;
+  benchmarkValid?: boolean;
+  expectedResultCount?: number;
+  resultCount?: number;
+  reviewedBy?: string;
 }): AcceptDecision {
   if (!input.runId) return { allowed: false, reason: "A completed run id is required." };
   if (input.runStatus !== "completed") return { allowed: false, reason: "Only a completed run can be accepted." };
+  if (input.benchmarkValid === false) return { allowed: false, reason: "An invalid benchmark cannot be accepted." };
+  if (input.expectedResultCount !== undefined || input.resultCount !== undefined) {
+    if (input.expectedResultCount !== input.resultCount || !input.expectedResultCount) {
+      return { allowed: false, reason: "Result count does not match the expected scenarios." };
+    }
+  }
+  if (input.reviewedBy !== undefined && !input.reviewedBy.trim()) {
+    return { allowed: false, reason: "Acceptance requires a reviewer name." };
+  }
   if (input.currentAcceptedRunId && input.currentAcceptedRunId !== input.runId && !input.replaceAccepted) {
     return { allowed: false, reason: "This capability already has a different accepted run. Pass --replace-accepted to change it." };
   }
