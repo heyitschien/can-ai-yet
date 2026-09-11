@@ -153,8 +153,8 @@ describe("OpenRouter tool loop", () => {
       { capabilityCode: "CAP-001", instruction: "x", allowedTools: scenario.allowedTools, payload: {} },
       world,
     );
-    expect(result.benchmarkInvalid).toBe(true);
-    expect(result.error).toMatch(/max turns/);
+    expect(result.benchmarkInvalid).not.toBe(true);
+    expect(result.error).toMatch(/turn budget/);
     expect(world.sent).toEqual([]);
   });
 

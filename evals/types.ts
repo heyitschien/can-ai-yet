@@ -83,11 +83,19 @@ export type ProviderUsage = {
   attempts: ProviderAttempt[];
 };
 
+export type ToolTraceEntry = {
+  name: string;
+  arguments: Record<string, unknown>;
+  ok: boolean;
+  result: unknown;
+};
+
 export type AgentRunResult = {
   toolsCalled: string[];
   finished: boolean;
   error?: string;
   usage?: ProviderUsage;
+  toolTrace?: ToolTraceEntry[];
   /** True when the configured benchmark was not honored. Do not publish this as a model score. */
   benchmarkInvalid?: boolean;
 };

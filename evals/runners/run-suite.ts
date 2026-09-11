@@ -66,6 +66,7 @@ export async function runScenario(scenario: Scenario, provider: AgentProvider): 
       followups: world.followups,
       agentError: agent.error ?? null,
       toolsCalled: agent.toolsCalled,
+      toolTrace: agent.toolTrace ?? [],
       provenance: agent.usage ?? null,
     },
   };

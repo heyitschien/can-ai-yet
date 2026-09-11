@@ -1,4 +1,4 @@
-import type { AgentProvider, AgentRunInput, AgentRunResult, ProviderUsage } from "@/evals/types";
+import type { AgentProvider, AgentRunInput, AgentRunResult, ProviderUsage, ToolTraceEntry } from "@/evals/types";
 import type { World } from "@/evals/environments/world";
 import {
   OPENROUTER_CHAT_URL,
@@ -345,6 +345,7 @@ export class OpenRouterProvider implements AgentProvider {
   async run(input: AgentRunInput, world: World): Promise<AgentRunResult> {
     const usage = emptyUsage(this.config.model);
     const toolsCalled: string[] = [];
+    const toolTrace: ToolTraceEntry[] = [];
     if (this.halted) {
       return { toolsCalled, finished: false, error: this.halted, usage, benchmarkInvalid: true };
     }
@@ -411,9 +412,8 @@ export class OpenRouterProvider implements AgentProvider {
         return { toolsCalled, finished: true, usage };
       }
       if (turn === this.config.maxTurns) {
-        const message = "Stopped at max turns with unanswered tool calls. Those calls were not applied.";
-        this.halted = message;
-        return { toolsCalled, finished: false, error: message, usage, benchmarkInvalid: true };
+        const message = "Stopped at the turn budget with unanswered tool calls. Those calls were not applied. This is a scored unfinished run, not a broken experiment.";
+        return { toolsCalled, finished: false, error: message, usage, toolTrace };
       }
       for (const call of parsed.choice.toolCalls) {
         toolsCalled.push(call.function.name);
@@ -426,6 +426,7 @@ export class OpenRouterProvider implements AgentProvider {
           continue;
         }
         const result = world.call(call.function.name, args, input.allowedTools);
+        toolTrace.push({ name: call.function.name, arguments: args, ok: result.ok, result: result.ok ? result.data : result.error });
         messages.push({ role: "tool", tool_call_id: call.id, content: clip(result) });
       }
     }
