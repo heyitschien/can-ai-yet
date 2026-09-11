@@ -2,6 +2,17 @@
 
 Short scan log. Newest first.
 
+## CAY-20260910-08 — 2026-09-10
+
+STATUS: READY_FOR_REVIEW  
+What: Corrected PR #2 against re-review findings R1–R7. No paid run. No merge.  
+Branch: `feature/cay-20260910-04-openrouter-prep`  
+Commit: `432a302`  
+PR: https://github.com/heyitschien/can-ai-yet/pull/2  
+Next: fresh independent review. Do not merge. Do not spend.
+
+Issue #1 is the handoff desk. This file is the trail. One entry per finished slice. Do not delete old entries.
+
 ## CAY-20260910-06 — 2026-09-10
 
 STATUS: READY_FOR_REVIEW  
