@@ -334,6 +334,102 @@ Today's work should answer today's uncertainty.
 
 > **Do not optimize for impressive scores. Optimize for honest evidence.**
 
+## 12. The authority–evidence principle
+
+The value of capability evidence may rise as AI is given more authority over the world.
+
+An AI that drafts a paragraph can be wrong with relatively little consequence. An AI that sends a customer message, changes a CRM record, schedules a person, issues a refund, modifies software, handles a claim, or moves money creates a different problem.
+
+A useful non-scientific heuristic is:
+
+```text
+value of verification
+    rises with
+agent authority × consequence of failure × uncertainty of behavior
+```
+
+This is not a pricing formula. It is a way to understand why agent evaluation may become more important as systems move from **advice** to **action**.
+
+> **The more authority we give intelligence, the more valuable trustworthy evidence about that intelligence may become.**
+
+This is one of the central hypotheses worth testing.
+
+## 13. Why this moment may be unusually favorable for measurement
+
+There is a possible timing window.
+
+If agents were too weak to perform meaningful work, there would be little deployment decision to make.
+
+If agents became perfectly reliable and universally understood overnight, there would be much less need for an independent capability-intelligence layer.
+
+The interesting regime is the middle:
+
+> **agents are powerful enough to perform economically meaningful work, but uncertain enough that people still need evidence about where the edges are.**
+
+That is the environment in which a laboratory can matter.
+
+This timing thesis could be wrong or temporary. It should be treated as a market hypothesis, not destiny. But if agent capability and adoption continue rising faster than trust, governance, and task-level evidence, CanAIYet's measurement problem becomes more—not less—important.
+
+## 14. We may be recording the advance of machine labor
+
+A normal benchmark asks how intelligent a model is.
+
+A task laboratory can ask a different historical question:
+
+> **When did this kind of work become reliably and economically delegatable to a machine?**
+
+If frozen tasks survive across model generations, the history can show transitions such as:
+
+```text
+cannot do reliably
+      ↓
+can sometimes do
+      ↓
+useful with supervision
+      ↓
+reliable under defined conditions
+      ↓
+economically preferable for a bounded workflow
+```
+
+Over years, that becomes more than model comparison. It may become a record of the changing boundary between human work and machine-delegatable work.
+
+This is why preserving old exams, old failures, provenance, and dates matters. A future competitor can run a new test; it cannot recreate an honest past it never measured.
+
+## 15. A plausible early business loop: evaluation before subscription
+
+The first economically meaningful product may not be a broad consumer subscription.
+
+A more direct early question is:
+
+> **"Bring us the workflow you are considering automating. We will test whether current AI can do it safely enough under your constraints."**
+
+That creates a plausible bootstrap loop:
+
+```text
+public research
+      ↓
+trust
+      ↓
+custom workflow evaluation
+      ↓
+revenue + new real-world learning
+      ↓
+stronger public/private evidence corpus
+      ↓
+recurring intelligence / alerts / API if demand appears
+```
+
+This path is attractive because a customer may value avoiding a bad deployment decision far more than the benchmark costs to manufacture the evidence.
+
+But this is still only a hypothesis. The important validation event is not admiration for the idea. It is a real operator eventually asking:
+
+> **"Can you test our workflow?"**
+
+And the stronger event after that is:
+
+> **"How much?"**
+
 ## One-sentence thought record
 
-**CanAIYet is an experiment in whether a cheap, automated laboratory for real agent work can accumulate enough demand-linked, longitudinal evidence to become the trusted layer that helps humans decide what intelligence should actually be allowed to do.**
+**CanAIYet is an experiment in whether a cheap, automated laboratory for real agent work can accumulate enough demand-linked, longitudinal evidence to become the trusted layer that helps humans decide what intelligence should actually be allowed to do—and perhaps, over time, record when different kinds of work cross the boundary into reliable machine delegation.**
