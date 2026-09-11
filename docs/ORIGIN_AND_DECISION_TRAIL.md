@@ -310,3 +310,5 @@ It is to put a real frontier model through CAP-001, preserve exact provenance, i
 That closes the loop from the original question:
 
 > **Instead of guessing what rapidly changing intelligence can do, build an observation layer that measures it — and listen to what humans are asking it to do next.**
+
+How that work is staffed is recorded separately in `docs/FOUR_AGENT_SYSTEM.md`. This trail does not define agent contracts or implementation steps.

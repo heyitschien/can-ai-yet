@@ -2,7 +2,8 @@
 
 **Status:** CURRENT EXECUTION RECOMMENDATION  
 **Date:** 2026-09-10  
-**Operational channel:** GitHub Issue #1
+**Operational channel:** GitHub Issue #1  
+**Who does the work:** see `docs/FOUR_AGENT_SYSTEM.md`. This file says what happens next. It does not reassign roles.
 
 ## Current state
 
@@ -132,6 +133,16 @@ Add or verify:
 Do not turn this into a giant test-framework project. Cover the trust boundary and first vertical slice.
 
 ---
+
+# Who executes these missions
+
+Role assignments live in `docs/FOUR_AGENT_SYSTEM.md`. For this sequence:
+
+- **Coordinator (ChatGPT/Solace)** writes the bounded work order and does not accept the builder's own summary.
+- **Builder (Cursor)** implements the labeling, provider path, persistence, and tests after the plan is approved. It does not spend model money until a spend cap is approved.
+- **Independent reviewer (fresh Cursor context)** checks the exact head before any public claim changes.
+- **Human owner** approves meaningful spend, destructive database changes, and publication of a real-model score.
+- **Scout (Grok)** is not required for the first CAP-001 implementation. It starts when we watch for later changes that should trigger a retest.
 
 # Mission 5 — Independently accept the first real CAP-001 run
 

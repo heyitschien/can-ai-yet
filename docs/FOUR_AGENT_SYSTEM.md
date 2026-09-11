@@ -37,7 +37,7 @@ Agents can recommend, test, compare, and prepare. They do not replace the owner'
 | Logical agent | Preferred MVP engine | Job | Must not do |
 |---|---|---|---|
 | **1. Scout / Eyes** | **Grok** | Watch model releases, tools, benchmarks, research, and other changes that may affect existing capabilities. Convert discoveries into bounded findings. | Modify fixtures, change benchmark expectations, publish capability claims, or trigger expensive runs on its own. |
-| **2. Builder / Test Runner / Hands** | **Cursor Cloud Agent** | Implement repo changes, run frozen evaluation suites, execute bounded tests, create commits/PRs, and report exact evidence. | Self-accept its own work, weaken tests to improve a score, or broaden scope without approval. |
+| **2. Builder / Test Runner / Hands** | **Cursor** (cloud or a local session; same contract) | Implement repo changes, run frozen evaluation suites, execute bounded tests, create commits/PRs, and report exact evidence. | Self-accept its own work, weaken tests to improve a score, or broaden scope without approval. |
 | **3. Independent Judge / Reviewer** | **Fresh independent Cursor reviewer by default**; ChatGPT/Solace may provide strategic second review | Inspect the exact head/PR and resulting state independently. Verify expected state, forbidden actions, provenance, tests, RLS, and evidence integrity. | Trust the builder summary as proof, silently modify fixtures, or accept work it authored. |
 | **4. Coordinator / Publisher** | **ChatGPT/Solace** for coordination and claim framing; Cursor/operator performs code/DB writes when needed | Turn accepted evidence into the next bounded work order, prepare publication/update instructions, maintain the operational ledger, and ensure public wording matches evidence strength. | Invent scores, publish unaccepted runs, upgrade evidence tier without proof, or bypass human gates. |
 
@@ -239,6 +239,7 @@ Every handoff should be reconstructable from durable state:
 
 ```text
 canonical docs
++ agent-system docs
 + Git commit / PR
 + Issue #1 receipts
 + accepted evaluation artifacts / Supabase rows
@@ -295,7 +296,7 @@ Preferred MVP configuration:
 
 - keep Cursor as the main execution engine;
 - use Grok for bounded discovery/scouting;
-- use ChatGPT/Solace as manager/coordinator/reviewer layer;
+- use ChatGPT/Solace as manager and coordinator/publisher, not as a substitute for the independent judge;
 - use a second clean Cursor context for independent code/evidence review when practical;
 - run frontier-model benchmark calls only when explicitly approved and budget-capped.
 
@@ -321,7 +322,7 @@ For the current CanAIYet phase:
 
 ```text
 SCOUT          = Grok
-BUILDER        = Cursor Cloud Agent
+BUILDER        = Cursor (cloud or local session)
 JUDGE          = fresh independent Cursor reviewer
 COORDINATOR    = ChatGPT/Solace
 HUMAN OWNER    = Chiến
@@ -355,6 +356,14 @@ That evaluation should become evidence of its own.
 ---
 
 ## 12. North-star operating idea
+
+### Two meanings of Judge
+
+The canonical document uses **Judge** for the deterministic checker: it looks at the pretend business and scores what happened. That checker is code. It does not change fixtures.
+
+This operating document also uses **Judge** for the independent reviewer: a fresh agent that inspects the exact commit or run. That reviewer is not the scoring function, and it is not ChatGPT by default.
+
+Do not collapse those two jobs. A passing score from the code judge is not the same thing as an accepted review.
 
 The human decides **why and where to point the system**.
 

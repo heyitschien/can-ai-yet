@@ -11,4 +11,6 @@ CanAIYet uses four logical agent roles, not four unrelated autonomous systems.
 
 The important design rule is: **roles stay stable; the specific model/vendor can change when a better one appears.** GitHub Issue #1, commits/PRs, canonical docs, and Supabase accepted evidence form the shared memory.
 
+This page is a refresher only. If it disagrees with `docs/FOUR_AGENT_SYSTEM.md` or `docs/AGENT_SYSTEM_INDEX.md`, those documents win.
+
 See `docs/FOUR_AGENT_SYSTEM.md` for the full contracts, handoffs, separation-of-duties rules, and current MVP configuration.

@@ -10,13 +10,17 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 # CanAIYet project operating rules
 
-Before material work:
+Before material work, use `docs/AGENT_SYSTEM_INDEX.md` as the map, then read in this order:
 
-1. Read `canonical-build-doc.md` as BUILD AUTHORITY.
-2. Read `docs/COMMUNICATION_PROTOCOL.md`.
-3. Read `docs/NEXT_MISSIONS.md` for current execution priorities.
-4. Use GitHub Issue **#1 — Agent Communication Channel — CanAIYet Mission Control** for ACKs, work orders, handoffs, evidence, blockers, and review verdicts.
-5. Use receipt IDs in the form `CAY-YYYYMMDD-NN`.
+1. `canonical-build-doc.md` as BUILD AUTHORITY. Do not silently change it.
+2. `docs/COMMUNICATION_PROTOCOL.md` — how work is handed off and accepted.
+3. `docs/FOUR_AGENT_SYSTEM.md` — who does what. Logical lab roles are Scout, Test Runner, Judge, and Publisher. Current engines and the human owner are assigned there, not here.
+4. `docs/NEXT_MISSIONS.md` for current execution priorities.
+5. GitHub Issue **#1 — Agent Communication Channel — CanAIYet Mission Control** for the live work order. Issue comments do not outrank the documents above.
+
+`docs/ORIGIN_AND_DECISION_TRAIL.md` and `docs/EXPLAINED_LIKE_IM_FIVE.md` explain why the product exists. They are not build authority.
+
+Use receipt IDs in the form `CAY-YYYYMMDD-NN`. Post ACKs, handoffs, evidence, blockers, and review verdicts on Issue #1.
 
 Do not fabricate benchmark evidence, relabel reference-agent results as frontier-model results, weaken fixtures to improve scores, or run uncontrolled paid-model loops.
 

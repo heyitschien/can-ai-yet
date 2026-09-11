@@ -17,7 +17,9 @@ When instructions disagree, use this order:
 5. Accepted evidence and exact repository state.
 6. Issue #1 — current operational handoffs.
 
-`docs/AGENT_SYSTEM_INDEX.md` is the navigation map for the documentation set.
+`docs/AGENT_SYSTEM_INDEX.md` is the navigation map. If this protocol and that index disagree on order, this protocol wins until the conflict is posted on Issue #1.
+
+The canonical lab roles are **Scout, Test Runner, Judge, and Publisher**. This protocol uses the practical names below. ChatGPT/Solace is the coordinator/publisher, not the default judge. A strategic comment from the coordinator does not replace an independent review.
 
 Do not silently reinterpret the canonical product thesis. Surface conflicts in Issue #1 and STOP.
 
@@ -33,7 +35,7 @@ Finds relevant external changes and proposes bounded review/retest work. Scout d
 Implements only the bounded work order and/or executes the approved evaluation. The builder does not self-accept its own work.
 
 ### Reviewer / Judge
-Inspects the exact commit/PR or run independently. A summary from the builder is not evidence.
+Inspects the exact commit/PR or run independently. A summary from the builder is not evidence. This role is not the deterministic scoring function also called Judge in the canonical document. That function is code. See `docs/FOUR_AGENT_SYSTEM.md`.
 
 ### Coordinator / Publisher
 Turns accepted evidence and human intent into the next bounded work order or publish candidate. It does not invent or upgrade claims beyond accepted evidence.

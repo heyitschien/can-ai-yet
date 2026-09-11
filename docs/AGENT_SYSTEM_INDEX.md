@@ -2,14 +2,32 @@
 
 This index exists so a fresh human or agent can quickly understand which document answers which question.
 
-## Read in this order
+Two lists. Do not treat them as the same thing.
+
+## If documents disagree, this order wins
 
 1. `../canonical-build-doc.md` — what CanAIYet is and what must be built.
 2. `COMMUNICATION_PROTOCOL.md` — how work is handed off, reviewed, accepted, and recorded.
-3. `FOUR_AGENT_SYSTEM.md` — which logical agent roles exist, which tools currently fill them, and the separation-of-duties rules.
+3. `FOUR_AGENT_SYSTEM.md` — logical lab roles, current tool assignments, and separation of duties.
 4. `NEXT_MISSIONS.md` — what should happen next and why.
-5. `ORIGIN_AND_DECISION_TRAIL.md` — how the product idea evolved and the decisions that produced the current architecture.
-6. `EXPLAINED_LIKE_IM_FIVE.md` — the plain-language mental model.
+5. Accepted evidence and the exact repository state.
+6. GitHub Issue #1 — the live work order.
+
+`ORIGIN_AND_DECISION_TRAIL.md` and `EXPLAINED_LIKE_IM_FIVE.md` are explanation, not authority. `FOUR_AGENT_SYSTEM_SUMMARY.md` is a refresher, not a second architecture.
+
+## First read for a fresh agent
+
+1. This index.
+2. `../canonical-build-doc.md`
+3. `COMMUNICATION_PROTOCOL.md`
+4. `FOUR_AGENT_SYSTEM.md`
+5. `NEXT_MISSIONS.md`
+6. Issue #1, including the latest receipt.
+7. `ORIGIN_AND_DECISION_TRAIL.md` and `EXPLAINED_LIKE_IM_FIVE.md` when the why or the plain explanation is needed.
+
+## Name map
+
+The canonical lab roles are **Scout, Test Runner, Judge, and Publisher**. The operating docs also say Builder, Reviewer, and Coordinator. Those are the same jobs with practical names. The human owner and the ChatGPT manager layer sit above that loop. They are not a fifth lab role, and ChatGPT is not the default Judge.
 
 ## Operational memory
 

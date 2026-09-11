@@ -88,6 +88,16 @@ Then the referee checks it exactly the same way.
 
 When we can truthfully show that result, the full idea is working end to end.
 
+## Who does the jobs?
+
+Four helpers, plus a person in charge. We do not need four expensive clubs. The jobs stay the same even if we later swap the helper.
+
+- One helper **looks around** for new tools and model news.
+- One helper **builds and runs the test**.
+- A different helper, who did not do the work, **checks the homework**.
+- One helper **writes the next assignment** and only talks about results that already passed review.
+- **A person still decides** the big stuff: what matters, when to spend money, and what we are allowed to say in public.
+
 ## The whole project in one little story
 
 **The website asks the question.  
