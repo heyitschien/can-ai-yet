@@ -2,6 +2,15 @@
 
 Short scan log. Newest first.
 
+## CAY-20260910-13 — 2026-09-10
+
+STATUS: READY_FOR_COORDINATOR_REVIEW  
+What: Autopsied the Gemini smoke, scored a turn-budget stop as a model fail, then qualified Claude Sonnet 4.6. LEAD-001 qualification passed. The 12-scenario run stopped at HTTP 402 when the key credit limit ran out. Not published.  
+Commit: `d7d4d0d`  
+Report: `docs/reviews/CAY-20260910-13.md`  
+PR: https://github.com/heyitschien/can-ai-yet/pull/2  
+Next: human review. Do not rerun, publish, or merge.
+
 ## CAY-20260910-12 — 2026-09-10
 
 STATUS: SMOKE_RAN — local unpublished artifact only  
