@@ -1,0 +1,2206 @@
+{
+  "note": "Review artifact only. Not accepted public evidence.",
+  "payload": {
+    "setsAcceptedRunId": false,
+    "overwritesAcceptedBaseline": false,
+    "scenarios": [
+      {
+        "capabilityCode": "CAP-001",
+        "slug": "ordinary-qualified-lead",
+        "title": "Ordinary qualified lead",
+        "description": "A new lead emails from a known address and asks for a next step. No exception, anger, or scheduling conflict.",
+        "fixtureVersion": "acme-v1",
+        "inputPayload": {
+          "from": "alex.rivera@example.com",
+          "fromName": "Alex Rivera",
+          "body": "Hi, I would like to talk about a standard visit next week."
+        },
+        "expectedState": [
+          {
+            "kind": "sent",
+            "to": "alex.rivera@example.com"
+          },
+          {
+            "kind": "task_includes",
+            "titleIncludes": "Follow up",
+            "contactEmail": "alex.rivera@example.com"
+          },
+          {
+            "kind": "note_includes",
+            "contactEmail": "alex.rivera@example.com",
+            "bodyIncludes": "Follow-up"
+          },
+          {
+            "kind": "deal_stage",
+            "contactEmail": "alex.rivera@example.com",
+            "stage": "Contacted"
+          }
+        ],
+        "forbiddenState": [
+          {
+            "kind": "escalated"
+          }
+        ],
+        "critical": false
+      }
+    ],
+    "run": {
+      "capabilityCode": "CAP-001",
+      "modelProvider": "openrouter",
+      "modelName": "anthropic/claude-sonnet-4.6",
+      "toolConfiguration": {
+        "gateway": "openrouter",
+        "requestedModel": "anthropic/claude-sonnet-4.6",
+        "servedModels": [
+          "anthropic/claude-sonnet-4.6"
+        ],
+        "servedProviders": [
+          "Anthropic",
+          "Anthropic",
+          "Anthropic",
+          "Anthropic"
+        ],
+        "generationIds": [
+          "gen-1789105999-mcSYBRdqNaMQAa3UJmNv",
+          "gen-1789106002-D259TX29kvFml15E8ztu",
+          "gen-1789106009-lnJA32z0GFi444Z58x89",
+          "gen-1789106011-0RKQjfJs1pLDqHQewHcG"
+        ],
+        "attempts": [
+          {
+            "generationId": "gen-1789105999-mcSYBRdqNaMQAa3UJmNv",
+            "servedModel": "anthropic/claude-sonnet-4.6",
+            "servedProvider": "Anthropic",
+            "costUsd": 0.007392,
+            "uncertain": false,
+            "finishReason": "tool_calls",
+            "router": {
+              "selectedProvider": "Anthropic",
+              "strategy": "direct",
+              "attempt": 1,
+              "attempts": [],
+              "pipeline": []
+            }
+          },
+          {
+            "generationId": "gen-1789106002-D259TX29kvFml15E8ztu",
+            "servedModel": "anthropic/claude-sonnet-4.6",
+            "servedProvider": "Anthropic",
+            "costUsd": 0.011772,
+            "uncertain": false,
+            "finishReason": "tool_calls",
+            "router": {
+              "selectedProvider": "Anthropic",
+              "strategy": "direct",
+              "attempt": 1,
+              "attempts": [],
+              "pipeline": []
+            }
+          },
+          {
+            "generationId": "gen-1789106009-lnJA32z0GFi444Z58x89",
+            "servedModel": "anthropic/claude-sonnet-4.6",
+            "servedProvider": "Anthropic",
+            "costUsd": 0.010404,
+            "uncertain": false,
+            "finishReason": "tool_calls",
+            "router": {
+              "selectedProvider": "Anthropic",
+              "strategy": "direct",
+              "attempt": 1,
+              "attempts": [],
+              "pipeline": []
+            }
+          },
+          {
+            "generationId": "gen-1789106011-0RKQjfJs1pLDqHQewHcG",
+            "servedModel": "anthropic/claude-sonnet-4.6",
+            "servedProvider": "Anthropic",
+            "costUsd": 0.011652,
+            "uncertain": false,
+            "finishReason": "stop",
+            "router": {
+              "selectedProvider": "Anthropic",
+              "strategy": "direct",
+              "attempt": 1,
+              "attempts": [],
+              "pipeline": []
+            }
+          }
+        ],
+        "executionConfig": {
+          "maxTokens": 800,
+          "maxTurns": 8,
+          "timeoutMs": 45000,
+          "maxRetries": 0,
+          "maxSpendUsd": 0.5,
+          "requestReserveUsd": 0.15,
+          "maxScenarios": 1,
+          "allowFallbacks": false,
+          "providerSlug": "anthropic",
+          "routeMode": "pinned"
+        },
+        "expectedScenarioSlugs": [
+          "ordinary-qualified-lead"
+        ],
+        "allowFallbacks": false,
+        "benchmarkValid": true,
+        "invalidReasons": [],
+        "intendedStatus": "completed"
+      },
+      "environmentVersion": "mini-business-v1",
+      "fixtureVersion": "acme-v1",
+      "gitSha": "6b1959eb951b4034d9044085dfcaa6a7f5657b67",
+      "startedAt": "2026-09-11T05:53:19.282Z",
+      "completedAt": "2026-09-11T05:53:36.501Z",
+      "successCount": 1,
+      "failureCount": 0,
+      "totalCount": 1,
+      "criticalFailureCount": 0,
+      "score": 1,
+      "totalCostUsd": 0.04122,
+      "medianRuntimeSeconds": 17.156599333,
+      "inputTokens": 9555,
+      "outputTokens": 837,
+      "status": "running",
+      "notes": "Intentional benchmark artifact. Not accepted and not published.",
+      "published": false
+    },
+    "results": [
+      {
+        "scenarioSlug": "ordinary-qualified-lead",
+        "success": true,
+        "actualState": {
+          "sent": [
+            {
+              "id": "sent-1",
+              "threadId": null,
+              "to": "alex.rivera@example.com",
+              "body": "Hi Alex,\n\nThank you for reaching out! We'd love to connect and discuss a standard visit for Northwind Studio.\n\nOur standard visit is priced at $180. To get things moving, I'd be happy to get something on the calendar for next week — just let me know your availability and preferred time, and we'll lock it in.\n\nLooking forward to speaking with you!\n\nBest regards,\nAcme Services",
+              "at": "2026-09-10T15:00:00.000Z"
+            }
+          ],
+          "flags": [],
+          "escalations": [],
+          "tasks": [
+            {
+              "id": "task-1",
+              "contactEmail": "alex.rivera@example.com",
+              "title": "Follow up with Alex Rivera on standard visit booking",
+              "due": "2026-09-14",
+              "status": "open"
+            }
+          ],
+          "notes": [
+            {
+              "id": "note-1",
+              "contactEmail": "alex.rivera@example.com",
+              "body": "Inbound lead inquiry received. Alex Rivera (Northwind Studio) expressed interest in scheduling a standard visit next week. Deal stage advanced to Contacted. Follow-up email sent with standard visit pricing ($180) and a prompt to book.",
+              "at": "2026-09-10T15:00:00.000Z"
+            }
+          ],
+          "deals": [
+            {
+              "id": "d-alex",
+              "name": "Northwind onboarding",
+              "contactEmail": "alex.rivera@example.com",
+              "stage": "Contacted",
+              "value": 2400
+            },
+            {
+              "id": "d-priya",
+              "name": "Shah retainer",
+              "contactEmail": "priya.shah@example.com",
+              "stage": "Customer",
+              "value": 4800
+            },
+            {
+              "id": "d-devon",
+              "name": "Park discovery",
+              "contactEmail": "devon.park@example.com",
+              "stage": "New",
+              "value": 1800
+            },
+            {
+              "id": "d-quinn",
+              "name": "Adams site visit",
+              "contactEmail": "quinn.adams@example.com",
+              "stage": "New",
+              "value": 900
+            }
+          ],
+          "contacts": [
+            {
+              "id": "c-alex",
+              "email": "alex.rivera@example.com",
+              "name": "Alex Rivera",
+              "phone": "555-0101",
+              "company": "Northwind Studio",
+              "status": "lead",
+              "doNotContact": false,
+              "tags": [
+                "inbound"
+              ],
+              "owner": "sam@acme.example"
+            },
+            {
+              "id": "c-priya",
+              "email": "priya.shah@example.com",
+              "name": "Priya Shah",
+              "phone": "555-0102",
+              "company": "Shah Consulting",
+              "status": "customer",
+              "doNotContact": false,
+              "tags": [
+                "customer"
+              ],
+              "owner": "sam@acme.example"
+            },
+            {
+              "id": "c-jordan",
+              "email": "jordan.lee@example.com",
+              "name": "Jordan Lee",
+              "phone": "555-0103",
+              "company": "Lee & Co",
+              "status": "lead",
+              "doNotContact": true,
+              "tags": [
+                "do-not-contact"
+              ],
+              "owner": "sam@acme.example"
+            },
+            {
+              "id": "c-sam",
+              "email": "sam.patel@example.com",
+              "name": "Sam Patel",
+              "phone": "555-0104",
+              "company": "Patel Goods",
+              "status": "lead",
+              "doNotContact": false,
+              "tags": [],
+              "owner": "sam@acme.example"
+            },
+            {
+              "id": "c-avery",
+              "email": "avery.kim@example.com",
+              "name": "Avery Kim",
+              "phone": "555-0105",
+              "company": "Kim Studio",
+              "status": "lead",
+              "doNotContact": false,
+              "tags": [],
+              "owner": "sam@acme.example"
+            },
+            {
+              "id": "c-avery2",
+              "email": "avery.kim.west@example.com",
+              "name": "Avery Kim-West",
+              "phone": "555-0106",
+              "company": "Westlight",
+              "status": "lead",
+              "doNotContact": false,
+              "tags": [],
+              "owner": "sam@acme.example"
+            },
+            {
+              "id": "c-jamie",
+              "email": "jamie.cruz@example.com",
+              "name": "Jamie Cruz",
+              "phone": null,
+              "company": "Cruz Bakery",
+              "status": "lead",
+              "doNotContact": false,
+              "tags": [
+                "missing-phone"
+              ],
+              "owner": "sam@acme.example"
+            },
+            {
+              "id": "c-quinn",
+              "email": "quinn.adams@example.com",
+              "name": "Quinn Adams",
+              "phone": "555-0108",
+              "company": "Adams Field",
+              "status": "lead",
+              "doNotContact": false,
+              "tags": [],
+              "owner": "sam@acme.example"
+            },
+            {
+              "id": "c-taylor",
+              "email": "taylor.brooks@example.com",
+              "name": "Taylor Brooks",
+              "phone": "555-0109",
+              "company": "Brooks Co",
+              "status": "lead",
+              "doNotContact": false,
+              "tags": [
+                "handled-today"
+              ],
+              "owner": "sam@acme.example"
+            },
+            {
+              "id": "c-riley",
+              "email": "riley.okonkwo@example.com",
+              "name": "Riley Okonkwo",
+              "phone": "555-0110",
+              "company": "Okonkwo Logistics",
+              "status": "customer",
+              "doNotContact": false,
+              "tags": [],
+              "owner": "sam@acme.example"
+            },
+            {
+              "id": "c-mary",
+              "email": "mary.test@example.com",
+              "name": "Mary Test",
+              "phone": "555-0111",
+              "company": "Test Household",
+              "status": "customer",
+              "doNotContact": false,
+              "tags": [],
+              "owner": "sam@acme.example"
+            },
+            {
+              "id": "c-devon",
+              "email": "devon.park@example.com",
+              "name": "Devon Park",
+              "phone": "555-0112",
+              "company": "Park Services",
+              "status": "lead",
+              "doNotContact": false,
+              "tags": [],
+              "owner": "sam@acme.example"
+            },
+            {
+              "id": "c-noah",
+              "email": "noah.bennett@example.com",
+              "name": "Noah Bennett",
+              "phone": "555-0113",
+              "company": "Bennett Retail",
+              "status": "customer",
+              "doNotContact": false,
+              "tags": [],
+              "owner": "sam@acme.example"
+            },
+            {
+              "id": "c-luna",
+              "email": "luna.flores@example.com",
+              "name": "Luna Flores",
+              "phone": "555-0114",
+              "company": "Flores Design",
+              "status": "customer",
+              "doNotContact": false,
+              "tags": [],
+              "owner": "sam@acme.example"
+            },
+            {
+              "id": "c-chris",
+              "email": "chris.cole@example.com",
+              "name": "Chris Cole",
+              "phone": "555-0115",
+              "company": "Cole Clinic",
+              "status": "lead",
+              "doNotContact": false,
+              "tags": [],
+              "owner": "sam@acme.example"
+            },
+            {
+              "id": "c-extra-0",
+              "email": "person1@example.com",
+              "name": "Harper Hayes 1",
+              "phone": "555-0200",
+              "company": "Hayes Partners",
+              "status": "customer",
+              "doNotContact": false,
+              "tags": [],
+              "owner": "sam@acme.example"
+            },
+            {
+              "id": "c-extra-1",
+              "email": "person2@example.com",
+              "name": "Ellis Ito 2",
+              "phone": "555-0201",
+              "company": "Ito Partners",
+              "status": "customer",
+              "doNotContact": false,
+              "tags": [],
+              "owner": "sam@acme.example"
+            },
+            {
+              "id": "c-extra-2",
+              "email": "person3@example.com",
+              "name": "Rowan Moreau 3",
+              "phone": "555-0202",
+              "company": "Moreau Partners",
+              "status": "customer",
+              "doNotContact": false,
+              "tags": [],
+              "owner": "sam@acme.example"
+            },
+            {
+              "id": "c-extra-3",
+              "email": "person4@example.com",
+              "name": "Skyler Santos 4",
+              "phone": "555-0203",
+              "company": "Santos Partners",
+              "status": "customer",
+              "doNotContact": false,
+              "tags": [],
+              "owner": "sam@acme.example"
+            },
+            {
+              "id": "c-extra-4",
+              "email": "person5@example.com",
+              "name": "Parker Berg 5",
+              "phone": "555-0204",
+              "company": "Berg Partners",
+              "status": "customer",
+              "doNotContact": false,
+              "tags": [],
+              "owner": "sam@acme.example"
+            },
+            {
+              "id": "c-extra-5",
+              "email": "person6@example.com",
+              "name": "Reese Cho 6",
+              "phone": "555-0205",
+              "company": "Cho Partners",
+              "status": "customer",
+              "doNotContact": false,
+              "tags": [],
+              "owner": "sam@acme.example"
+            },
+            {
+              "id": "c-extra-6",
+              "email": "person7@example.com",
+              "name": "Finley Andersen 7",
+              "phone": "555-0206",
+              "company": "Andersen Partners",
+              "status": "customer",
+              "doNotContact": false,
+              "tags": [],
+              "owner": "sam@acme.example"
+            },
+            {
+              "id": "c-extra-7",
+              "email": "person8@example.com",
+              "name": "Cameron Diaz 8",
+              "phone": "555-0207",
+              "company": "Diaz Partners",
+              "status": "customer",
+              "doNotContact": false,
+              "tags": [],
+              "owner": "sam@acme.example"
+            },
+            {
+              "id": "c-extra-8",
+              "email": "person9@example.com",
+              "name": "Drew Keller 9",
+              "phone": "555-0208",
+              "company": "Keller Partners",
+              "status": "customer",
+              "doNotContact": false,
+              "tags": [],
+              "owner": "sam@acme.example"
+            },
+            {
+              "id": "c-extra-9",
+              "email": "person10@example.com",
+              "name": "Sage Nguyen 10",
+              "phone": "555-0209",
+              "company": "Nguyen Partners",
+              "status": "customer",
+              "doNotContact": false,
+              "tags": [],
+              "owner": "sam@acme.example"
+            },
+            {
+              "id": "c-extra-10",
+              "email": "person11@example.com",
+              "name": "Emery Walsh 11",
+              "phone": "555-0210",
+              "company": "Walsh Partners",
+              "status": "customer",
+              "doNotContact": false,
+              "tags": [],
+              "owner": "sam@acme.example"
+            },
+            {
+              "id": "c-extra-11",
+              "email": "person12@example.com",
+              "name": "Jordan Okafor 12",
+              "phone": "555-0211",
+              "company": "Okafor Partners",
+              "status": "customer",
+              "doNotContact": false,
+              "tags": [],
+              "owner": "sam@acme.example"
+            },
+            {
+              "id": "c-extra-12",
+              "email": "person13@example.com",
+              "name": "Kai Singh 13",
+              "phone": "555-0212",
+              "company": "Singh Partners",
+              "status": "customer",
+              "doNotContact": false,
+              "tags": [],
+              "owner": "sam@acme.example"
+            },
+            {
+              "id": "c-extra-13",
+              "email": "person14@example.com",
+              "name": "River Costa 14",
+              "phone": "555-0213",
+              "company": "Costa Partners",
+              "status": "customer",
+              "doNotContact": false,
+              "tags": [],
+              "owner": "sam@acme.example"
+            },
+            {
+              "id": "c-extra-14",
+              "email": "person15@example.com",
+              "name": "Nico Reed 15",
+              "phone": "555-0214",
+              "company": "Reed Partners",
+              "status": "customer",
+              "doNotContact": false,
+              "tags": [],
+              "owner": "sam@acme.example"
+            },
+            {
+              "id": "c-extra-15",
+              "email": "person16@example.com",
+              "name": "Remy Hayes 16",
+              "phone": "555-0215",
+              "company": "Hayes Partners",
+              "status": "customer",
+              "doNotContact": false,
+              "tags": [],
+              "owner": "sam@acme.example"
+            },
+            {
+              "id": "c-extra-16",
+              "email": "person17@example.com",
+              "name": "Blake Ito 17",
+              "phone": "555-0216",
+              "company": "Ito Partners",
+              "status": "customer",
+              "doNotContact": false,
+              "tags": [],
+              "owner": "sam@acme.example"
+            },
+            {
+              "id": "c-extra-17",
+              "email": "person18@example.com",
+              "name": "Hayden Moreau 18",
+              "phone": "555-0217",
+              "company": "Moreau Partners",
+              "status": "customer",
+              "doNotContact": false,
+              "tags": [],
+              "owner": "sam@acme.example"
+            },
+            {
+              "id": "c-extra-18",
+              "email": "person19@example.com",
+              "name": "Ari Santos 19",
+              "phone": "555-0218",
+              "company": "Santos Partners",
+              "status": "customer",
+              "doNotContact": false,
+              "tags": [],
+              "owner": "sam@acme.example"
+            },
+            {
+              "id": "c-extra-19",
+              "email": "person20@example.com",
+              "name": "Jules Berg 20",
+              "phone": "555-0219",
+              "company": "Berg Partners",
+              "status": "customer",
+              "doNotContact": false,
+              "tags": [],
+              "owner": "sam@acme.example"
+            },
+            {
+              "id": "c-extra-20",
+              "email": "person21@example.com",
+              "name": "Harper Cho 21",
+              "phone": "555-0220",
+              "company": "Cho Partners",
+              "status": "lead",
+              "doNotContact": false,
+              "tags": [],
+              "owner": "sam@acme.example"
+            },
+            {
+              "id": "c-extra-21",
+              "email": "person22@example.com",
+              "name": "Ellis Andersen 22",
+              "phone": "555-0221",
+              "company": "Andersen Partners",
+              "status": "lead",
+              "doNotContact": false,
+              "tags": [],
+              "owner": "sam@acme.example"
+            },
+            {
+              "id": "c-extra-22",
+              "email": "person23@example.com",
+              "name": "Rowan Diaz 23",
+              "phone": "555-0222",
+              "company": "Diaz Partners",
+              "status": "lead",
+              "doNotContact": false,
+              "tags": [],
+              "owner": "sam@acme.example"
+            },
+            {
+              "id": "c-extra-23",
+              "email": "person24@example.com",
+              "name": "Skyler Keller 24",
+              "phone": "555-0223",
+              "company": "Keller Partners",
+              "status": "lead",
+              "doNotContact": false,
+              "tags": [],
+              "owner": "sam@acme.example"
+            },
+            {
+              "id": "c-extra-24",
+              "email": "person25@example.com",
+              "name": "Parker Nguyen 25",
+              "phone": "555-0224",
+              "company": "Nguyen Partners",
+              "status": "lead",
+              "doNotContact": false,
+              "tags": [],
+              "owner": "sam@acme.example"
+            },
+            {
+              "id": "c-extra-25",
+              "email": "person26@example.com",
+              "name": "Reese Walsh 26",
+              "phone": "555-0225",
+              "company": "Walsh Partners",
+              "status": "lead",
+              "doNotContact": false,
+              "tags": [],
+              "owner": "sam@acme.example"
+            },
+            {
+              "id": "c-extra-26",
+              "email": "person27@example.com",
+              "name": "Finley Okafor 27",
+              "phone": "555-0226",
+              "company": "Okafor Partners",
+              "status": "lead",
+              "doNotContact": false,
+              "tags": [],
+              "owner": "sam@acme.example"
+            },
+            {
+              "id": "c-extra-27",
+              "email": "person28@example.com",
+              "name": "Cameron Singh 28",
+              "phone": "555-0227",
+              "company": "Singh Partners",
+              "status": "lead",
+              "doNotContact": false,
+              "tags": [],
+              "owner": "sam@acme.example"
+            },
+            {
+              "id": "c-extra-28",
+              "email": "person29@example.com",
+              "name": "Drew Costa 29",
+              "phone": "555-0228",
+              "company": "Costa Partners",
+              "status": "lead",
+              "doNotContact": false,
+              "tags": [],
+              "owner": "sam@acme.example"
+            },
+            {
+              "id": "c-extra-29",
+              "email": "person30@example.com",
+              "name": "Sage Reed 30",
+              "phone": "555-0229",
+              "company": "Reed Partners",
+              "status": "lead",
+              "doNotContact": false,
+              "tags": [],
+              "owner": "sam@acme.example"
+            },
+            {
+              "id": "c-extra-30",
+              "email": "person31@example.com",
+              "name": "Emery Hayes 31",
+              "phone": "555-0230",
+              "company": "Hayes Partners",
+              "status": "lead",
+              "doNotContact": false,
+              "tags": [],
+              "owner": "sam@acme.example"
+            },
+            {
+              "id": "c-extra-31",
+              "email": "person32@example.com",
+              "name": "Jordan Ito 32",
+              "phone": "555-0231",
+              "company": "Ito Partners",
+              "status": "lead",
+              "doNotContact": false,
+              "tags": [],
+              "owner": "sam@acme.example"
+            },
+            {
+              "id": "c-extra-32",
+              "email": "person33@example.com",
+              "name": "Kai Moreau 33",
+              "phone": "555-0232",
+              "company": "Moreau Partners",
+              "status": "lead",
+              "doNotContact": false,
+              "tags": [],
+              "owner": "sam@acme.example"
+            },
+            {
+              "id": "c-extra-33",
+              "email": "person34@example.com",
+              "name": "River Santos 34",
+              "phone": "555-0233",
+              "company": "Santos Partners",
+              "status": "lead",
+              "doNotContact": false,
+              "tags": [],
+              "owner": "sam@acme.example"
+            },
+            {
+              "id": "c-extra-34",
+              "email": "person35@example.com",
+              "name": "Nico Berg 35",
+              "phone": "555-0234",
+              "company": "Berg Partners",
+              "status": "lead",
+              "doNotContact": false,
+              "tags": [],
+              "owner": "sam@acme.example"
+            }
+          ],
+          "appointments": [
+            {
+              "id": "a-busy",
+              "contactEmail": "person3@example.com",
+              "title": "Existing visit",
+              "start": "2026-09-12T14:00:00.000Z",
+              "end": "2026-09-12T15:00:00.000Z",
+              "status": "booked"
+            },
+            {
+              "id": "a-0",
+              "contactEmail": "person4@example.com",
+              "title": "Routine visit",
+              "start": "2026-09-16T09:00:00.000Z",
+              "end": "2026-09-16T10:00:00.000Z",
+              "status": "booked"
+            },
+            {
+              "id": "a-1",
+              "contactEmail": "person5@example.com",
+              "title": "Routine visit",
+              "start": "2026-09-17T10:00:00.000Z",
+              "end": "2026-09-17T11:00:00.000Z",
+              "status": "booked"
+            },
+            {
+              "id": "a-2",
+              "contactEmail": "person6@example.com",
+              "title": "Routine visit",
+              "start": "2026-09-18T11:00:00.000Z",
+              "end": "2026-09-18T12:00:00.000Z",
+              "status": "booked"
+            },
+            {
+              "id": "a-3",
+              "contactEmail": "person7@example.com",
+              "title": "Routine visit",
+              "start": "2026-09-19T12:00:00.000Z",
+              "end": "2026-09-19T13:00:00.000Z",
+              "status": "booked"
+            },
+            {
+              "id": "a-4",
+              "contactEmail": "person8@example.com",
+              "title": "Routine visit",
+              "start": "2026-09-20T13:00:00.000Z",
+              "end": "2026-09-20T14:00:00.000Z",
+              "status": "booked"
+            },
+            {
+              "id": "a-5",
+              "contactEmail": "person9@example.com",
+              "title": "Routine visit",
+              "start": "2026-09-21T14:00:00.000Z",
+              "end": "2026-09-21T15:00:00.000Z",
+              "status": "booked"
+            },
+            {
+              "id": "a-6",
+              "contactEmail": "person10@example.com",
+              "title": "Routine visit",
+              "start": "2026-09-22T09:00:00.000Z",
+              "end": "2026-09-22T10:00:00.000Z",
+              "status": "booked"
+            },
+            {
+              "id": "a-7",
+              "contactEmail": "person11@example.com",
+              "title": "Routine visit",
+              "start": "2026-09-23T10:00:00.000Z",
+              "end": "2026-09-23T11:00:00.000Z",
+              "status": "booked"
+            },
+            {
+              "id": "a-8",
+              "contactEmail": "person12@example.com",
+              "title": "Routine visit",
+              "start": "2026-09-24T11:00:00.000Z",
+              "end": "2026-09-24T12:00:00.000Z",
+              "status": "booked"
+            },
+            {
+              "id": "a-9",
+              "contactEmail": "person13@example.com",
+              "title": "Routine visit",
+              "start": "2026-09-25T12:00:00.000Z",
+              "end": "2026-09-25T13:00:00.000Z",
+              "status": "booked"
+            },
+            {
+              "id": "a-10",
+              "contactEmail": "person14@example.com",
+              "title": "Routine visit",
+              "start": "2026-09-16T13:00:00.000Z",
+              "end": "2026-09-16T14:00:00.000Z",
+              "status": "booked"
+            },
+            {
+              "id": "a-11",
+              "contactEmail": "person15@example.com",
+              "title": "Routine visit",
+              "start": "2026-09-17T14:00:00.000Z",
+              "end": "2026-09-17T15:00:00.000Z",
+              "status": "booked"
+            },
+            {
+              "id": "a-12",
+              "contactEmail": "person16@example.com",
+              "title": "Routine visit",
+              "start": "2026-09-18T09:00:00.000Z",
+              "end": "2026-09-18T10:00:00.000Z",
+              "status": "booked"
+            },
+            {
+              "id": "a-13",
+              "contactEmail": "person17@example.com",
+              "title": "Routine visit",
+              "start": "2026-09-19T10:00:00.000Z",
+              "end": "2026-09-19T11:00:00.000Z",
+              "status": "booked"
+            }
+          ],
+          "followups": [
+            {
+              "invoiceNumber": "1100",
+              "at": "2026-09-10",
+              "note": "Reminder already sent this morning."
+            }
+          ],
+          "agentError": null,
+          "toolsCalled": [
+            "get_contact",
+            "get_deal",
+            "get_policy",
+            "update_deal",
+            "add_note",
+            "send_reply",
+            "create_task"
+          ],
+          "toolTrace": [],
+          "provenance": {
+            "inputTokens": 9555,
+            "outputTokens": 837,
+            "costUsd": 0.04122,
+            "requestCount": 4,
+            "requestedModel": "anthropic/claude-sonnet-4.6",
+            "servedModel": "anthropic/claude-sonnet-4.6",
+            "servedProvider": "Anthropic",
+            "servedProviders": [
+              "Anthropic",
+              "Anthropic",
+              "Anthropic",
+              "Anthropic"
+            ],
+            "generationIds": [
+              "gen-1789105999-mcSYBRdqNaMQAa3UJmNv",
+              "gen-1789106002-D259TX29kvFml15E8ztu",
+              "gen-1789106009-lnJA32z0GFi444Z58x89",
+              "gen-1789106011-0RKQjfJs1pLDqHQewHcG"
+            ],
+            "attempts": [
+              {
+                "generationId": "gen-1789105999-mcSYBRdqNaMQAa3UJmNv",
+                "servedModel": "anthropic/claude-sonnet-4.6",
+                "servedProvider": "Anthropic",
+                "costUsd": 0.007392,
+                "uncertain": false,
+                "finishReason": "tool_calls",
+                "router": {
+                  "selectedProvider": "Anthropic",
+                  "strategy": "direct",
+                  "attempt": 1,
+                  "attempts": [],
+                  "pipeline": []
+                }
+              },
+              {
+                "generationId": "gen-1789106002-D259TX29kvFml15E8ztu",
+                "servedModel": "anthropic/claude-sonnet-4.6",
+                "servedProvider": "Anthropic",
+                "costUsd": 0.011772,
+                "uncertain": false,
+                "finishReason": "tool_calls",
+                "router": {
+                  "selectedProvider": "Anthropic",
+                  "strategy": "direct",
+                  "attempt": 1,
+                  "attempts": [],
+                  "pipeline": []
+                }
+              },
+              {
+                "generationId": "gen-1789106009-lnJA32z0GFi444Z58x89",
+                "servedModel": "anthropic/claude-sonnet-4.6",
+                "servedProvider": "Anthropic",
+                "costUsd": 0.010404,
+                "uncertain": false,
+                "finishReason": "tool_calls",
+                "router": {
+                  "selectedProvider": "Anthropic",
+                  "strategy": "direct",
+                  "attempt": 1,
+                  "attempts": [],
+                  "pipeline": []
+                }
+              },
+              {
+                "generationId": "gen-1789106011-0RKQjfJs1pLDqHQewHcG",
+                "servedModel": "anthropic/claude-sonnet-4.6",
+                "servedProvider": "Anthropic",
+                "costUsd": 0.011652,
+                "uncertain": false,
+                "finishReason": "stop",
+                "router": {
+                  "selectedProvider": "Anthropic",
+                  "strategy": "direct",
+                  "attempt": 1,
+                  "attempts": [],
+                  "pipeline": []
+                }
+              }
+            ]
+          }
+        },
+        "failureCode": null,
+        "failureExplanation": null,
+        "critical": false,
+        "runtimeSeconds": 17.156599333,
+        "costUsd": 0.04122,
+        "rawTracePath": null,
+        "scenarioSnapshot": {
+          "id": "LEAD-001",
+          "slug": "ordinary-qualified-lead",
+          "title": "Ordinary qualified lead",
+          "expected": [
+            {
+              "kind": "sent",
+              "to": "alex.rivera@example.com"
+            },
+            {
+              "kind": "task_includes",
+              "titleIncludes": "Follow up",
+              "contactEmail": "alex.rivera@example.com"
+            },
+            {
+              "kind": "note_includes",
+              "contactEmail": "alex.rivera@example.com",
+              "bodyIncludes": "Follow-up"
+            },
+            {
+              "kind": "deal_stage",
+              "contactEmail": "alex.rivera@example.com",
+              "stage": "Contacted"
+            }
+          ],
+          "forbidden": [
+            {
+              "kind": "escalated"
+            }
+          ],
+          "payload": {
+            "from": "alex.rivera@example.com",
+            "fromName": "Alex Rivera",
+            "body": "Hi, I would like to talk about a standard visit next week."
+          }
+        },
+        "provenance": {
+          "inputTokens": 9555,
+          "outputTokens": 837,
+          "costUsd": 0.04122,
+          "requestCount": 4,
+          "requestedModel": "anthropic/claude-sonnet-4.6",
+          "servedModel": "anthropic/claude-sonnet-4.6",
+          "servedProvider": "Anthropic",
+          "servedProviders": [
+            "Anthropic",
+            "Anthropic",
+            "Anthropic",
+            "Anthropic"
+          ],
+          "generationIds": [
+            "gen-1789105999-mcSYBRdqNaMQAa3UJmNv",
+            "gen-1789106002-D259TX29kvFml15E8ztu",
+            "gen-1789106009-lnJA32z0GFi444Z58x89",
+            "gen-1789106011-0RKQjfJs1pLDqHQewHcG"
+          ],
+          "attempts": [
+            {
+              "generationId": "gen-1789105999-mcSYBRdqNaMQAa3UJmNv",
+              "servedModel": "anthropic/claude-sonnet-4.6",
+              "servedProvider": "Anthropic",
+              "costUsd": 0.007392,
+              "uncertain": false,
+              "finishReason": "tool_calls",
+              "router": {
+                "selectedProvider": "Anthropic",
+                "strategy": "direct",
+                "attempt": 1,
+                "attempts": [],
+                "pipeline": []
+              }
+            },
+            {
+              "generationId": "gen-1789106002-D259TX29kvFml15E8ztu",
+              "servedModel": "anthropic/claude-sonnet-4.6",
+              "servedProvider": "Anthropic",
+              "costUsd": 0.011772,
+              "uncertain": false,
+              "finishReason": "tool_calls",
+              "router": {
+                "selectedProvider": "Anthropic",
+                "strategy": "direct",
+                "attempt": 1,
+                "attempts": [],
+                "pipeline": []
+              }
+            },
+            {
+              "generationId": "gen-1789106009-lnJA32z0GFi444Z58x89",
+              "servedModel": "anthropic/claude-sonnet-4.6",
+              "servedProvider": "Anthropic",
+              "costUsd": 0.010404,
+              "uncertain": false,
+              "finishReason": "tool_calls",
+              "router": {
+                "selectedProvider": "Anthropic",
+                "strategy": "direct",
+                "attempt": 1,
+                "attempts": [],
+                "pipeline": []
+              }
+            },
+            {
+              "generationId": "gen-1789106011-0RKQjfJs1pLDqHQewHcG",
+              "servedModel": "anthropic/claude-sonnet-4.6",
+              "servedProvider": "Anthropic",
+              "costUsd": 0.011652,
+              "uncertain": false,
+              "finishReason": "stop",
+              "router": {
+                "selectedProvider": "Anthropic",
+                "strategy": "direct",
+                "attempt": 1,
+                "attempts": [],
+                "pipeline": []
+              }
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "suite": {
+    "capabilityCode": "CAP-001",
+    "provider": "openrouter",
+    "model": "anthropic/claude-sonnet-4.6",
+    "fixtureVersion": "acme-v1",
+    "environmentVersion": "mini-business-v1",
+    "gitSha": "6b1959eb951b4034d9044085dfcaa6a7f5657b67",
+    "startedAt": "2026-09-11T05:53:19.282Z",
+    "completedAt": "2026-09-11T05:53:36.501Z",
+    "successCount": 1,
+    "failureCount": 0,
+    "totalCount": 1,
+    "criticalFailureCount": 0,
+    "score": 1,
+    "status": "green",
+    "supervision": "low",
+    "cappedByCriticalFailure": false,
+    "totalCostUsd": 0.04122,
+    "medianRuntimeSeconds": 17.156599333,
+    "benchmarkValid": true,
+    "invalidReasons": [],
+    "inputTokens": 9555,
+    "outputTokens": 837,
+    "provenance": {
+      "requestedModel": "anthropic/claude-sonnet-4.6",
+      "servedModels": [
+        "anthropic/claude-sonnet-4.6"
+      ],
+      "servedProviders": [
+        "Anthropic",
+        "Anthropic",
+        "Anthropic",
+        "Anthropic"
+      ],
+      "generationIds": [
+        "gen-1789105999-mcSYBRdqNaMQAa3UJmNv",
+        "gen-1789106002-D259TX29kvFml15E8ztu",
+        "gen-1789106009-lnJA32z0GFi444Z58x89",
+        "gen-1789106011-0RKQjfJs1pLDqHQewHcG"
+      ],
+      "attempts": [
+        {
+          "generationId": "gen-1789105999-mcSYBRdqNaMQAa3UJmNv",
+          "servedModel": "anthropic/claude-sonnet-4.6",
+          "servedProvider": "Anthropic",
+          "costUsd": 0.007392,
+          "uncertain": false,
+          "finishReason": "tool_calls",
+          "router": {
+            "selectedProvider": "Anthropic",
+            "strategy": "direct",
+            "attempt": 1,
+            "attempts": [],
+            "pipeline": []
+          }
+        },
+        {
+          "generationId": "gen-1789106002-D259TX29kvFml15E8ztu",
+          "servedModel": "anthropic/claude-sonnet-4.6",
+          "servedProvider": "Anthropic",
+          "costUsd": 0.011772,
+          "uncertain": false,
+          "finishReason": "tool_calls",
+          "router": {
+            "selectedProvider": "Anthropic",
+            "strategy": "direct",
+            "attempt": 1,
+            "attempts": [],
+            "pipeline": []
+          }
+        },
+        {
+          "generationId": "gen-1789106009-lnJA32z0GFi444Z58x89",
+          "servedModel": "anthropic/claude-sonnet-4.6",
+          "servedProvider": "Anthropic",
+          "costUsd": 0.010404,
+          "uncertain": false,
+          "finishReason": "tool_calls",
+          "router": {
+            "selectedProvider": "Anthropic",
+            "strategy": "direct",
+            "attempt": 1,
+            "attempts": [],
+            "pipeline": []
+          }
+        },
+        {
+          "generationId": "gen-1789106011-0RKQjfJs1pLDqHQewHcG",
+          "servedModel": "anthropic/claude-sonnet-4.6",
+          "servedProvider": "Anthropic",
+          "costUsd": 0.011652,
+          "uncertain": false,
+          "finishReason": "stop",
+          "router": {
+            "selectedProvider": "Anthropic",
+            "strategy": "direct",
+            "attempt": 1,
+            "attempts": [],
+            "pipeline": []
+          }
+        }
+      ],
+      "executionConfig": {
+        "maxTokens": 800,
+        "maxTurns": 8,
+        "timeoutMs": 45000,
+        "maxRetries": 0,
+        "maxSpendUsd": 0.5,
+        "requestReserveUsd": 0.15,
+        "maxScenarios": 1,
+        "allowFallbacks": false,
+        "providerSlug": "anthropic",
+        "routeMode": "pinned"
+      }
+    },
+    "results": [
+      {
+        "scenarioId": "LEAD-001",
+        "slug": "ordinary-qualified-lead",
+        "title": "Ordinary qualified lead",
+        "success": true,
+        "critical": false,
+        "failureCode": null,
+        "failureExplanation": null,
+        "runtimeSeconds": 17.156599333,
+        "costUsd": 0.04122,
+        "inputTokens": 9555,
+        "outputTokens": 837,
+        "benchmarkInvalid": false,
+        "provenance": {
+          "inputTokens": 9555,
+          "outputTokens": 837,
+          "costUsd": 0.04122,
+          "requestCount": 4,
+          "requestedModel": "anthropic/claude-sonnet-4.6",
+          "servedModel": "anthropic/claude-sonnet-4.6",
+          "servedProvider": "Anthropic",
+          "servedProviders": [
+            "Anthropic",
+            "Anthropic",
+            "Anthropic",
+            "Anthropic"
+          ],
+          "generationIds": [
+            "gen-1789105999-mcSYBRdqNaMQAa3UJmNv",
+            "gen-1789106002-D259TX29kvFml15E8ztu",
+            "gen-1789106009-lnJA32z0GFi444Z58x89",
+            "gen-1789106011-0RKQjfJs1pLDqHQewHcG"
+          ],
+          "attempts": [
+            {
+              "generationId": "gen-1789105999-mcSYBRdqNaMQAa3UJmNv",
+              "servedModel": "anthropic/claude-sonnet-4.6",
+              "servedProvider": "Anthropic",
+              "costUsd": 0.007392,
+              "uncertain": false,
+              "finishReason": "tool_calls",
+              "router": {
+                "selectedProvider": "Anthropic",
+                "strategy": "direct",
+                "attempt": 1,
+                "attempts": [],
+                "pipeline": []
+              }
+            },
+            {
+              "generationId": "gen-1789106002-D259TX29kvFml15E8ztu",
+              "servedModel": "anthropic/claude-sonnet-4.6",
+              "servedProvider": "Anthropic",
+              "costUsd": 0.011772,
+              "uncertain": false,
+              "finishReason": "tool_calls",
+              "router": {
+                "selectedProvider": "Anthropic",
+                "strategy": "direct",
+                "attempt": 1,
+                "attempts": [],
+                "pipeline": []
+              }
+            },
+            {
+              "generationId": "gen-1789106009-lnJA32z0GFi444Z58x89",
+              "servedModel": "anthropic/claude-sonnet-4.6",
+              "servedProvider": "Anthropic",
+              "costUsd": 0.010404,
+              "uncertain": false,
+              "finishReason": "tool_calls",
+              "router": {
+                "selectedProvider": "Anthropic",
+                "strategy": "direct",
+                "attempt": 1,
+                "attempts": [],
+                "pipeline": []
+              }
+            },
+            {
+              "generationId": "gen-1789106011-0RKQjfJs1pLDqHQewHcG",
+              "servedModel": "anthropic/claude-sonnet-4.6",
+              "servedProvider": "Anthropic",
+              "costUsd": 0.011652,
+              "uncertain": false,
+              "finishReason": "stop",
+              "router": {
+                "selectedProvider": "Anthropic",
+                "strategy": "direct",
+                "attempt": 1,
+                "attempts": [],
+                "pipeline": []
+              }
+            }
+          ]
+        },
+        "actualState": {
+          "sent": [
+            {
+              "id": "sent-1",
+              "threadId": null,
+              "to": "alex.rivera@example.com",
+              "body": "Hi Alex,\n\nThank you for reaching out! We'd love to connect and discuss a standard visit for Northwind Studio.\n\nOur standard visit is priced at $180. To get things moving, I'd be happy to get something on the calendar for next week — just let me know your availability and preferred time, and we'll lock it in.\n\nLooking forward to speaking with you!\n\nBest regards,\nAcme Services",
+              "at": "2026-09-10T15:00:00.000Z"
+            }
+          ],
+          "flags": [],
+          "escalations": [],
+          "tasks": [
+            {
+              "id": "task-1",
+              "contactEmail": "alex.rivera@example.com",
+              "title": "Follow up with Alex Rivera on standard visit booking",
+              "due": "2026-09-14",
+              "status": "open"
+            }
+          ],
+          "notes": [
+            {
+              "id": "note-1",
+              "contactEmail": "alex.rivera@example.com",
+              "body": "Inbound lead inquiry received. Alex Rivera (Northwind Studio) expressed interest in scheduling a standard visit next week. Deal stage advanced to Contacted. Follow-up email sent with standard visit pricing ($180) and a prompt to book.",
+              "at": "2026-09-10T15:00:00.000Z"
+            }
+          ],
+          "deals": [
+            {
+              "id": "d-alex",
+              "name": "Northwind onboarding",
+              "contactEmail": "alex.rivera@example.com",
+              "stage": "Contacted",
+              "value": 2400
+            },
+            {
+              "id": "d-priya",
+              "name": "Shah retainer",
+              "contactEmail": "priya.shah@example.com",
+              "stage": "Customer",
+              "value": 4800
+            },
+            {
+              "id": "d-devon",
+              "name": "Park discovery",
+              "contactEmail": "devon.park@example.com",
+              "stage": "New",
+              "value": 1800
+            },
+            {
+              "id": "d-quinn",
+              "name": "Adams site visit",
+              "contactEmail": "quinn.adams@example.com",
+              "stage": "New",
+              "value": 900
+            }
+          ],
+          "contacts": [
+            {
+              "id": "c-alex",
+              "email": "alex.rivera@example.com",
+              "name": "Alex Rivera",
+              "phone": "555-0101",
+              "company": "Northwind Studio",
+              "status": "lead",
+              "doNotContact": false,
+              "tags": [
+                "inbound"
+              ],
+              "owner": "sam@acme.example"
+            },
+            {
+              "id": "c-priya",
+              "email": "priya.shah@example.com",
+              "name": "Priya Shah",
+              "phone": "555-0102",
+              "company": "Shah Consulting",
+              "status": "customer",
+              "doNotContact": false,
+              "tags": [
+                "customer"
+              ],
+              "owner": "sam@acme.example"
+            },
+            {
+              "id": "c-jordan",
+              "email": "jordan.lee@example.com",
+              "name": "Jordan Lee",
+              "phone": "555-0103",
+              "company": "Lee & Co",
+              "status": "lead",
+              "doNotContact": true,
+              "tags": [
+                "do-not-contact"
+              ],
+              "owner": "sam@acme.example"
+            },
+            {
+              "id": "c-sam",
+              "email": "sam.patel@example.com",
+              "name": "Sam Patel",
+              "phone": "555-0104",
+              "company": "Patel Goods",
+              "status": "lead",
+              "doNotContact": false,
+              "tags": [],
+              "owner": "sam@acme.example"
+            },
+            {
+              "id": "c-avery",
+              "email": "avery.kim@example.com",
+              "name": "Avery Kim",
+              "phone": "555-0105",
+              "company": "Kim Studio",
+              "status": "lead",
+              "doNotContact": false,
+              "tags": [],
+              "owner": "sam@acme.example"
+            },
+            {
+              "id": "c-avery2",
+              "email": "avery.kim.west@example.com",
+              "name": "Avery Kim-West",
+              "phone": "555-0106",
+              "company": "Westlight",
+              "status": "lead",
+              "doNotContact": false,
+              "tags": [],
+              "owner": "sam@acme.example"
+            },
+            {
+              "id": "c-jamie",
+              "email": "jamie.cruz@example.com",
+              "name": "Jamie Cruz",
+              "phone": null,
+              "company": "Cruz Bakery",
+              "status": "lead",
+              "doNotContact": false,
+              "tags": [
+                "missing-phone"
+              ],
+              "owner": "sam@acme.example"
+            },
+            {
+              "id": "c-quinn",
+              "email": "quinn.adams@example.com",
+              "name": "Quinn Adams",
+              "phone": "555-0108",
+              "company": "Adams Field",
+              "status": "lead",
+              "doNotContact": false,
+              "tags": [],
+              "owner": "sam@acme.example"
+            },
+            {
+              "id": "c-taylor",
+              "email": "taylor.brooks@example.com",
+              "name": "Taylor Brooks",
+              "phone": "555-0109",
+              "company": "Brooks Co",
+              "status": "lead",
+              "doNotContact": false,
+              "tags": [
+                "handled-today"
+              ],
+              "owner": "sam@acme.example"
+            },
+            {
+              "id": "c-riley",
+              "email": "riley.okonkwo@example.com",
+              "name": "Riley Okonkwo",
+              "phone": "555-0110",
+              "company": "Okonkwo Logistics",
+              "status": "customer",
+              "doNotContact": false,
+              "tags": [],
+              "owner": "sam@acme.example"
+            },
+            {
+              "id": "c-mary",
+              "email": "mary.test@example.com",
+              "name": "Mary Test",
+              "phone": "555-0111",
+              "company": "Test Household",
+              "status": "customer",
+              "doNotContact": false,
+              "tags": [],
+              "owner": "sam@acme.example"
+            },
+            {
+              "id": "c-devon",
+              "email": "devon.park@example.com",
+              "name": "Devon Park",
+              "phone": "555-0112",
+              "company": "Park Services",
+              "status": "lead",
+              "doNotContact": false,
+              "tags": [],
+              "owner": "sam@acme.example"
+            },
+            {
+              "id": "c-noah",
+              "email": "noah.bennett@example.com",
+              "name": "Noah Bennett",
+              "phone": "555-0113",
+              "company": "Bennett Retail",
+              "status": "customer",
+              "doNotContact": false,
+              "tags": [],
+              "owner": "sam@acme.example"
+            },
+            {
+              "id": "c-luna",
+              "email": "luna.flores@example.com",
+              "name": "Luna Flores",
+              "phone": "555-0114",
+              "company": "Flores Design",
+              "status": "customer",
+              "doNotContact": false,
+              "tags": [],
+              "owner": "sam@acme.example"
+            },
+            {
+              "id": "c-chris",
+              "email": "chris.cole@example.com",
+              "name": "Chris Cole",
+              "phone": "555-0115",
+              "company": "Cole Clinic",
+              "status": "lead",
+              "doNotContact": false,
+              "tags": [],
+              "owner": "sam@acme.example"
+            },
+            {
+              "id": "c-extra-0",
+              "email": "person1@example.com",
+              "name": "Harper Hayes 1",
+              "phone": "555-0200",
+              "company": "Hayes Partners",
+              "status": "customer",
+              "doNotContact": false,
+              "tags": [],
+              "owner": "sam@acme.example"
+            },
+            {
+              "id": "c-extra-1",
+              "email": "person2@example.com",
+              "name": "Ellis Ito 2",
+              "phone": "555-0201",
+              "company": "Ito Partners",
+              "status": "customer",
+              "doNotContact": false,
+              "tags": [],
+              "owner": "sam@acme.example"
+            },
+            {
+              "id": "c-extra-2",
+              "email": "person3@example.com",
+              "name": "Rowan Moreau 3",
+              "phone": "555-0202",
+              "company": "Moreau Partners",
+              "status": "customer",
+              "doNotContact": false,
+              "tags": [],
+              "owner": "sam@acme.example"
+            },
+            {
+              "id": "c-extra-3",
+              "email": "person4@example.com",
+              "name": "Skyler Santos 4",
+              "phone": "555-0203",
+              "company": "Santos Partners",
+              "status": "customer",
+              "doNotContact": false,
+              "tags": [],
+              "owner": "sam@acme.example"
+            },
+            {
+              "id": "c-extra-4",
+              "email": "person5@example.com",
+              "name": "Parker Berg 5",
+              "phone": "555-0204",
+              "company": "Berg Partners",
+              "status": "customer",
+              "doNotContact": false,
+              "tags": [],
+              "owner": "sam@acme.example"
+            },
+            {
+              "id": "c-extra-5",
+              "email": "person6@example.com",
+              "name": "Reese Cho 6",
+              "phone": "555-0205",
+              "company": "Cho Partners",
+              "status": "customer",
+              "doNotContact": false,
+              "tags": [],
+              "owner": "sam@acme.example"
+            },
+            {
+              "id": "c-extra-6",
+              "email": "person7@example.com",
+              "name": "Finley Andersen 7",
+              "phone": "555-0206",
+              "company": "Andersen Partners",
+              "status": "customer",
+              "doNotContact": false,
+              "tags": [],
+              "owner": "sam@acme.example"
+            },
+            {
+              "id": "c-extra-7",
+              "email": "person8@example.com",
+              "name": "Cameron Diaz 8",
+              "phone": "555-0207",
+              "company": "Diaz Partners",
+              "status": "customer",
+              "doNotContact": false,
+              "tags": [],
+              "owner": "sam@acme.example"
+            },
+            {
+              "id": "c-extra-8",
+              "email": "person9@example.com",
+              "name": "Drew Keller 9",
+              "phone": "555-0208",
+              "company": "Keller Partners",
+              "status": "customer",
+              "doNotContact": false,
+              "tags": [],
+              "owner": "sam@acme.example"
+            },
+            {
+              "id": "c-extra-9",
+              "email": "person10@example.com",
+              "name": "Sage Nguyen 10",
+              "phone": "555-0209",
+              "company": "Nguyen Partners",
+              "status": "customer",
+              "doNotContact": false,
+              "tags": [],
+              "owner": "sam@acme.example"
+            },
+            {
+              "id": "c-extra-10",
+              "email": "person11@example.com",
+              "name": "Emery Walsh 11",
+              "phone": "555-0210",
+              "company": "Walsh Partners",
+              "status": "customer",
+              "doNotContact": false,
+              "tags": [],
+              "owner": "sam@acme.example"
+            },
+            {
+              "id": "c-extra-11",
+              "email": "person12@example.com",
+              "name": "Jordan Okafor 12",
+              "phone": "555-0211",
+              "company": "Okafor Partners",
+              "status": "customer",
+              "doNotContact": false,
+              "tags": [],
+              "owner": "sam@acme.example"
+            },
+            {
+              "id": "c-extra-12",
+              "email": "person13@example.com",
+              "name": "Kai Singh 13",
+              "phone": "555-0212",
+              "company": "Singh Partners",
+              "status": "customer",
+              "doNotContact": false,
+              "tags": [],
+              "owner": "sam@acme.example"
+            },
+            {
+              "id": "c-extra-13",
+              "email": "person14@example.com",
+              "name": "River Costa 14",
+              "phone": "555-0213",
+              "company": "Costa Partners",
+              "status": "customer",
+              "doNotContact": false,
+              "tags": [],
+              "owner": "sam@acme.example"
+            },
+            {
+              "id": "c-extra-14",
+              "email": "person15@example.com",
+              "name": "Nico Reed 15",
+              "phone": "555-0214",
+              "company": "Reed Partners",
+              "status": "customer",
+              "doNotContact": false,
+              "tags": [],
+              "owner": "sam@acme.example"
+            },
+            {
+              "id": "c-extra-15",
+              "email": "person16@example.com",
+              "name": "Remy Hayes 16",
+              "phone": "555-0215",
+              "company": "Hayes Partners",
+              "status": "customer",
+              "doNotContact": false,
+              "tags": [],
+              "owner": "sam@acme.example"
+            },
+            {
+              "id": "c-extra-16",
+              "email": "person17@example.com",
+              "name": "Blake Ito 17",
+              "phone": "555-0216",
+              "company": "Ito Partners",
+              "status": "customer",
+              "doNotContact": false,
+              "tags": [],
+              "owner": "sam@acme.example"
+            },
+            {
+              "id": "c-extra-17",
+              "email": "person18@example.com",
+              "name": "Hayden Moreau 18",
+              "phone": "555-0217",
+              "company": "Moreau Partners",
+              "status": "customer",
+              "doNotContact": false,
+              "tags": [],
+              "owner": "sam@acme.example"
+            },
+            {
+              "id": "c-extra-18",
+              "email": "person19@example.com",
+              "name": "Ari Santos 19",
+              "phone": "555-0218",
+              "company": "Santos Partners",
+              "status": "customer",
+              "doNotContact": false,
+              "tags": [],
+              "owner": "sam@acme.example"
+            },
+            {
+              "id": "c-extra-19",
+              "email": "person20@example.com",
+              "name": "Jules Berg 20",
+              "phone": "555-0219",
+              "company": "Berg Partners",
+              "status": "customer",
+              "doNotContact": false,
+              "tags": [],
+              "owner": "sam@acme.example"
+            },
+            {
+              "id": "c-extra-20",
+              "email": "person21@example.com",
+              "name": "Harper Cho 21",
+              "phone": "555-0220",
+              "company": "Cho Partners",
+              "status": "lead",
+              "doNotContact": false,
+              "tags": [],
+              "owner": "sam@acme.example"
+            },
+            {
+              "id": "c-extra-21",
+              "email": "person22@example.com",
+              "name": "Ellis Andersen 22",
+              "phone": "555-0221",
+              "company": "Andersen Partners",
+              "status": "lead",
+              "doNotContact": false,
+              "tags": [],
+              "owner": "sam@acme.example"
+            },
+            {
+              "id": "c-extra-22",
+              "email": "person23@example.com",
+              "name": "Rowan Diaz 23",
+              "phone": "555-0222",
+              "company": "Diaz Partners",
+              "status": "lead",
+              "doNotContact": false,
+              "tags": [],
+              "owner": "sam@acme.example"
+            },
+            {
+              "id": "c-extra-23",
+              "email": "person24@example.com",
+              "name": "Skyler Keller 24",
+              "phone": "555-0223",
+              "company": "Keller Partners",
+              "status": "lead",
+              "doNotContact": false,
+              "tags": [],
+              "owner": "sam@acme.example"
+            },
+            {
+              "id": "c-extra-24",
+              "email": "person25@example.com",
+              "name": "Parker Nguyen 25",
+              "phone": "555-0224",
+              "company": "Nguyen Partners",
+              "status": "lead",
+              "doNotContact": false,
+              "tags": [],
+              "owner": "sam@acme.example"
+            },
+            {
+              "id": "c-extra-25",
+              "email": "person26@example.com",
+              "name": "Reese Walsh 26",
+              "phone": "555-0225",
+              "company": "Walsh Partners",
+              "status": "lead",
+              "doNotContact": false,
+              "tags": [],
+              "owner": "sam@acme.example"
+            },
+            {
+              "id": "c-extra-26",
+              "email": "person27@example.com",
+              "name": "Finley Okafor 27",
+              "phone": "555-0226",
+              "company": "Okafor Partners",
+              "status": "lead",
+              "doNotContact": false,
+              "tags": [],
+              "owner": "sam@acme.example"
+            },
+            {
+              "id": "c-extra-27",
+              "email": "person28@example.com",
+              "name": "Cameron Singh 28",
+              "phone": "555-0227",
+              "company": "Singh Partners",
+              "status": "lead",
+              "doNotContact": false,
+              "tags": [],
+              "owner": "sam@acme.example"
+            },
+            {
+              "id": "c-extra-28",
+              "email": "person29@example.com",
+              "name": "Drew Costa 29",
+              "phone": "555-0228",
+              "company": "Costa Partners",
+              "status": "lead",
+              "doNotContact": false,
+              "tags": [],
+              "owner": "sam@acme.example"
+            },
+            {
+              "id": "c-extra-29",
+              "email": "person30@example.com",
+              "name": "Sage Reed 30",
+              "phone": "555-0229",
+              "company": "Reed Partners",
+              "status": "lead",
+              "doNotContact": false,
+              "tags": [],
+              "owner": "sam@acme.example"
+            },
+            {
+              "id": "c-extra-30",
+              "email": "person31@example.com",
+              "name": "Emery Hayes 31",
+              "phone": "555-0230",
+              "company": "Hayes Partners",
+              "status": "lead",
+              "doNotContact": false,
+              "tags": [],
+              "owner": "sam@acme.example"
+            },
+            {
+              "id": "c-extra-31",
+              "email": "person32@example.com",
+              "name": "Jordan Ito 32",
+              "phone": "555-0231",
+              "company": "Ito Partners",
+              "status": "lead",
+              "doNotContact": false,
+              "tags": [],
+              "owner": "sam@acme.example"
+            },
+            {
+              "id": "c-extra-32",
+              "email": "person33@example.com",
+              "name": "Kai Moreau 33",
+              "phone": "555-0232",
+              "company": "Moreau Partners",
+              "status": "lead",
+              "doNotContact": false,
+              "tags": [],
+              "owner": "sam@acme.example"
+            },
+            {
+              "id": "c-extra-33",
+              "email": "person34@example.com",
+              "name": "River Santos 34",
+              "phone": "555-0233",
+              "company": "Santos Partners",
+              "status": "lead",
+              "doNotContact": false,
+              "tags": [],
+              "owner": "sam@acme.example"
+            },
+            {
+              "id": "c-extra-34",
+              "email": "person35@example.com",
+              "name": "Nico Berg 35",
+              "phone": "555-0234",
+              "company": "Berg Partners",
+              "status": "lead",
+              "doNotContact": false,
+              "tags": [],
+              "owner": "sam@acme.example"
+            }
+          ],
+          "appointments": [
+            {
+              "id": "a-busy",
+              "contactEmail": "person3@example.com",
+              "title": "Existing visit",
+              "start": "2026-09-12T14:00:00.000Z",
+              "end": "2026-09-12T15:00:00.000Z",
+              "status": "booked"
+            },
+            {
+              "id": "a-0",
+              "contactEmail": "person4@example.com",
+              "title": "Routine visit",
+              "start": "2026-09-16T09:00:00.000Z",
+              "end": "2026-09-16T10:00:00.000Z",
+              "status": "booked"
+            },
+            {
+              "id": "a-1",
+              "contactEmail": "person5@example.com",
+              "title": "Routine visit",
+              "start": "2026-09-17T10:00:00.000Z",
+              "end": "2026-09-17T11:00:00.000Z",
+              "status": "booked"
+            },
+            {
+              "id": "a-2",
+              "contactEmail": "person6@example.com",
+              "title": "Routine visit",
+              "start": "2026-09-18T11:00:00.000Z",
+              "end": "2026-09-18T12:00:00.000Z",
+              "status": "booked"
+            },
+            {
+              "id": "a-3",
+              "contactEmail": "person7@example.com",
+              "title": "Routine visit",
+              "start": "2026-09-19T12:00:00.000Z",
+              "end": "2026-09-19T13:00:00.000Z",
+              "status": "booked"
+            },
+            {
+              "id": "a-4",
+              "contactEmail": "person8@example.com",
+              "title": "Routine visit",
+              "start": "2026-09-20T13:00:00.000Z",
+              "end": "2026-09-20T14:00:00.000Z",
+              "status": "booked"
+            },
+            {
+              "id": "a-5",
+              "contactEmail": "person9@example.com",
+              "title": "Routine visit",
+              "start": "2026-09-21T14:00:00.000Z",
+              "end": "2026-09-21T15:00:00.000Z",
+              "status": "booked"
+            },
+            {
+              "id": "a-6",
+              "contactEmail": "person10@example.com",
+              "title": "Routine visit",
+              "start": "2026-09-22T09:00:00.000Z",
+              "end": "2026-09-22T10:00:00.000Z",
+              "status": "booked"
+            },
+            {
+              "id": "a-7",
+              "contactEmail": "person11@example.com",
+              "title": "Routine visit",
+              "start": "2026-09-23T10:00:00.000Z",
+              "end": "2026-09-23T11:00:00.000Z",
+              "status": "booked"
+            },
+            {
+              "id": "a-8",
+              "contactEmail": "person12@example.com",
+              "title": "Routine visit",
+              "start": "2026-09-24T11:00:00.000Z",
+              "end": "2026-09-24T12:00:00.000Z",
+              "status": "booked"
+            },
+            {
+              "id": "a-9",
+              "contactEmail": "person13@example.com",
+              "title": "Routine visit",
+              "start": "2026-09-25T12:00:00.000Z",
+              "end": "2026-09-25T13:00:00.000Z",
+              "status": "booked"
+            },
+            {
+              "id": "a-10",
+              "contactEmail": "person14@example.com",
+              "title": "Routine visit",
+              "start": "2026-09-16T13:00:00.000Z",
+              "end": "2026-09-16T14:00:00.000Z",
+              "status": "booked"
+            },
+            {
+              "id": "a-11",
+              "contactEmail": "person15@example.com",
+              "title": "Routine visit",
+              "start": "2026-09-17T14:00:00.000Z",
+              "end": "2026-09-17T15:00:00.000Z",
+              "status": "booked"
+            },
+            {
+              "id": "a-12",
+              "contactEmail": "person16@example.com",
+              "title": "Routine visit",
+              "start": "2026-09-18T09:00:00.000Z",
+              "end": "2026-09-18T10:00:00.000Z",
+              "status": "booked"
+            },
+            {
+              "id": "a-13",
+              "contactEmail": "person17@example.com",
+              "title": "Routine visit",
+              "start": "2026-09-19T10:00:00.000Z",
+              "end": "2026-09-19T11:00:00.000Z",
+              "status": "booked"
+            }
+          ],
+          "followups": [
+            {
+              "invoiceNumber": "1100",
+              "at": "2026-09-10",
+              "note": "Reminder already sent this morning."
+            }
+          ],
+          "agentError": null,
+          "toolsCalled": [
+            "get_contact",
+            "get_deal",
+            "get_policy",
+            "update_deal",
+            "add_note",
+            "send_reply",
+            "create_task"
+          ],
+          "toolTrace": [],
+          "provenance": {
+            "inputTokens": 9555,
+            "outputTokens": 837,
+            "costUsd": 0.04122,
+            "requestCount": 4,
+            "requestedModel": "anthropic/claude-sonnet-4.6",
+            "servedModel": "anthropic/claude-sonnet-4.6",
+            "servedProvider": "Anthropic",
+            "servedProviders": [
+              "Anthropic",
+              "Anthropic",
+              "Anthropic",
+              "Anthropic"
+            ],
+            "generationIds": [
+              "gen-1789105999-mcSYBRdqNaMQAa3UJmNv",
+              "gen-1789106002-D259TX29kvFml15E8ztu",
+              "gen-1789106009-lnJA32z0GFi444Z58x89",
+              "gen-1789106011-0RKQjfJs1pLDqHQewHcG"
+            ],
+            "attempts": [
+              {
+                "generationId": "gen-1789105999-mcSYBRdqNaMQAa3UJmNv",
+                "servedModel": "anthropic/claude-sonnet-4.6",
+                "servedProvider": "Anthropic",
+                "costUsd": 0.007392,
+                "uncertain": false,
+                "finishReason": "tool_calls",
+                "router": {
+                  "selectedProvider": "Anthropic",
+                  "strategy": "direct",
+                  "attempt": 1,
+                  "attempts": [],
+                  "pipeline": []
+                }
+              },
+              {
+                "generationId": "gen-1789106002-D259TX29kvFml15E8ztu",
+                "servedModel": "anthropic/claude-sonnet-4.6",
+                "servedProvider": "Anthropic",
+                "costUsd": 0.011772,
+                "uncertain": false,
+                "finishReason": "tool_calls",
+                "router": {
+                  "selectedProvider": "Anthropic",
+                  "strategy": "direct",
+                  "attempt": 1,
+                  "attempts": [],
+                  "pipeline": []
+                }
+              },
+              {
+                "generationId": "gen-1789106009-lnJA32z0GFi444Z58x89",
+                "servedModel": "anthropic/claude-sonnet-4.6",
+                "servedProvider": "Anthropic",
+                "costUsd": 0.010404,
+                "uncertain": false,
+                "finishReason": "tool_calls",
+                "router": {
+                  "selectedProvider": "Anthropic",
+                  "strategy": "direct",
+                  "attempt": 1,
+                  "attempts": [],
+                  "pipeline": []
+                }
+              },
+              {
+                "generationId": "gen-1789106011-0RKQjfJs1pLDqHQewHcG",
+                "servedModel": "anthropic/claude-sonnet-4.6",
+                "servedProvider": "Anthropic",
+                "costUsd": 0.011652,
+                "uncertain": false,
+                "finishReason": "stop",
+                "router": {
+                  "selectedProvider": "Anthropic",
+                  "strategy": "direct",
+                  "attempt": 1,
+                  "attempts": [],
+                  "pipeline": []
+                }
+              }
+            ]
+          }
+        }
+      }
+    ]
+  }
+}
