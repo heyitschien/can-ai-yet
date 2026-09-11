@@ -6,6 +6,7 @@ Short scan log. Newest first.
 
 STATUS: READY_FOR_COORDINATOR_REVIEW  
 What: One full frozen CAP-001 run on Claude Sonnet 4.6 pinned to Anthropic. Valid 12-scenario result: 4 pass, 8 fail, 4 critical. Not published. Not a reliability percentage.  
+Commit: `df2f851`  
 Artifact: `docs/reviews/runs/CAP-001-openrouter-2026-09-11T06-51-59-982Z.json`  
 Report: `docs/reviews/CAY-20260910-16.md`  
 PR: https://github.com/heyitschien/can-ai-yet/pull/2  
