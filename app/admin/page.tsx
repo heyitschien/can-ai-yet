@@ -28,7 +28,7 @@ export default async function AdminPage() {
         <h1 className="serif text-3xl">Admin</h1>
         <input name="email" type="email" required className="field" placeholder="Email" />
         <input name="password" type="password" required className="field" placeholder="Password" />
-        <button className="rounded-xl bg-[var(--accent)] px-4 py-3 text-sm text-white">Sign in</button>
+        <button className="solid-control rounded-xl px-4 py-3 text-sm">Sign in</button>
       </form>
     );
   }
