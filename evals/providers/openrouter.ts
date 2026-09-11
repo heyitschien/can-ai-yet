@@ -6,6 +6,7 @@ import {
   SpendLedger,
   assertExactModelId,
   assertPaidExecutionAllowed,
+  configFromEnv,
   paidRunBlockedReason,
   type OpenRouterRunConfig,
 } from "@/evals/providers/openrouter-config";
@@ -36,7 +37,12 @@ export type OpenRouterChatBody = {
   tools: ToolSchema[];
   tool_choice: "auto";
   max_tokens: number;
-  provider: { allow_fallbacks: false; require_parameters: true };
+  provider: {
+    allow_fallbacks: false;
+    require_parameters: true;
+    only?: [string];
+    order?: [string];
+  };
 };
 
 export type OpenRouterClient = (body: OpenRouterChatBody, init: { timeoutMs: number; apiKey: string }) => Promise<unknown>;
@@ -44,6 +50,15 @@ export type OpenRouterClient = (body: OpenRouterChatBody, init: { timeoutMs: num
 type ParsedChoice = {
   toolCalls: ToolCall[];
   content: string | null;
+};
+
+export type RouterSnapshot = {
+  selectedProvider: string | null;
+  strategy: string | null;
+  attempt: number | null;
+  attempts: unknown[];
+  pipeline: unknown[];
+  requested: string | null;
 };
 
 type ParsedResponse = {
@@ -56,6 +71,8 @@ type ParsedResponse = {
   inputTokens: number;
   outputTokens: number;
   costUsd: number | null;
+  router: RouterSnapshot | null;
+  routeError: string | null;
 };
 
 const SUCCESSFUL_STOP = "stop";
@@ -100,6 +117,7 @@ export function parseOpenRouterResponse(payload: unknown): ParsedResponse {
   const usage = asRecord(root.usage);
   const choiceError = choice ? asRecord(choice.error) : null;
   const finishReason = typeof choice?.finish_reason === "string" ? choice.finish_reason : null;
+  const router = parseRouterMetadata(root);
   return {
     choice: {
       toolCalls: envelopeErrors.length > 0 ? [] : toolCalls,
@@ -114,12 +132,44 @@ export function parseOpenRouterResponse(payload: unknown): ParsedResponse {
           ? "choice error"
           : null,
     servedModel: typeof root.model === "string" ? root.model : null,
-    servedProvider: typeof root.provider === "string" ? root.provider : null,
+    servedProvider: router.snapshot?.selectedProvider ?? null,
     generationId: typeof root.id === "string" ? root.id : null,
     inputTokens: numberOrNull(usage?.prompt_tokens) ?? 0,
     outputTokens: numberOrNull(usage?.completion_tokens) ?? 0,
     costUsd: numberOrNull(usage?.cost),
+    router: router.snapshot,
+    routeError: router.error,
   };
+}
+
+function parseRouterMetadata(root: Record<string, unknown>): { snapshot: RouterSnapshot | null; error: string | null } {
+  const meta = asRecord(root.openrouter_metadata);
+  if (!meta) return { snapshot: null, error: "Router metadata is missing. The provider route is unproven." };
+  const endpoints = asRecord(meta.endpoints);
+  const available = Array.isArray(endpoints?.available) ? endpoints.available : [];
+  const selected = available
+    .map(asRecord)
+    .filter((item): item is Record<string, unknown> => item !== null)
+    .filter((item) => item.selected === true);
+  const selectedProvider = selected.length === 1 && typeof selected[0]?.provider === "string" ? selected[0].provider : null;
+  const snapshot: RouterSnapshot = {
+    selectedProvider,
+    strategy: typeof meta.strategy === "string" ? meta.strategy : null,
+    attempt: typeof meta.attempt === "number" && Number.isFinite(meta.attempt) ? meta.attempt : null,
+    attempts: Array.isArray(meta.attempts) ? meta.attempts : [],
+    pipeline: Array.isArray(meta.pipeline) ? meta.pipeline : [],
+    requested: typeof meta.requested === "string" ? meta.requested : null,
+  };
+  if (!selectedProvider) return { snapshot, error: "Router metadata has no selected provider." };
+  if (snapshot.attempt !== null && snapshot.attempt > 1) {
+    return { snapshot, error: "Router metadata shows a fallback attempt. The pinned route was not honored." };
+  }
+  return { snapshot, error: null };
+}
+
+export function providerMatchesPin(selected: string, pin: string): boolean {
+  const normalize = (value: string) => value.toLowerCase().replace(/[^a-z0-9]/g, "");
+  return normalize(selected) === normalize(pin);
 }
 
 export function terminalProblem(parsed: ParsedResponse): string | null {
@@ -146,7 +196,19 @@ export function chatBody(config: OpenRouterRunConfig, messages: ChatMessage[], t
     tools,
     tool_choice: "auto",
     max_tokens: config.maxTokens,
-    provider: { allow_fallbacks: false, require_parameters: true },
+    provider: config.providerSlug
+      ? { allow_fallbacks: false, require_parameters: true, only: [config.providerSlug], order: [config.providerSlug] }
+      : { allow_fallbacks: false, require_parameters: true },
+  };
+}
+
+export function openRouterHeaders(apiKey: string): Record<string, string> {
+  return {
+    Authorization: `Bearer ${apiKey}`,
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://can-ai-yet.local",
+    "X-Title": "CanAIYet",
+    "X-OpenRouter-Metadata": "enabled",
   };
 }
 
@@ -164,6 +226,10 @@ export async function fetchOpenRouterChat(body: OpenRouterChatBody, init: { time
   if (body.provider.allow_fallbacks !== false) {
     throw new GuardError("FALLBACK_FORBIDDEN", "A real request must forbid provider fallbacks.");
   }
+  const pinned = configFromEnv(process.env);
+  if (pinned.routeMode !== "pinned" || !pinned.providerSlug || body.provider.only?.[0] !== pinned.providerSlug || body.provider.order?.[0] !== pinned.providerSlug) {
+    throw new GuardError("PROVIDER_PIN_REQUIRED", "A real request must pin one provider with only and order.");
+  }
   if (!Number.isFinite(body.max_tokens) || !(body.max_tokens > 0) || !Number.isFinite(init.timeoutMs) || !(init.timeoutMs > 0)) {
     throw new GuardError("LIMITS_REQUIRED", "A real request needs a finite token ceiling and timeout.");
   }
@@ -177,6 +243,8 @@ export async function fetchOpenRouterChat(body: OpenRouterChatBody, init: { time
       maxRetries: 0,
       maxSpendUsd: cap,
       requestReserveUsd: reserve,
+      providerSlug: pinned.providerSlug,
+      routeMode: pinned.routeMode,
       maxScenarios: 1,
       appUrl: "https://can-ai-yet.local",
       appTitle: "CanAIYet",
@@ -190,12 +258,7 @@ export async function fetchOpenRouterChat(body: OpenRouterChatBody, init: { time
   try {
     const response = await fetch(OPENROUTER_CHAT_URL, {
       method: "POST",
-      headers: {
-        Authorization: `Bearer ${init.apiKey}`,
-        "Content-Type": "application/json",
-        "HTTP-Referer": "https://can-ai-yet.local",
-        "X-Title": "CanAIYet",
-      },
+      headers: openRouterHeaders(init.apiKey),
       body: JSON.stringify(body),
       signal: controller.signal,
     });
@@ -254,6 +317,8 @@ export class OpenRouterProvider implements AgentProvider {
     requestReserveUsd: number | null;
     maxScenarios: number;
     allowFallbacks: false;
+    providerSlug: string | null;
+    routeMode: "pinned" | "unpinned" | null;
   };
   private halted: string | null = null;
 
@@ -272,6 +337,8 @@ export class OpenRouterProvider implements AgentProvider {
       requestReserveUsd: config.requestReserveUsd,
       maxScenarios: config.maxScenarios,
       allowFallbacks: false,
+      providerSlug: config.providerSlug,
+      routeMode: config.routeMode,
     };
   }
 
@@ -396,6 +463,15 @@ export class OpenRouterProvider implements AgentProvider {
     attempt.costUsd = parsed.costUsd;
     attempt.finishReason = parsed.finishReason;
     attempt.uncertain = this.ledger.uncertainAttempts > 0 || parsed.costUsd === null;
+    attempt.router = parsed.router
+      ? {
+          selectedProvider: parsed.router.selectedProvider,
+          strategy: parsed.router.strategy,
+          attempt: parsed.router.attempt,
+          attempts: parsed.router.attempts,
+          pipeline: parsed.router.pipeline,
+        }
+      : null;
   }
 
   private account(payload: unknown, usage: ProviderUsage): ParsedResponse | string {
@@ -417,6 +493,20 @@ export class OpenRouterProvider implements AgentProvider {
     const cost = this.ledger.noteCost(parsed.costUsd);
     if (this.ledger.uncertainAttempts > 0 || parsed.costUsd === null) usage.costUsd = null;
     else if (usage.costUsd !== null) usage.costUsd += parsed.costUsd;
+    if (parsed.routeError) {
+      this.halted = parsed.routeError;
+      return parsed.routeError;
+    }
+    if (this.config.providerSlug && parsed.servedProvider && !providerMatchesPin(parsed.servedProvider, this.config.providerSlug)) {
+      const message = `Selected provider ${parsed.servedProvider} did not match pinned ${this.config.providerSlug}.`;
+      this.halted = message;
+      return message;
+    }
+    if (this.config.routeMode === "unpinned") {
+      const message = "This request used automatic provider selection. It is not a pinned provider benchmark.";
+      this.halted = message;
+      return message;
+    }
     if (parsed.servedModel !== this.config.model) {
       const message = `Served model ${parsed.servedModel ?? "missing"} did not match requested ${this.config.model}. No fallback is allowed.`;
       this.halted = message;

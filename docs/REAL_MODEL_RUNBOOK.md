@@ -20,9 +20,10 @@ A chat reply is not a pass. Only tool calls through `World.call` change the simu
 
 1. Confirm the exact model ID on OpenRouter. Do not use `openrouter/auto`, a brand name, or a routing suffix such as `:nitro` or `:floor`.
 2. Confirm the live price. This repository does not quote a price.
-3. Set a hard spend cap and a per-request reserve. The first request is refused unless the reserve is a finite amount no larger than the cap.
-4. Run the dry-run and read it. Dry-run makes zero paid requests.
-5. A human sets `CANAIYET_PAID_RUN=1` and runs `--execute`. Agents do not do that without a separate approval.
+3. Set a client-side stop threshold and a per-request reserve. This is not a provider charge ceiling. One in-flight request can still cost more, and that run is invalid.
+4. Pin one provider slug. Also set a separate OpenRouter key or account limit outside this repo. This command cannot reserve money at the gateway before the reply.
+5. Run the dry-run and read it. Dry-run makes zero paid requests.
+6. A human sets `CANAIYET_PAID_RUN=1` and runs `--execute` from a clean commit. Agents do not do that without a separate approval.
 
 Suggested candidate to verify, not a confirmed live ID and not an approval: `google/gemini-3-flash-preview`, seen on OpenRouter's public tool-calling docs during preparation. Check the catalog again before spend.
 
@@ -37,6 +38,7 @@ Put these in the environment. Do not commit them.
 ```text
 OPENROUTER_API_KEY=
 OPENROUTER_MODEL=provider/exact-model-id
+OPENROUTER_PROVIDER=one-provider-slug
 OPENROUTER_MAX_SPEND_USD=1
 OPENROUTER_REQUEST_RESERVE_USD=
 OPENROUTER_MAX_TURNS=8
@@ -68,11 +70,13 @@ Read the printed plan: model, scenario count, caps, git SHA, fixture version, an
 
 ## Paid run
 
-Only after the dry-run looks right and a human has approved the model ID, expected request count, and spend cap:
+Only after the dry-run looks right, the worktree is clean, and a human has approved the model ID, provider slug, one scenario, and stop threshold:
 
 ```text
-CANAIYET_PAID_RUN=1 OPENROUTER_MAX_SCENARIOS=1 OPENROUTER_REQUEST_RESERVE_USD=<finite-usd> pnpm exec tsx scripts/run-openrouter-cap001.ts --execute
+CANAIYET_PAID_RUN=1 OPENROUTER_PROVIDER=<slug> OPENROUTER_MAX_SCENARIOS=1 OPENROUTER_MAX_RETRIES=0 OPENROUTER_REQUEST_RESERVE_USD=<finite-usd> pnpm exec tsx scripts/run-openrouter-cap001.ts --execute
 ```
+
+The first smoke is one scenario, zero retries, a pinned provider, and a small external key limit. `OPENROUTER_MAX_SPEND_USD` only stops later requests after a measured reply. It does not cap the charge already in flight.
 
 Add `--persist` only when the run should also write unpublished `test_scenarios`, `test_runs`, and `test_results`. Persistence does not set `accepted_test_run_id`.
 
@@ -130,7 +134,7 @@ Request reserve USD:
 Persistence: unpublished review artifact only
 ```
 
-A missing reserve, an unknown charge, or a cost above the reserve stops the run. That is not a measured score. The first paid smoke is one scenario, with the reserve set by a human.
+A missing reserve, an unknown charge, a dirty worktree, or a cost above the reserve stops the run. That is not a measured score. The first paid smoke is one scenario, zero retries, a pinned provider, and a human-set reserve. The stop threshold is not a hard gateway cap.
 
 ## What not to do
 

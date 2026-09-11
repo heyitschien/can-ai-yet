@@ -22,6 +22,9 @@ export type DryRunPlan = {
   maxRetries: number;
   maxSpendUsd: number | null;
   requestReserveUsd: number | null;
+  providerSlug: string | null;
+  routeMode: "pinned" | "unpinned" | null;
+  spendLimitKind: "client-stop-threshold";
   maxHttpRequests: number;
   estimatedMaxOutputTokens: number;
   estimatedMaxCostUsd: null;
@@ -51,11 +54,14 @@ export function buildCap001DryRunPlan(config: OpenRouterRunConfig, env: Record<s
     maxRetries: config.maxRetries,
     maxSpendUsd: config.maxSpendUsd,
     requestReserveUsd: config.requestReserveUsd,
+    providerSlug: config.providerSlug,
+    routeMode: config.routeMode,
+    spendLimitKind: "client-stop-threshold",
     maxHttpRequests: maxHttpRequests(scenarios.length, config),
     estimatedMaxOutputTokens: estimateOutputTokenCeiling(scenarios.length, config),
     estimatedMaxCostUsd: null,
     estimateNote:
-      "No price is quoted here. Confirm the live OpenRouter model ID and price before any paid run. Output-token ceiling is a cap, not a bill.",
+      "No price is quoted here. OPENROUTER_MAX_SPEND_USD is a client-side stop threshold, not a provider charge ceiling. One in-flight request can still cost more, and that run is invalid.",
     gitSha: gitSha(),
     fixtureVersion: FIXTURE_VERSION,
     environmentVersion: ENVIRONMENT_VERSION,

@@ -21,6 +21,8 @@ function config(overrides: Partial<ReturnType<typeof configFromEnv>> = {}) {
     maxRetries: 0,
     maxSpendUsd: 1,
     requestReserveUsd: 0.01,
+    providerSlug: null,
+    routeMode: null,
     maxScenarios: 12,
     appUrl: "https://can-ai-yet.local",
     appTitle: "CanAIYet",
@@ -36,6 +38,14 @@ function completion(message: Record<string, unknown>, extra: Record<string, unkn
     provider: "OpenAI",
     choices: [{ message, finish_reason: finishReason }],
     usage: { prompt_tokens: 12, completion_tokens: 6, cost: 0.0002 },
+    openrouter_metadata: {
+      requested: MODEL,
+      strategy: "direct",
+      attempt: 1,
+      endpoints: { total: 1, available: [{ provider: "OpenAI", model: MODEL, selected: true }] },
+      attempts: [{ provider: "OpenAI", model: MODEL, status: 200 }],
+      pipeline: [],
+    },
     ...extra,
   };
 }

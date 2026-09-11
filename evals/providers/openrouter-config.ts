@@ -1,3 +1,5 @@
+import { gitProvenance, type GitProvenance } from "@/evals/provenance/git";
+
 export const OPENROUTER_CHAT_URL = "https://openrouter.ai/api/v1/chat/completions";
 export const CAP001_SCENARIO_CEILING = 12;
 
@@ -18,6 +20,8 @@ export type OpenRouterRunConfig = {
   maxRetries: number;
   maxSpendUsd: number | null;
   requestReserveUsd: number | null;
+  providerSlug: string | null;
+  routeMode: "pinned" | "unpinned" | null;
   maxScenarios: number;
   appUrl: string;
   appTitle: string;
@@ -63,7 +67,11 @@ export function paidRunBlockedReason(env: Record<string, string | undefined>): s
   return null;
 }
 
-export function assertPaidExecutionAllowed(env: Record<string, string | undefined>, config: OpenRouterRunConfig): void {
+export function assertPaidExecutionAllowed(
+  env: Record<string, string | undefined>,
+  config: OpenRouterRunConfig,
+  git: GitProvenance = gitProvenance(),
+): void {
   const blocked = paidRunBlockedReason(env);
   if (blocked) throw new GuardError("PAID_BLOCKED", blocked);
   if (!config.apiKey) throw new GuardError("KEY_REQUIRED", "OPENROUTER_API_KEY is required for a paid run.");
@@ -72,6 +80,12 @@ export function assertPaidExecutionAllowed(env: Record<string, string | undefine
   }
   if (config.requestReserveUsd === null || !Number.isFinite(config.requestReserveUsd) || !(config.requestReserveUsd > 0) || config.requestReserveUsd > config.maxSpendUsd) {
     throw new GuardError("RESERVE_REQUIRED", "OPENROUTER_REQUEST_RESERVE_USD must be a finite positive amount no larger than the spend cap.");
+  }
+  if (config.routeMode !== "pinned" || !config.providerSlug) {
+    throw new GuardError("PROVIDER_PIN_REQUIRED", "Paid execution needs OPENROUTER_PROVIDER set to one provider slug. An unpinned route is not a pinned benchmark.");
+  }
+  if (git.dirty || !/^[0-9a-f]{40}$/.test(git.sha)) {
+    throw new GuardError("DIRTY_WORKTREE", "Paid execution requires a clean worktree and the full commit SHA. A dirty tree is not that commit.");
   }
   assertExactModelId(config.model);
   if (config.maxScenarios < 1 || config.maxScenarios > CAP001_SCENARIO_CEILING) {
@@ -84,6 +98,29 @@ function readPositiveInt(raw: string | undefined, fallback: number, name: string
   const value = Number(raw);
   if (!Number.isInteger(value) || value < 0) throw new GuardError("CONFIG_INVALID", `${name} must be a non-negative integer.`);
   return value;
+}
+
+function readProviderSlug(raw: string | undefined): string | null {
+  if (raw === undefined || raw.trim() === "") return null;
+  const slug = raw.trim();
+  if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)) {
+    throw new GuardError("PROVIDER_PIN_INVALID", "OPENROUTER_PROVIDER must be one provider slug, such as openai. Not a display name or a list.");
+  }
+  return slug;
+}
+
+function readRouteMode(env: NodeJS.ProcessEnv): "pinned" | "unpinned" | null {
+  const explicit = env.OPENROUTER_ROUTE?.trim() ?? "";
+  const pinned = readProviderSlug(env.OPENROUTER_PROVIDER);
+  if (explicit === "unpinned" && pinned) {
+    throw new GuardError("PROVIDER_PIN_INVALID", "Do not set OPENROUTER_PROVIDER and OPENROUTER_ROUTE=unpinned together.");
+  }
+  if (explicit === "unpinned") return "unpinned";
+  if (explicit !== "" && explicit !== "pinned") {
+    throw new GuardError("PROVIDER_PIN_INVALID", "OPENROUTER_ROUTE must be pinned or unpinned.");
+  }
+  if (pinned) return "pinned";
+  return null;
 }
 
 function readSpend(raw: string | undefined): number | null {
@@ -111,6 +148,8 @@ export function configFromEnv(env: NodeJS.ProcessEnv): OpenRouterRunConfig {
     maxRetries: readPositiveInt(env.OPENROUTER_MAX_RETRIES, OPENROUTER_DEFAULTS.maxRetries, "OPENROUTER_MAX_RETRIES"),
     maxSpendUsd: readSpend(env.OPENROUTER_MAX_SPEND_USD),
     requestReserveUsd: readSpend(env.OPENROUTER_REQUEST_RESERVE_USD),
+    providerSlug: readProviderSlug(env.OPENROUTER_PROVIDER),
+    routeMode: readRouteMode(env),
     maxScenarios,
     appUrl: env.NEXT_PUBLIC_APP_URL?.trim() || "https://can-ai-yet.local",
     appTitle: "CanAIYet",
@@ -135,9 +174,8 @@ export class SpendLedger {
 
   /**
    * Reserve the next attempt before dispatch.
-   * With a cap, the whole remaining budget is held for this one in-flight request
-   * unless a smaller per-request reserve was approved. A later request is refused
-   * once the cap is exhausted or any attempt cost is unknown.
+   * This is a client-side stop threshold, not a provider-side charge ceiling.
+   * The gateway can still bill one in-flight request above the reserve. That run is invalid.
    */
   beginAttempt(): { ok: true } | { ok: false; reason: string } {
     if (this.requestReserveUsd === null || !Number.isFinite(this.requestReserveUsd) || !(this.requestReserveUsd > 0)) {

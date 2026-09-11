@@ -19,6 +19,8 @@ const cfg: OpenRouterRunConfig = {
   maxRetries: 0,
   maxSpendUsd: 1,
   requestReserveUsd: 0.01,
+  providerSlug: null,
+  routeMode: null,
   maxScenarios: 1,
   appUrl: "https://review.invalid",
   appTitle: "Review",
@@ -31,6 +33,14 @@ function reply(calls?: unknown[]) {
     model: MODEL,
     provider: "route-review",
     usage: { cost: 0.01, prompt_tokens: 12, completion_tokens: 6 },
+    openrouter_metadata: {
+      requested: MODEL,
+      strategy: "direct",
+      attempt: 1,
+      endpoints: { total: 1, available: [{ provider: "route-review", model: MODEL, selected: true }] },
+      attempts: [],
+      pipeline: [],
+    },
     choices: [{
       finish_reason: calls ? "tool_calls" : "stop",
       message: { role: "assistant", content: calls ? null : "Done", ...(calls ? { tool_calls: calls } : {}) },
@@ -239,6 +249,7 @@ it("R4: paid CLI carries scenario provenance into run-level persistence", async 
     OPENROUTER_MODEL: "review/exact-model",
     OPENROUTER_MAX_SPEND_USD: "0.01",
     OPENROUTER_REQUEST_RESERVE_USD: "0.01",
+    OPENROUTER_PROVIDER: "review",
     OPENROUTER_MAX_SCENARIOS: "1",
     OPENROUTER_MAX_RETRIES: "0",
   })) vi.stubEnv(key, value);
@@ -248,7 +259,19 @@ it("R4: paid CLI carries scenario provenance into run-level persistence", async 
     provider: "route-review",
     choices: [{ finish_reason: "stop", message: { role: "assistant", content: "Done" } }],
     usage: { cost: 0.001, prompt_tokens: 10, completion_tokens: 1 },
+    openrouter_metadata: {
+      requested: "review/exact-model",
+      strategy: "direct",
+      attempt: 1,
+      endpoints: { total: 1, available: [{ provider: "review", model: "review/exact-model", selected: true }] },
+      attempts: [],
+      pipeline: [],
+    },
   }))));
+  vi.doMock("@/evals/provenance/git", () => ({
+    gitProvenance: () => ({ sha: "a".repeat(40), dirty: false }),
+    gitSha: () => "a".repeat(40),
+  }));
   const write = vi.fn<(suite: SuiteResult) => string>(() => "mock-artifact-no-file-written");
   vi.doMock("@/evals/persistence/persist-run", async (importOriginal) => ({
     ...(await importOriginal<typeof import("@/evals/persistence/persist-run")>()),

@@ -1,4 +1,3 @@
-import { execSync } from "node:child_process";
 import { calculateStatus } from "@/lib/scoring/calculate";
 import { allScenarios, prepareWorld, scenariosFor } from "@/evals/capabilities";
 import { judgeScenario } from "@/evals/judges/judge";
@@ -14,14 +13,9 @@ import {
   type SuiteResult,
 } from "@/evals/types";
 import { World } from "@/evals/environments/world";
+import { gitSha } from "@/evals/provenance/git";
 
-export function gitSha(): string {
-  try {
-    return execSync("git rev-parse --short HEAD", { encoding: "utf8" }).trim();
-  } catch {
-    return "uncommitted";
-  }
-}
+export { gitSha };
 
 export function median(values: number[]): number {
   if (values.length === 0) return 0;

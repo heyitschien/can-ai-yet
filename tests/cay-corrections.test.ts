@@ -21,6 +21,8 @@ const config = (overrides: Partial<ReturnType<typeof configFromEnv>> = {}) => ({
   maxRetries: 0,
   maxSpendUsd: 1,
   requestReserveUsd: 0.01,
+  providerSlug: null,
+  routeMode: null,
   maxScenarios: 12,
   appUrl: "https://review.invalid",
   appTitle: "Review",
@@ -38,6 +40,14 @@ const completion = (message: Record<string, unknown> = { content: "Done" }, cost
   provider: "route-review",
   choices: [{ message: { role: "assistant", ...message }, finish_reason: finishReason }],
   usage: { prompt_tokens: 12, completion_tokens: 6, cost },
+  openrouter_metadata: {
+    requested: MODEL,
+    strategy: "direct",
+    attempt: 1,
+    endpoints: { total: 1, available: [{ provider: "route-review", model: MODEL, selected: true }] },
+    attempts: [{ provider: "route-review", model: MODEL, status: 200 }],
+    pipeline: [],
+  },
 });
 const local = publishedRecords().find((record) => record.catalog.code === "CAP-001");
 if (!local) throw new Error("missing local evidence");

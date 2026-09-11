@@ -61,6 +61,13 @@ export type ProviderAttempt = {
   costUsd: number | null;
   uncertain: boolean;
   finishReason: string | null;
+  router?: {
+    selectedProvider: string | null;
+    strategy: string | null;
+    attempt: number | null;
+    attempts: unknown[];
+    pipeline: unknown[];
+  } | null;
 };
 
 export type ProviderUsage = {
