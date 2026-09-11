@@ -112,7 +112,7 @@ export function buildPersistPayload(suite: SuiteResult, scenarios: Scenario[]): 
       inputTokens: suite.inputTokens ?? 0,
       outputTokens: suite.outputTokens ?? 0,
       status: "running",
-      notes: "Intentional benchmark artifact. Not accepted and not published.",
+      notes: persistNotes(suite),
       published: false,
     },
     results: suite.results.map((result) => {
@@ -173,6 +173,12 @@ export async function persistIntentionalRun(writer: EvidenceWriter, suite: Suite
   const settled = suite.benchmarkValid === false ? "failed" : "completed";
   if (writer.markRunSettled) await writer.markRunSettled(runId, settled);
   return { runId, accepted: false };
+}
+
+function persistNotes(suite: SuiteResult): string {
+  const base = "Intentional benchmark artifact. Not accepted and not published.";
+  if (!suite.segment || suite.segment.kind === "full") return base;
+  return `${base} ${suite.segment.note}`;
 }
 
 function resultMembershipMatches(suite: SuiteResult, scenarios: Scenario[]): boolean {

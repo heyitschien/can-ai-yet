@@ -52,6 +52,22 @@ OPENROUTER_MAX_SCENARIOS=12
 
 ---
 
+## Scenario list and a stopped suite
+
+`OPENROUTER_MAX_SCENARIOS=1` still runs a prefix, starting at LEAD-001. That is a labeled segment, not a 12-scenario score.
+
+To rerun a later slice without paying for scenarios already scored, pass an explicit list or a forward range:
+
+```text
+pnpm exec tsx scripts/run-openrouter-cap001.ts --scenarios LEAD-006:LEAD-012
+```
+
+or `OPENROUTER_SCENARIO_IDS=LEAD-006,LEAD-007`. Execution stays in frozen CAP-001 order. A segment artifact says it is not a full score and must not be stitched to a different git SHA or config. Accepted evidence still needs one clean full run.
+
+The dry-run also prints an observed cost plan when the model is `anthropic/claude-sonnet-4.6`. That range is not a bill. Response caching is not sent. Prompt-cache token fields are recorded only if the gateway returns them.
+
+---
+
 ## Dry-run
 
 ```text

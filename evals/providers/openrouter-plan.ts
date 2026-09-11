@@ -1,12 +1,17 @@
 import { scenariosFor } from "@/evals/capabilities";
 import { ENVIRONMENT_VERSION, FIXTURE_VERSION } from "@/evals/types";
 import { gitSha } from "@/evals/runners/run-suite";
+import { estimateSonnet46FromObserved, type ObservedCostPlan } from "@/evals/providers/observed-cost";
+import { ACME_SYSTEM_PROMPT } from "@/evals/providers/openrouter";
 import {
   estimateOutputTokenCeiling,
   maxHttpRequests,
   paidRunBlockedReason,
   type OpenRouterRunConfig,
 } from "@/evals/providers/openrouter-config";
+import { observePromptPrefix, type PromptPrefixObservation } from "@/evals/providers/prompt-cache";
+import { readScenarioSpec, selectCap001Scenarios, type ScenarioSegment } from "@/evals/providers/scenario-selection";
+import { CAP001_TOOL_SCHEMAS } from "@/evals/providers/tool-schemas";
 
 export type DryRunPlan = {
   mode: "dry-run";
@@ -36,10 +41,24 @@ export type DryRunPlan = {
   apiKeyPresent: boolean;
   paidExecutionBlockedReason: string | null;
   allowFallbacks: false;
+  responseCache: "disabled";
+  promptCache: PromptPrefixObservation;
+  selection: ScenarioSegment;
+  observedCostPlan: ObservedCostPlan | null;
+  qualificationGate: {
+    status: "proposal-not-adopted";
+    note: string;
+  };
 };
 
-export function buildCap001DryRunPlan(config: OpenRouterRunConfig, env: Record<string, string | undefined> = process.env): DryRunPlan {
-  const scenarios = scenariosFor("CAP-001").slice(0, config.maxScenarios);
+export function buildCap001DryRunPlan(
+  config: OpenRouterRunConfig,
+  env: Record<string, string | undefined> = process.env,
+  scenarioSpec: string | null = readScenarioSpec([], env),
+): DryRunPlan {
+  const selected = selectCap001Scenarios(scenariosFor("CAP-001"), scenarioSpec, config.maxScenarios);
+  const scenarios = selected.scenarios;
+  const observed = config.model === "anthropic/claude-sonnet-4.6" ? estimateSonnet46FromObserved(scenarios.length, config.maxTurns) : null;
   return {
     mode: "dry-run",
     paidRequests: 0,
@@ -70,5 +89,13 @@ export function buildCap001DryRunPlan(config: OpenRouterRunConfig, env: Record<s
     apiKeyPresent: Boolean(config.apiKey),
     paidExecutionBlockedReason: paidRunBlockedReason(env),
     allowFallbacks: false,
+    responseCache: "disabled",
+    promptCache: observePromptPrefix(ACME_SYSTEM_PROMPT, CAP001_TOOL_SCHEMAS),
+    selection: selected.segment,
+    observedCostPlan: observed,
+    qualificationGate: {
+      status: "proposal-not-adopted",
+      note: "A one-pass qualification is not a reliability claim. The proposed gate is two independent LEAD-001 trials and one LEAD-005 trial on the same frozen config, reported as counts. It is not a runner rule yet.",
+    },
   };
 }

@@ -47,13 +47,16 @@ export async function runScenario(scenario: Scenario, provider: AgentProvider): 
     success: judged.success,
     critical: !judged.success && scenario.criticalOnFail,
     failureCode: judged.success ? null : scenario.failureCode,
-    failureExplanation: judged.success ? null : judged.failures.join(" "),
+    failureExplanation: judged.success
+      ? null
+      : [judged.failures.join(" "), agent.failureMode ? `Stop mode ${agent.failureMode}.` : null].filter(Boolean).join(" "),
     runtimeSeconds,
     costUsd: agent.usage ? agent.usage.costUsd : 0,
     inputTokens: agent.usage?.inputTokens,
     outputTokens: agent.usage?.outputTokens,
     benchmarkInvalid: agent.benchmarkInvalid === true,
     provenance: agent.usage,
+    failureMode: agent.failureMode ?? null,
     actualState: {
       sent: world.sent,
       flags: world.flags,
@@ -65,6 +68,7 @@ export async function runScenario(scenario: Scenario, provider: AgentProvider): 
       appointments: world.appointments,
       followups: world.followups,
       agentError: agent.error ?? null,
+      failureMode: agent.failureMode ?? null,
       toolsCalled: agent.toolsCalled,
       toolTrace: agent.toolTrace ?? [],
       provenance: agent.usage ?? null,

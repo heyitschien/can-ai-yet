@@ -54,6 +54,34 @@ export type AgentRunInput = {
   payload: Record<string, unknown>;
 };
 
+export type ModelStopMode = "TOOL_LOOP" | "NO_PROGRESS" | "TURN_BUDGET";
+
+export type TrialRecord = {
+  scenarioId: string;
+  repeatIndex: number;
+  trialId: string;
+  outcome: "pass" | "fail" | "invalid";
+  failureMode: ModelStopMode | null;
+  validity: "valid" | "invalid";
+  inputTokens: number | null;
+  outputTokens: number | null;
+  costUsd: number | null;
+  runtimeSeconds: number;
+  cacheReadTokens: number | null;
+  cacheWriteTokens: number | null;
+};
+
+export type RunSegment = {
+  kind: "full" | "explicit-segment" | "prefix-segment";
+  scenarioIds: string[];
+  omittedScenarioIds: string[];
+  requested: string | null;
+  executedOrder: "frozen-suite-order";
+  combinable: false;
+  acceptedEvidence: "requires-one-clean-full-run";
+  note: string;
+};
+
 export type ProviderAttempt = {
   generationId: string | null;
   servedModel: string | null;
@@ -61,6 +89,8 @@ export type ProviderAttempt = {
   costUsd: number | null;
   uncertain: boolean;
   finishReason: string | null;
+  cacheReadTokens?: number | null;
+  cacheWriteTokens?: number | null;
   router?: {
     selectedProvider: string | null;
     strategy: string | null;
@@ -81,6 +111,8 @@ export type ProviderUsage = {
   servedProviders: string[];
   generationIds: string[];
   attempts: ProviderAttempt[];
+  cacheReadTokens?: number | null;
+  cacheWriteTokens?: number | null;
 };
 
 export type ToolTraceEntry = {
@@ -98,6 +130,8 @@ export type AgentRunResult = {
   toolTrace?: ToolTraceEntry[];
   /** True when the configured benchmark was not honored. Do not publish this as a model score. */
   benchmarkInvalid?: boolean;
+  /** Scored stop when the experiment stayed valid. Not a reason to throw the run away. */
+  failureMode?: ModelStopMode;
 };
 
 export interface AgentProvider {
@@ -120,6 +154,8 @@ export type ScenarioResult = {
   outputTokens?: number;
   benchmarkInvalid?: boolean;
   provenance?: ProviderUsage;
+  failureMode?: ModelStopMode | null;
+  trial?: TrialRecord;
   actualState: Record<string, unknown>;
 };
 
@@ -155,4 +191,5 @@ export type SuiteResult = {
     executionConfig?: unknown;
   };
   results: ScenarioResult[];
+  segment?: RunSegment;
 };

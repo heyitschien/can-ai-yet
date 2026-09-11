@@ -3,6 +3,7 @@ import { runScenario, summarize } from "@/evals/runners/run-suite";
 import { OpenRouterProvider } from "@/evals/providers/openrouter";
 import { SpendLedger, assertPaidExecutionAllowed, configFromEnv } from "@/evals/providers/openrouter-config";
 import { buildCap001DryRunPlan } from "@/evals/providers/openrouter-plan";
+import { readScenarioSpec, selectCap001Scenarios, stampTrials } from "@/evals/providers/scenario-selection";
 import { persistIntentionalRun, writeLocalRunArtifact } from "@/evals/persistence/persist-run";
 import { resolveScenarioWrite, scenarioContentHash, type StoredScenario } from "@/evals/persistence/scenario-identity";
 import { createClient } from "@supabase/supabase-js";
@@ -11,7 +12,8 @@ import type { ScenarioResult, SuiteResult } from "@/evals/types";
 
 function printPlan(): void {
   const config = configFromEnv(process.env);
-  const plan = buildCap001DryRunPlan(config);
+  const spec = readScenarioSpec(process.argv, process.env);
+  const plan = buildCap001DryRunPlan(config, process.env, spec);
   console.log(JSON.stringify(plan, null, 2));
   console.log("\nDry run finished. Zero paid requests.");
 }
@@ -19,14 +21,22 @@ function printPlan(): void {
 async function execute(): Promise<void> {
   const config = configFromEnv(process.env);
   assertPaidExecutionAllowed(process.env, config);
-  const scenarios = scenariosFor("CAP-001").slice(0, config.maxScenarios);
+  const spec = readScenarioSpec(process.argv, process.env);
+  const selected = selectCap001Scenarios(scenariosFor("CAP-001"), spec, config.maxScenarios);
+  const scenarios = selected.scenarios;
   const provider = new OpenRouterProvider(config, new SpendLedger(config.maxSpendUsd, config.requestReserveUsd));
   const startedAt = new Date().toISOString();
   const results: ScenarioResult[] = [];
   for (const scenario of scenarios) {
     results.push(await runScenario(scenario, provider));
   }
-  const suite: SuiteResult = summarize("CAP-001", results, startedAt, provider);
+  const suite: SuiteResult = stampTrials({
+    ...summarize("CAP-001", results, startedAt, provider),
+    segment: selected.segment,
+  });
+  if (selected.segment.kind !== "full") {
+    console.log(selected.segment.note);
+  }
   const artifact = writeLocalRunArtifact(suite, scenarios);
   console.log(`Wrote review artifact ${artifact}`);
   console.log(`Valid benchmark: ${suite.benchmarkValid === true}. This is not accepted public evidence.`);

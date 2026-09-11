@@ -237,3 +237,24 @@ That worked while we were building the school.
 Before real students start taking important exams, we want the report card and every marked answer to belong to the same saved exam.
 
 Then nobody has to guess which notes created which grade.
+
+---
+
+## 10. Repeated trials must not overwrite one another
+
+A later attempt at the same scenario is a new trial. It is not an update to the earlier row.
+
+Store each trial beside the others. A result row, or the JSON kept inside it until a later schema change, needs:
+
+- scenario ID;
+- repeat index and a trial ID that includes the git SHA, model, provider, and scenario;
+- outcome: pass, fail, or invalid;
+- failure mode, such as `TOOL_LOOP`, `NO_PROGRESS`, or `TURN_BUDGET`, when a scored stop ended the attempt;
+- provenance: model, provider/route, generation IDs, fixture, environment, git SHA;
+- input tokens, output tokens, cache read/write tokens when the gateway returns them, cost, runtime;
+- tool trace;
+- validity state, so an HTTP 402 stop cannot be stored as a finished model score.
+
+Do not replace a pass with a later fail, or a fail with a later pass. Public percentages wait until the repeat count supports a rate. Until then, the honest report is a count such as `1/2`.
+
+An explicit scenario subset is a labeled segment. It is not a full capability score, and it must not be stitched to a segment from a different git SHA or config. Accepted evidence still requires one clean full run. This note does not add a production migration. New OpenRouter artifacts already carry the trial fields so a later store does not have to invent them.

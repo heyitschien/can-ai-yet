@@ -36,6 +36,62 @@ That is why every accepted run must record the configuration rather than simply 
 
 ---
 
+## 1a. Capability, reliability, and economics
+
+These are three different measurements. Do not collapse them into one score.
+
+**Capability** is whether a configuration can finish the task at all. One valid pass shows that the task is possible under those exact conditions. It does not show how often that happens.
+
+**Reliability** is whether that same configuration finishes the task again. A trial is one independent attempt:
+
+```text
+scenario
++ exact model
++ provider / route
++ settings and tools
++ fixture and environment version
++ git SHA
+```
+
+A later repeat is a new trial. It must not overwrite the earlier one. Until the repeat count supports a rate, report the count, not a percentage. `1 pass / 2 observed trials` is an observation. `94% reliable` is a claim this laboratory cannot make from one or two trials.
+
+**Economics** is first-class evidence, not a footnote: cost per trial, requests, input and output tokens, cache read/write tokens when the gateway returns them, and runtime. Later, cost per successful completion. A cheap fail and an expensive pass are different facts.
+
+Three outcomes stay distinct:
+
+- valid pass — the experiment stayed intact and the judge passed;
+- valid fail — the experiment stayed intact and the judge failed, including a scored stop such as a turn-budget stop or a no-progress tool loop;
+- invalid experiment — the route, cost, or configuration was not the one we asked for. Do not publish that as a model score.
+
+Small-N results stay counts. Repeatability requires repeated independent trials of the same definition. One lucky pass is not a reliability qualification.
+
+### Observed signal, not a percentage
+
+On 2026-09-11, `anthropic/claude-sonnet-4.6` pinned to Anthropic completed LEAD-001 twice under closely related heads:
+
+- qualification on `6b1959e`: valid pass, $0.04122, 4 requests;
+- later full-suite trial on `d7d4d0d`: valid fail, missing the follow-up task, $0.030465, 3 requests.
+
+That is `1 pass / 2 observed LEAD-001 trials`. The git SHAs differ by the tool-trace commit, so they are not one frozen experiment. Report them as two observations. Do not write a reliability percentage from them.
+
+This is why CanAIYet has to measure task outcome, repeatability, failure mode, cost, tokens, and runtime together. Capability is not the same as reliability.
+
+### Qualification gate — proposal only, not adopted
+
+Do not treat one lucky pass as proof the model is ready for an expensive suite, and do not implement a new public scoring rule from this note.
+
+The smallest honest gate before a full CAP-001 suite, if a later receipt adopts it:
+
+- two independent trials of LEAD-001;
+- one trial of LEAD-005, a critical scenario;
+- the same exact model, provider, fixture, environment, and git SHA;
+- zero retries;
+- report counts, not a percentage.
+
+From the saved Sonnet artifacts, that gate is about $0.10 to $0.15, not a bill: two LEAD-001 trials were $0.04122 and $0.030465, and the scored LEAD-005 trial was $0.033984. This receipt does not turn that proposal into a runner rule.
+
+---
+
 ## 2. What we use today
 
 Today the accepted public baseline is:
@@ -310,6 +366,10 @@ Start with one capability and a small panel.
 
 Do not run all capabilities across many models until the first vertical slice is proven trustworthy.
 
+A dry-run can print an observed cost plan from a prior saved artifact. That range is not a quote and not a guaranteed bill. The next paid run still needs a live price check, a client stop, and enough remaining key credit to finish. A previous CAP-001 attempt stopped on OpenRouter HTTP 402 because the key credit limit was about $0.25, while the client cap was $1.50. Do not start another full run on that key limit.
+
+OpenRouter response caching stays off for benchmark trials. A cached completion would make a repeat look independent when it is not. Prompt-cache token fields may be recorded if the gateway returns them. Turning prompt caching on would be a new configuration and needs its own receipt.
+
 ---
 
 ## 12. First recommended real-model experiment
@@ -335,6 +395,12 @@ Compare failures, not just headline score
 ```
 
 Do not start with every capability and every model.
+
+### Prepared next paid target — not authorized here
+
+The next paid milestone, after a coordinator spend review, is one clean full CAP-001 run on `anthropic/claude-sonnet-4.6` pinned to `anthropic`. All 12 frozen scenarios, once each, zero retries, full tool trace, judge unchanged. No other model. No publication. `accepted_test_run_id` stays put.
+
+From the five valid scored scenarios in the partial suite, a 12-scenario run at that observed rate is about $0.36 to $0.50. If every scenario used the turn budget at the qualification per-request rate, the planning ceiling is about $1.00. Neither number is a bill. The previous attempt died because remaining key credit was about $0.25. Do not start unless remaining key credit is at least $1.50, and set the client stop at $1.00 so the client stops before the key. Copy the JSON from `evals/runs/` to `docs/reviews/runs/` after the run. This receipt does not authorize that spend.
 
 ---
 

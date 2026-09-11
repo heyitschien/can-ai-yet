@@ -2,6 +2,14 @@
 
 Short scan log. Newest first.
 
+## CAY-20260910-14 — 2026-09-10
+
+STATUS: READY_FOR_SPEND_REVIEW  
+What: Documented capability vs reliability vs cost. A tool loop is now a scored fail. A later scenario slice can be run without paying for the ones already scored. No paid request.  
+Commit: pending  
+PR: https://github.com/heyitschien/can-ai-yet/pull/2  
+Next: coordinator spend review. Do not spend, publish, or merge until that review. The key limit must cover a full Sonnet run before anyone retries.
+
 ## CAY-20260910-13b — 2026-09-10
 
 STATUS: evidence saved  

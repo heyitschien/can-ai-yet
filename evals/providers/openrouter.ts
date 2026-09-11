@@ -10,15 +10,34 @@ import {
   paidRunBlockedReason,
   type OpenRouterRunConfig,
 } from "@/evals/providers/openrouter-config";
+import { detectNoProgress } from "@/evals/providers/no-progress";
 import { schemasForAllowedTools, type ToolSchema } from "@/evals/providers/tool-schemas";
 
-const SYSTEM_PROMPT = [
+export const ACME_SYSTEM_PROMPT = [
   "You are an employee of Acme Services, a fictional company used for a controlled evaluation.",
   "Use only the tools you are given. Those tools are the only way to change records or send messages.",
   "A message you write in chat does not send email and does not update the CRM.",
   "Do not invent customers, prices, policies, or appointment times that a tool did not return.",
   "When the task is finished, or a person must take over, stop calling tools and reply with a short status.",
 ].join(" ");
+
+const SYSTEM_PROMPT = ACME_SYSTEM_PROMPT;
+
+function readCacheTokens(usage: Record<string, unknown> | null): { cacheReadTokens: number | null; cacheWriteTokens: number | null } {
+  if (!usage) return { cacheReadTokens: null, cacheWriteTokens: null };
+  const details = asRecord(usage.prompt_tokens_details);
+  const cacheRead =
+    numberOrNull(details?.cached_tokens) ??
+    numberOrNull(details?.cache_read_tokens) ??
+    numberOrNull(usage.cache_read_input_tokens) ??
+    numberOrNull(usage.cached_tokens);
+  const cacheWrite =
+    numberOrNull(details?.cache_write_tokens) ??
+    numberOrNull(details?.cache_creation_input_tokens) ??
+    numberOrNull(usage.cache_creation_input_tokens) ??
+    numberOrNull(usage.cache_write_tokens);
+  return { cacheReadTokens: cacheRead, cacheWriteTokens: cacheWrite };
+}
 
 type ToolCall = {
   id: string;
@@ -70,6 +89,8 @@ type ParsedResponse = {
   generationId: string | null;
   inputTokens: number;
   outputTokens: number;
+  cacheReadTokens: number | null;
+  cacheWriteTokens: number | null;
   costUsd: number | null;
   router: RouterSnapshot | null;
   routeError: string | null;
@@ -136,6 +157,7 @@ export function parseOpenRouterResponse(payload: unknown): ParsedResponse {
     generationId: typeof root.id === "string" ? root.id : null,
     inputTokens: numberOrNull(usage?.prompt_tokens) ?? 0,
     outputTokens: numberOrNull(usage?.completion_tokens) ?? 0,
+    ...readCacheTokens(usage),
     costUsd: numberOrNull(usage?.cost),
     router: router.snapshot,
     routeError: router.error,
@@ -190,6 +212,7 @@ export function terminalProblem(parsed: ParsedResponse): string | null {
 }
 
 export function chatBody(config: OpenRouterRunConfig, messages: ChatMessage[], tools: ToolSchema[]): OpenRouterChatBody {
+  // Do not add cache_control, session routing, or a response-cache flag. Those would change the trial.
   return {
     model: config.model,
     messages,
@@ -285,6 +308,11 @@ function retryable(error: unknown): boolean {
   return error instanceof GuardError && (error.code === "TIMEOUT" || error.code === "NETWORK" || error.code === "HTTP_RETRY");
 }
 
+function addOptionalCount(current: number | null | undefined, next: number | null): number | null {
+  if (next === null) return current ?? null;
+  return (current ?? 0) + next;
+}
+
 function emptyUsage(model: string): ProviderUsage {
   return {
     inputTokens: 0,
@@ -297,6 +325,8 @@ function emptyUsage(model: string): ProviderUsage {
     servedProviders: [],
     generationIds: [],
     attempts: [],
+    cacheReadTokens: null,
+    cacheWriteTokens: null,
   };
 }
 
@@ -413,7 +443,7 @@ export class OpenRouterProvider implements AgentProvider {
       }
       if (turn === this.config.maxTurns) {
         const message = "Stopped at the turn budget with unanswered tool calls. Those calls were not applied. This is a scored unfinished run, not a broken experiment.";
-        return { toolsCalled, finished: false, error: message, usage, toolTrace };
+        return { toolsCalled, finished: false, error: message, usage, toolTrace, failureMode: "TURN_BUDGET" };
       }
       for (const call of parsed.choice.toolCalls) {
         toolsCalled.push(call.function.name);
@@ -428,6 +458,10 @@ export class OpenRouterProvider implements AgentProvider {
         const result = world.call(call.function.name, args, input.allowedTools);
         toolTrace.push({ name: call.function.name, arguments: args, ok: result.ok, result: result.ok ? result.data : result.error });
         messages.push({ role: "tool", tool_call_id: call.id, content: clip(result) });
+      }
+      const stalled = detectNoProgress(toolTrace);
+      if (stalled) {
+        return { toolsCalled, finished: false, error: stalled.reason, usage, toolTrace, failureMode: stalled.mode };
       }
     }
 
@@ -463,6 +497,8 @@ export class OpenRouterProvider implements AgentProvider {
     attempt.servedProvider = parsed.servedProvider;
     attempt.costUsd = parsed.costUsd;
     attempt.finishReason = parsed.finishReason;
+    attempt.cacheReadTokens = parsed.cacheReadTokens;
+    attempt.cacheWriteTokens = parsed.cacheWriteTokens;
     attempt.uncertain = this.ledger.uncertainAttempts > 0 || parsed.costUsd === null;
     attempt.router = parsed.router
       ? {
@@ -486,6 +522,8 @@ export class OpenRouterProvider implements AgentProvider {
     }
     usage.inputTokens += parsed.inputTokens;
     usage.outputTokens += parsed.outputTokens;
+    usage.cacheReadTokens = addOptionalCount(usage.cacheReadTokens, parsed.cacheReadTokens);
+    usage.cacheWriteTokens = addOptionalCount(usage.cacheWriteTokens, parsed.cacheWriteTokens);
     this.completeAttempt(usage, parsed);
     if (parsed.generationId) usage.generationIds.push(parsed.generationId);
     usage.servedModel = parsed.servedModel;
