@@ -22,7 +22,7 @@ These explain the product. They do not outrank the authority list above.
 1. `ARCHITECTURE.md` — how the website, lab, model, judge, and evidence fit together.
 2. `ACME_SERVICES_LAB.md` — the fictional company and tools.
 3. `METHODOLOGY.md` — how a scenario is graded.
-4. `MODEL_EVALUATION_STRATEGY.md` — which configurations to test, and why one gateway is enough.
+4. `MODEL_EVALUATION_STRATEGY.md` — which configurations to test, why one gateway is enough, and how spend is demand-gated.
 5. `EVIDENCE_SOURCE_OF_TRUTH_PLAN.md` — why headline and detail must come from the same accepted run.
 6. `REAL_MODEL_RUNBOOK.md` — how a human runs or refuses a CAP-001 OpenRouter test.
 7. `FOUR_AGENT_SYSTEM.md` — who scouts, runs, judges, and publishes.

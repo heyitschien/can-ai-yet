@@ -2,6 +2,14 @@
 
 Short scan log. Newest first.
 
+## CAY-20260910-16 — 2026-09-10
+
+STATUS: BLOCKED  
+What: Prepared the one Sonnet CAP-001 command and recorded demand-gated spend rules. Live price and Anthropic pin matched. This key still has a $0.25 weekly limit and about $0.006 left, so the run was not started.  
+Report: `docs/reviews/CAY-20260910-16.md`  
+PR: https://github.com/heyitschien/can-ai-yet/pull/2  
+Next: human raises remaining key credit to at least $1.50. Do not spend, publish, or merge until a new spend receipt.
+
 ## CAY-20260910-14 — 2026-09-10
 
 STATUS: READY_FOR_SPEND_REVIEW  

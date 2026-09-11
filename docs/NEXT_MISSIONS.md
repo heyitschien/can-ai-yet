@@ -73,6 +73,7 @@ The canonical product promise is not “we designed tests.” It is “we test r
 - Record exact model/provider/version where available.
 - Add explicit cost/token accounting and a maximum-spend guard.
 - Do not automatically run paid model evals in normal CI.
+- Spend is demand-gated. Do not benchmark every capability or model. Prefer the test that teaches the most per dollar. Do not turn a tiny sample into a reliability percentage.
 
 ## Suggested first provider
 

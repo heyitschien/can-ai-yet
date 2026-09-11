@@ -65,6 +65,22 @@ Three outcomes stay distinct:
 
 Small-N results stay counts. Repeatability requires repeated independent trials of the same definition. One lucky pass is not a reliability qualification.
 
+### How we spend
+
+CanAIYet is a research and publishing model, not per-view inference. We pay once to create reusable evidence. Many people can read the same report at near-zero model cost. Do not rerun a model because a page was viewed.
+
+**Demand-gated testing.** Do not benchmark every capability, model, and repeat. Search and request demand ranks what deserves spend. Low-demand capabilities wait.
+
+**Evidence ladder.** Discovery may use one trial. An important claim gets repeated independent trials. A high-stakes or public reliability claim needs a larger N. Do not publish a reliability percentage from a tiny sample.
+
+**Information gained per dollar** is a first-class optimization target. Prefer a test that distinguishes models, exposes an important failure mode, or answers a high-demand question. A cheap test that cannot change a decision is not a bargain.
+
+**Do not test every model.** After one complete Sonnet CAP-001 report, the next panel should be the smallest set of two or three models that maximize useful contrast — for example a premium model, a cheap model, and one other provider. That is a contrast panel, not a leaderboard.
+
+**Public pages vs deeper intelligence.** A public page may summarize capability, status, evidence level, and date. Deeper scenario detail, reliability analysis, model comparison, history, cost per successful completion, and custom evaluation can become higher-value product surfaces later. Do not build a paywall from this note. Record the principle only.
+
+Cost engineering may shorten redundant context or stop a loop. It must not change frozen task expectations or the judge to make a model pass.
+
 ### Observed signal, not a percentage
 
 On 2026-09-11, `anthropic/claude-sonnet-4.6` pinned to Anthropic completed LEAD-001 twice under closely related heads:
@@ -202,7 +218,7 @@ This gives us speed now without giving up rigor later.
 
 Testing every model would create noise, cost, and maintenance burden.
 
-Start with a small representative panel.
+Start with a small representative panel. After one complete report on a single configuration, the next useful step is the smallest two or three models that answer a contrast, not a catalog.
 
 The panel should answer three useful questions:
 
@@ -211,6 +227,8 @@ What can a strong practical model do?
 What can a cheaper model do?
 What can a frontier ceiling model do?
 ```
+
+Do not run that panel until the first full CAP-001 report exists and a coordinator receipt names the next model. Breadth is not the goal.
 
 ---
 
@@ -366,6 +384,8 @@ Start with one capability and a small panel.
 
 Do not run all capabilities across many models until the first vertical slice is proven trustworthy.
 
+Spend follows demand and information gained, not coverage. A capability with no search or request demand waits. A second model waits until the first full report can show what a contrast would teach. Record pass/fail, the repeatability count, the failure mode, requests, tokens, runtime, raw cost, and later cost per successful completion. Do not turn a small count into a rate.
+
 A dry-run can print an observed cost plan from a prior saved artifact. That range is not a quote and not a guaranteed bill. The next paid run still needs a live price check, a client stop, and enough remaining key credit to finish. A previous CAP-001 attempt stopped on OpenRouter HTTP 402 because the key credit limit was about $0.25, while the client cap was $1.50. Do not start another full run on that key limit.
 
 OpenRouter response caching stays off for benchmark trials. A cached completion would make a repeat look independent when it is not. Prompt-cache token fields may be recorded if the gateway returns them. Turning prompt caching on would be a new configuration and needs its own receipt.
@@ -400,7 +420,9 @@ Do not start with every capability and every model.
 
 The next paid milestone, after a coordinator spend review, is one clean full CAP-001 run on `anthropic/claude-sonnet-4.6` pinned to `anthropic`. All 12 frozen scenarios, once each, zero retries, full tool trace, judge unchanged. No other model. No publication. `accepted_test_run_id` stays put.
 
-From the five valid scored scenarios in the partial suite, a 12-scenario run at that observed rate is about $0.36 to $0.50. If every scenario used the turn budget at the qualification per-request rate, the planning ceiling is about $1.00. Neither number is a bill. The previous attempt died because remaining key credit was about $0.25. Do not start unless remaining key credit is at least $1.50, and set the client stop at $1.00 so the client stops before the key. Copy the JSON from `evals/runs/` to `docs/reviews/runs/` after the run. This receipt does not authorize that spend.
+From the five valid scored scenarios in the partial suite, a 12-scenario run at that observed rate is about $0.36 to $0.50. If every scenario used the turn budget at the qualification per-request rate, the planning ceiling is about $1.00. Neither number is a bill. The previous attempt died because remaining key credit was about $0.25. Do not start unless remaining key credit is at least $1.50, and set the client stop at $1.00 so the client stops before the key. Copy the JSON from `evals/runs/` to `docs/reviews/runs/` after the run.
+
+This document does not authorize spend. The live gate is Issue #1. CAY-20260910-16 is the single-run authorization for that exact configuration. Re-check the live price and the Anthropic pin immediately before the first paid request, and stop without spending if either cannot be honored.
 
 ---
 

@@ -23,7 +23,7 @@ A chat reply is not a pass. Only tool calls through `World.call` change the simu
 3. Set a client-side stop threshold and a per-request reserve. This is not a provider charge ceiling. One in-flight request can still cost more, and that run is invalid.
 4. Pin one provider slug. Also set a separate OpenRouter key or account limit outside this repo. This command cannot reserve money at the gateway before the reply.
 5. Run the dry-run and read it. Dry-run makes zero paid requests.
-6. A human sets `CANAIYET_PAID_RUN=1` and runs `--execute` from a clean commit. Agents do not do that without a separate approval.
+6. A human sets `CANAIYET_PAID_RUN=1` and runs `--execute` from a clean commit. Agents do not do that unless Issue #1 has a spend receipt that names the exact model, provider, scenario set, and client stop.
 
 Suggested candidate to verify, not a confirmed live ID and not an approval: `google/gemini-3-flash-preview`, seen on OpenRouter's public tool-calling docs during preparation. Check the catalog again before spend.
 
@@ -151,6 +151,28 @@ Persistence: unpublished review artifact only
 ```
 
 A missing reserve, an unknown charge, a dirty worktree, or a cost above the reserve stops the run. That is not a measured score. The first paid smoke is one scenario, zero retries, a pinned provider, and a human-set reserve. The stop threshold is not a hard gateway cap.
+
+## Prepared one-run command — CAY-20260910-16
+
+This section records the prepared configuration. It is not a standing authorization. Execute it only while that receipt is the live spend gate, from a clean commit, after a live price and key-credit check.
+
+```text
+OPENROUTER_MODEL=anthropic/claude-sonnet-4.6
+OPENROUTER_PROVIDER=anthropic
+OPENROUTER_MAX_SCENARIOS=12
+OPENROUTER_MAX_RETRIES=0
+OPENROUTER_MAX_TURNS=8
+OPENROUTER_MAX_TOKENS=800
+OPENROUTER_TIMEOUT_MS=45000
+OPENROUTER_MAX_SPEND_USD=1
+OPENROUTER_REQUEST_RESERVE_USD=0.08
+```
+
+Expected observed range: about $0.36 to $0.50. Planning ceiling: about $1.00. Client stop: $1.00. External key remaining credit must be at least $1.50 before the first request. No `--scenarios` filter. No second model. No qualification rerun. No `--persist` unless `SUPABASE_SECRET_KEY` is set; otherwise the durable copy is `docs/reviews/runs/`. Do not set `accepted_test_run_id`.
+
+The $0.08 reserve is above the largest saved Sonnet request ($0.012861) and below the $1.00 cap. A single reply above $0.08 stops the run. That stop is not a 12-scenario score.
+
+Preflight on 2026-09-11, before any paid request: `anthropic/claude-sonnet-4.6` was listed, the `anthropic` pin was available, and that route was $3/M input and $15/M output. The local key still had a $0.25 weekly limit and about $0.006 remaining. That fails the $1.50 remaining-credit rule. Do not execute this command until a later receipt shows remaining key credit of at least $1.50.
 
 ## What not to do
 
