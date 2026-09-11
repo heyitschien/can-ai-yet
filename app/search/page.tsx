@@ -29,7 +29,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
               <p className="mt-2 text-sm leading-6 text-[var(--muted)]">
                 Nothing published is a strong or related match. We will not invent a score for it.
               </p>
-              <Link href={`/request?q=${encodeURIComponent(query)}`} className="mt-4 inline-block rounded-xl bg-[var(--accent)] px-4 py-3 text-sm text-white">
+              <Link href={`/request?q=${encodeURIComponent(query)}`} className="solid-control mt-4 inline-block rounded-xl px-4 py-3 text-sm">
                 Request this test
               </Link>
             </div>

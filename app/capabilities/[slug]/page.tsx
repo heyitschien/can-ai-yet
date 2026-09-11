@@ -154,10 +154,10 @@ export default async function CapabilityPage({ params }: { params: Promise<{ slu
       </Section>
 
       <div className="mt-12 flex flex-wrap gap-3">
-        <Link href="/request" className="rounded-xl bg-[var(--accent)] px-4 py-3 text-sm text-white">
+        <Link href="/request" className="solid-control rounded-xl px-4 py-3 text-sm">
           Request another capability
         </Link>
-        <Link href={`/request?intent=implementation&capability=${capability.slug}`} className="rounded-xl border border-[var(--line)] px-4 py-3 text-sm">
+        <Link href={`/request?intent=implementation&capability=${capability.slug}`} className="quiet-control rounded-xl border border-[var(--line)] px-4 py-3 text-sm">
           I want to implement this
         </Link>
       </div>

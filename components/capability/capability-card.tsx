@@ -7,7 +7,7 @@ export function CapabilityCard({ capability }: { capability: PublicCapability })
   return (
     <Link
       href={`/capabilities/${capability.slug}`}
-      className="block rounded-xl border border-[var(--line)] bg-[var(--paper-2)] p-5 transition hover:-translate-y-0.5 hover:shadow-sm"
+      className="surface-card block rounded-xl border border-[var(--line)] bg-[var(--paper-2)] p-5"
     >
       <div className="flex items-start justify-between gap-3">
         <h3 className="serif text-xl leading-tight">{capability.title}</h3>

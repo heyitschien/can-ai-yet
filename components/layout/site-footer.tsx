@@ -10,7 +10,7 @@ const links = [
 
 export function SiteFooter() {
   return (
-    <footer className="mt-auto border-t border-[var(--line)]">
+    <footer className="mt-auto border-t border-[var(--line)] bg-[var(--paper)]">
       <div className="site-wrap flex flex-col gap-4 py-8 text-sm text-[var(--muted)] sm:flex-row sm:items-center sm:justify-between">
         <p>We test real work so you don’t have to guess.</p>
         <div className="flex flex-wrap gap-4">

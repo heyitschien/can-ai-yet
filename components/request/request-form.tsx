@@ -45,7 +45,7 @@ export function RequestForm({ initialQuery, intent, capability }: { initialQuery
         <input type="email" value={email} onChange={(event) => setEmail(event.target.value)} className="field" />
       </Field>
       {error ? <p className="text-sm text-[var(--red)]">{error}</p> : null}
-      <button type="submit" className="rounded-xl bg-[var(--accent)] px-4 py-3 text-sm text-white">
+      <button type="submit" className="solid-control rounded-xl px-4 py-3 text-sm">
         {intent === "implementation" ? "Send implementation interest" : "Request this test"}
       </button>
     </form>

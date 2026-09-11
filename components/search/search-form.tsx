@@ -46,7 +46,7 @@ export function SearchForm({ initialQuery = "", large = false }: { initialQuery?
       />
       <button
         type="submit"
-        className="h-14 shrink-0 rounded-xl bg-[var(--accent)] px-5 text-sm font-medium text-white"
+        className="solid-control h-14 shrink-0 rounded-xl px-5 text-sm font-medium"
       >
         Check capability
       </button>
