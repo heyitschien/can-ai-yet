@@ -2,7 +2,7 @@ RECEIPT: CAY-20260910-19
 ROLE: coordinator / strategic curator
 MISSION: preserve the strategic/economic thesis and close the night without changing benchmark evidence
 BRANCH: feature/cay-20260910-04-openrouter-prep
-HEAD AFTER WRAP: 73da22c764a46e2e9f3120e6085263280e0a0d25
+PRE-RECEIPT DOC HEAD: 73da22c764a46e2e9f3120e6085263280e0a0d25
 STRATEGIC DOC: docs/CAPABILITY_INTELLIGENCE_THESIS.md
 END-OF-DAY RESTART: docs/reviews/CAY-20260910-19.md
 INDEX UPDATED: docs/AGENT_SYSTEM_INDEX.md
