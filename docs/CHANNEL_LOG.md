@@ -2,6 +2,16 @@
 
 Short scan log. Newest first.
 
+## CAY-20260910-19 — 2026-09-11
+
+STATUS: WRAPPED_FOR_NIGHT  
+What: Preserved the emerging capability-intelligence thesis, research economics, falsification logic, solo-founder direction, and end-of-day restart point. No benchmark change, no spend, no publication.  
+Strategy: `docs/CAPABILITY_INTELLIGENCE_THESIS.md`  
+Restart: `docs/reviews/CAY-20260910-19.md`  
+Commits: `3d2057e`, `0f4fde0`, `1215fae` plus this channel-log commit  
+PR: https://github.com/heyitschien/can-ai-yet/pull/2  
+Next: independent CAP-001 fairness/publication review. Then Demand Scout (#6), then business/economics validation (#8). Do not spend or add a second model yet.
+
 ## CAY-20260910-18 — 2026-09-11
 
 STATUS: READY_FOR_COORDINATOR_REVIEW  
