@@ -2,6 +2,16 @@
 
 Short scan log. Newest first.
 
+## CAY-20260911-04 — 2026-09-11
+
+STATUS: STRATEGY_PRESERVED  
+What: Added a durable falsification and phase-threshold framework. It treats provider-native evals as both validation and threat, records working probability priors, defines lab→public evidence→demand→decision utility→payment→repeat→data advantage→action-layer gates, and adds explicit continue/narrow/pivot/stop logic. No benchmark, scenario, judge, accepted evidence, spend, publication, or build authority changed.  
+Document: `docs/FALSIFICATION_AND_PHASE_THRESHOLDS.md`  
+Origin context: `docs/reviews/CAY-20260911-03-origin-chain-why-now.md`  
+Commits: `0a9c3733`, `2f271357` plus this channel-log commit  
+PR: https://github.com/heyitschien/can-ai-yet/pull/2  
+Next: preserve the current execution order — independent CAP-001 fairness/publication review, then Demand Scout (#6). Use this document as a strategic kill-switch, not as permission to broaden scope.
+
 ## CAY-20260911-02 — 2026-09-11
 
 STATUS: STRATEGY_PRESERVED  
