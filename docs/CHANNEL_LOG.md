@@ -6,6 +6,7 @@ Short scan log. Newest first.
 
 STATUS: READY_FOR_COORDINATOR_REVIEW  
 What: Wrapped the first full Sonnet run into durable notes. Four truths kept apart. Fairness matrix written. Frozen exam not changed. No spend.  
+Commit: `506afa5`  
 Report: `docs/reviews/CAY-20260910-18.md`  
 PR: https://github.com/heyitschien/can-ai-yet/pull/2  
 Next: fairness review before any public 4/12 claim. Do not spend, publish, or merge.
