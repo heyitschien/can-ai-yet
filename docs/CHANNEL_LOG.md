@@ -9,7 +9,7 @@ Issue #1 is the handoff desk. This file is the trail. One entry per finished sli
 STATUS: READY_FOR_REVIEW  
 What: OpenRouter CAP-001 prep. Dry-run only. No paid call. Public pages no longer mix headline and detail from different sources.  
 Branch: `feature/cay-20260910-04-openrouter-prep`  
-Commit: filled in after the push  
+Commit: `e83314b`  
 Handoff: https://github.com/heyitschien/can-ai-yet/issues/1#issuecomment-5628796508  
 Next: human review. Do not merge. Do not spend.
 
