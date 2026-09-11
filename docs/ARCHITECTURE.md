@@ -367,13 +367,11 @@ Already built:
 Still foundational work before the core promise is fully real:
 
 ```text
-→ real tool-calling model adapter
-→ explicit budget controls
-→ first real CAP-001 benchmark
-→ persist full run/results in Supabase
-→ make public page read one accepted run end to end
-→ independent review and acceptance
-→ then compare a small panel of models
+✓ real tool-calling model adapter, unpublished
+✓ first valid CAP-001 real-model run, unpublished review evidence only
+→ persist that accepted chain in Supabase after a human accepts it
+→ publication-quality fairness review before any public model claim
+→ then compare a small panel of models only if the next spend is justified
 ```
 
 ---

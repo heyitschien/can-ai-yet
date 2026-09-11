@@ -57,6 +57,8 @@ A later repeat is a new trial. It must not overwrite the earlier one. Until the 
 
 **Economics** is first-class evidence, not a footnote: cost per trial, requests, input and output tokens, cache read/write tokens when the gateway returns them, and runtime. Later, cost per successful completion. A cheap fail and an expensive pass are different facts.
 
+A suite cost is **benchmark-observation cost**. It is not the cost of doing the task in production, and it is not the cost of a page view. The first full valid CAP-001 run, CAY-20260910-16, cost $0.396747 for 12 measured scenarios, about $0.0331 each. That artifact can be read again without another model call. See `docs/reviews/CAY-20260910-18.md`.
+
 Three outcomes stay distinct:
 
 - valid pass — the experiment stayed intact and the judge passed;
@@ -416,6 +418,19 @@ Compare failures, not just headline score
 ```
 
 Do not start with every capability and every model.
+
+### What the first full run proved — four truths
+
+CAY-20260910-16 is the first complete valid real-model CAP-001 run. Keep these separate. Do not collapse them into “4/12 red.”
+
+- **Lab validity:** the experiment finished. One model, frozen scenarios, tool actions, deterministic judge, saved provenance.
+- **Model outcome:** on this one trial per scenario, Sonnet’s result was mixed and poor. That is an observation, not a reliability rate, and not a claim that the model always fails.
+- **Publication validity:** still open. A fairness review has to decide whether a CRM phrase and a wrong-person email belong in the same public headline.
+- **Commercial validation:** not proven. No one has paid for the report, and demand has not ranked this capability.
+
+The durable asset is not OpenRouter and not this model. It is the capability list, frozen tasks, judges, failure record, cost record, and later demand history. OpenRouter is the current observation window. A fragmented model supply can make that window useful. CanAIYet is the intelligence layer, not a router.
+
+Do not add a second model until the fairness review and the next spend receipt say so.
 
 ### Prepared next paid target — not authorized here
 

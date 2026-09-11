@@ -48,6 +48,8 @@ GitHub Issue #1 — **Agent Communication Channel — CanAIYet Mission Control**
 
 `CHANNEL_LOG.md` is the short scan log. Newest entry first. It does not replace Issue #1.
 
+The first full real-model wrap-up is `reviews/CAY-20260910-18.md`. It is a review, not a second build authority. It keeps four truths apart: the lab worked, the model result was mixed, publication is still pending, and commercial demand is not proven.
+
 ## Stable rule
 
 The role contracts and evidence protocol matter more than any particular model vendor. Agent/model assignments can change later, but canonical product claims, provenance, independent review, and human approval boundaries must remain intact.

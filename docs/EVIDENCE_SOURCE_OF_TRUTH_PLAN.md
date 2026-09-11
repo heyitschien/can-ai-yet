@@ -258,3 +258,5 @@ Store each trial beside the others. A result row, or the JSON kept inside it unt
 Do not replace a pass with a later fail, or a fail with a later pass. Public percentages wait until the repeat count supports a rate. Until then, the honest report is a count such as `1/2`.
 
 An explicit scenario subset is a labeled segment. It is not a full capability score, and it must not be stitched to a segment from a different git SHA or config. Accepted evidence still requires one clean full run. This note does not add a production migration. New OpenRouter artifacts already carry the trial fields so a later store does not have to invent them.
+
+The first full valid real-model file is `docs/reviews/runs/CAP-001-openrouter-2026-09-11T06-51-59-982Z.json`, from head `d7504c0`. Treat that JSON as immutable review evidence. Do not regenerate it to improve a score. A later judge or fixture change must be a new version, not an edit that rewrites this result. GitHub is the reproducibility trail. Supabase is the public chain only after `accepted_test_run_id` is set on purpose. That field was not set for this run.
