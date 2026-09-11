@@ -20,6 +20,7 @@ const config = (overrides: Partial<ReturnType<typeof configFromEnv>> = {}) => ({
   timeoutMs: 10,
   maxRetries: 0,
   maxSpendUsd: 1,
+  requestReserveUsd: 0.01,
   maxScenarios: 12,
   appUrl: "https://review.invalid",
   appTitle: "Review",
@@ -101,7 +102,7 @@ afterEach(() => {
 describe("CAY-20260910-06 corrections", () => {
   it("F1: refuses a request once the spend cap is exhausted", async () => {
     const client = vi.fn(async () => completion());
-    const provider = new OpenRouterProvider(config({ maxSpendUsd: 0.01 }), new SpendLedger(0.01), client);
+    const provider = new OpenRouterProvider(config({ maxSpendUsd: 0.01 }), new SpendLedger(0.01, 0.01), client);
     await provider.run(input, World.fresh());
     await provider.run(input, World.fresh());
     expect(client).toHaveBeenCalledTimes(1);
@@ -109,25 +110,26 @@ describe("CAY-20260910-06 corrections", () => {
 
   it("F1: preserves uncertain billed attempts instead of treating a retry as fully accounted", async () => {
     let calls = 0;
-    const provider = new OpenRouterProvider(config({ maxRetries: 1 }), new SpendLedger(1), async () => {
+    const provider = new OpenRouterProvider(config({ maxRetries: 1 }), new SpendLedger(1, 0.01), async () => {
       if (++calls === 1) throw new GuardError("TIMEOUT", "May already have been billed");
       return completion();
     });
     const result = await provider.run(input, World.fresh());
+    expect(calls).toBe(1);
     expect(result.usage?.costUsd).toBeNull();
   });
 
   it("F2: default HTTP transport enforces the paid gate even outside the CLI", async () => {
     const fetchMock = vi.fn(async () => new Response(JSON.stringify(completion())));
     vi.stubGlobal("fetch", fetchMock);
-    await new OpenRouterProvider(config(), new SpendLedger(1)).run(input, World.fresh());
+    await new OpenRouterProvider(config(), new SpendLedger(1, 0.01)).run(input, World.fresh());
     expect(fetchMock).not.toHaveBeenCalled();
-    expect(JSON.stringify(await new OpenRouterProvider(config(), new SpendLedger(1)).run(input, World.fresh()))).not.toContain(KEY);
+    expect(JSON.stringify(await new OpenRouterProvider(config(), new SpendLedger(1, 0.01)).run(input, World.fresh()))).not.toContain(KEY);
   });
 
   it.each(["length", "error", "content_filter"])("F3: rejects %s after a successful tool mutation", async (finish) => {
     let calls = 0;
-    const provider = new OpenRouterProvider(config(), new SpendLedger(1), async () =>
+    const provider = new OpenRouterProvider(config(), new SpendLedger(1, 0.01), async () =>
       ++calls === 1
         ? completion({ tool_calls: [tool("send_reply", { to: "devon.park@example.com", body: "$180" })] }, 0.01, "tool_calls")
         : completion({ content: null }, 0.01, finish),
@@ -137,7 +139,7 @@ describe("CAY-20260910-06 corrections", () => {
   });
 
   it("F3: rejects a malformed assistant envelope instead of finishing successfully", async () => {
-    const provider = new OpenRouterProvider(config(), new SpendLedger(1), async () => ({
+    const provider = new OpenRouterProvider(config(), new SpendLedger(1, 0.01), async () => ({
       ...completion(),
       choices: [{ message: {}, error: { code: 500, message: "failed" } }],
     }));
@@ -145,7 +147,7 @@ describe("CAY-20260910-06 corrections", () => {
   });
 
   it("F4: retains served route/model and generation ID in the run artifact", async () => {
-    const suite = await runCapability("CAP-001", new OpenRouterProvider(config(), new SpendLedger(1), async () => completion()));
+    const suite = await runCapability("CAP-001", new OpenRouterProvider(config(), new SpendLedger(1, 0.01), async () => completion()));
     const serialized = JSON.stringify({ suite, payload: buildPersistPayload(suite, leadScenarios) });
     expect(serialized).toContain("gen-review");
     expect(serialized).toContain("route-review");

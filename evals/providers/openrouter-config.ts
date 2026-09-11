@@ -17,6 +17,7 @@ export type OpenRouterRunConfig = {
   timeoutMs: number;
   maxRetries: number;
   maxSpendUsd: number | null;
+  requestReserveUsd: number | null;
   maxScenarios: number;
   appUrl: string;
   appTitle: string;
@@ -54,6 +55,7 @@ export function assertExactModelId(model: string): string {
 }
 
 export function paidRunBlockedReason(env: Record<string, string | undefined>): string | null {
+  if (env.NODE_ENV === "test") return "NODE_ENV=test. Automated tests must use mocks, not the real transport.";
   if (env.CI === "true" || env.CI === "1") return "CI is set. Paid evals never run as ordinary CI.";
   if (env.GITHUB_ACTIONS === "true") return "GITHUB_ACTIONS is set. Paid evals never run as ordinary CI.";
   if (env.VERCEL === "1") return "VERCEL is set. Paid evals never run on deploy.";
@@ -65,8 +67,11 @@ export function assertPaidExecutionAllowed(env: Record<string, string | undefine
   const blocked = paidRunBlockedReason(env);
   if (blocked) throw new GuardError("PAID_BLOCKED", blocked);
   if (!config.apiKey) throw new GuardError("KEY_REQUIRED", "OPENROUTER_API_KEY is required for a paid run.");
-  if (config.maxSpendUsd === null || !(config.maxSpendUsd > 0)) {
-    throw new GuardError("SPEND_CAP_REQUIRED", "OPENROUTER_MAX_SPEND_USD must be a positive number before a paid run.");
+  if (config.maxSpendUsd === null || !Number.isFinite(config.maxSpendUsd) || !(config.maxSpendUsd > 0)) {
+    throw new GuardError("SPEND_CAP_REQUIRED", "OPENROUTER_MAX_SPEND_USD must be a finite positive number before a paid run.");
+  }
+  if (config.requestReserveUsd === null || !Number.isFinite(config.requestReserveUsd) || !(config.requestReserveUsd > 0) || config.requestReserveUsd > config.maxSpendUsd) {
+    throw new GuardError("RESERVE_REQUIRED", "OPENROUTER_REQUEST_RESERVE_USD must be a finite positive amount no larger than the spend cap.");
   }
   assertExactModelId(config.model);
   if (config.maxScenarios < 1 || config.maxScenarios > CAP001_SCENARIO_CEILING) {
@@ -105,6 +110,7 @@ export function configFromEnv(env: NodeJS.ProcessEnv): OpenRouterRunConfig {
     timeoutMs: Math.max(1, readPositiveInt(env.OPENROUTER_TIMEOUT_MS, OPENROUTER_DEFAULTS.timeoutMs, "OPENROUTER_TIMEOUT_MS")),
     maxRetries: readPositiveInt(env.OPENROUTER_MAX_RETRIES, OPENROUTER_DEFAULTS.maxRetries, "OPENROUTER_MAX_RETRIES"),
     maxSpendUsd: readSpend(env.OPENROUTER_MAX_SPEND_USD),
+    requestReserveUsd: readSpend(env.OPENROUTER_REQUEST_RESERVE_USD),
     maxScenarios,
     appUrl: env.NEXT_PUBLIC_APP_URL?.trim() || "https://can-ai-yet.local",
     appTitle: "CanAIYet",
@@ -133,19 +139,22 @@ export class SpendLedger {
    * unless a smaller per-request reserve was approved. A later request is refused
    * once the cap is exhausted or any attempt cost is unknown.
    */
-  beginAttempt(options: { sameRequestRetry?: boolean } = {}): { ok: true } | { ok: false; reason: string } {
-    if (this.maxSpendUsd !== null && this.uncertainAttempts > 0 && !options.sameRequestRetry) {
+  beginAttempt(): { ok: true } | { ok: false; reason: string } {
+    if (this.requestReserveUsd === null || !Number.isFinite(this.requestReserveUsd) || !(this.requestReserveUsd > 0)) {
+      return { ok: false, reason: "No verified per-request cost bound. Refusing dispatch." };
+    }
+    if (this.uncertainAttempts > 0) {
       return { ok: false, reason: "An earlier attempt may already have been billed. Remaining spend cannot be verified, so no further request is sent." };
     }
-    if (this.maxSpendUsd !== null && this.measuredUsd >= this.maxSpendUsd) {
+    if (this.maxSpendUsd === null || !Number.isFinite(this.maxSpendUsd) || !(this.maxSpendUsd > 0)) {
+      return { ok: false, reason: "Spend cap is missing or not finite. Refusing dispatch." };
+    }
+    if (this.measuredUsd >= this.maxSpendUsd) {
       return { ok: false, reason: "Spend cap is exhausted. Refusing another request." };
     }
-    if (this.maxSpendUsd !== null) {
-      const remaining = this.remainingUsd() ?? 0;
-      const reserve = this.requestReserveUsd ?? remaining;
-      if (!(reserve > 0) || remaining < reserve) {
-        return { ok: false, reason: "Remaining budget is below the request reserve. Refusing the request." };
-      }
+    const remaining = this.remainingUsd() ?? 0;
+    if (remaining < this.requestReserveUsd) {
+      return { ok: false, reason: "Remaining budget is below the request reserve. Refusing the request." };
     }
     this.requests += 1;
     return { ok: true };
@@ -170,6 +179,9 @@ export class SpendLedger {
       return { stop: true, reason: "Gateway returned an unusable cost." };
     }
     this.measuredUsd += costUsd;
+    if (this.requestReserveUsd !== null && costUsd > this.requestReserveUsd) {
+      return { stop: true, reason: "A response cost more than the reserved per-request bound. Stopping." };
+    }
     if (this.maxSpendUsd !== null && this.measuredUsd > this.maxSpendUsd) {
       return { stop: true, reason: `Measured spend ${this.measuredUsd.toFixed(6)} exceeded the cap of ${this.maxSpendUsd}.` };
     }

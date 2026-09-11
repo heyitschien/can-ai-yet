@@ -137,6 +137,7 @@ export type SuiteResult = {
     servedProviders: string[];
     generationIds: string[];
     attempts: ProviderAttempt[];
+    executionConfig?: unknown;
   };
   results: ScenarioResult[];
 };

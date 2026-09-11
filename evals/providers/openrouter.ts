@@ -69,6 +69,22 @@ function numberOrNull(value: unknown): number | null {
   return typeof value === "number" && Number.isFinite(value) ? value : null;
 }
 
+function parseToolCall(item: unknown): { call: ToolCall } | { error: string } {
+  const call = asRecord(item);
+  if (!call) return { error: "tool call is not an object" };
+  if (typeof call.id !== "string" || call.id.length === 0) return { error: "tool call is missing an id" };
+  if (call.type !== "function") return { error: "tool call type is not function" };
+  const fn = asRecord(call.function);
+  if (!fn || typeof fn.name !== "string" || fn.name.length === 0) return { error: "tool call is missing a name" };
+  if (typeof fn.arguments !== "string") return { error: "tool call arguments are not a string" };
+  try {
+    if (!asRecord(JSON.parse(fn.arguments) as unknown)) return { error: "tool call arguments are not a JSON object" };
+  } catch {
+    return { error: "tool call arguments are not JSON" };
+  }
+  return { call: { id: call.id, type: "function", function: { name: fn.name, arguments: fn.arguments } } };
+}
+
 export function parseOpenRouterResponse(payload: unknown): ParsedResponse {
   const root = asRecord(payload);
   if (!root) throw new GuardError("RESPONSE_INVALID", "Gateway response was not an object.");
@@ -76,24 +92,27 @@ export function parseOpenRouterResponse(payload: unknown): ParsedResponse {
   const message = choice ? asRecord(choice.message) : null;
   if (!message) throw new GuardError("RESPONSE_INVALID", "Gateway response had no assistant message.");
   const rawCalls = Array.isArray(message.tool_calls) ? message.tool_calls : [];
-  const toolCalls: ToolCall[] = rawCalls.map((item, index) => {
-    const call = asRecord(item);
-    const fn = call ? asRecord(call.function) : null;
-    const name = typeof fn?.name === "string" ? fn.name : "";
-    const args = typeof fn?.arguments === "string" ? fn.arguments : "{}";
-    const id = typeof call?.id === "string" && call.id ? call.id : `call-${index + 1}`;
-    return { id, type: "function", function: { name, arguments: args } };
-  });
+  const parsedCalls = rawCalls.map(parseToolCall);
+  const envelopeErrors = parsedCalls.flatMap((item) => ("error" in item ? [item.error] : []));
+  const toolCalls = parsedCalls.flatMap((item) => ("call" in item ? [item.call] : []));
+  const ids = toolCalls.map((call) => call.id);
+  if (new Set(ids).size !== ids.length) envelopeErrors.push("tool call ids are not unique");
   const usage = asRecord(root.usage);
   const choiceError = choice ? asRecord(choice.error) : null;
   const finishReason = typeof choice?.finish_reason === "string" ? choice.finish_reason : null;
   return {
     choice: {
-      toolCalls: toolCalls.filter((call) => call.function.name.length > 0),
+      toolCalls: envelopeErrors.length > 0 ? [] : toolCalls,
       content: typeof message.content === "string" ? message.content : null,
     },
     finishReason,
-    choiceError: choiceError ? JSON.stringify(choiceError) : choice?.error ? "choice error" : null,
+    choiceError: envelopeErrors.length > 0
+      ? envelopeErrors.join("; ")
+      : choiceError
+        ? JSON.stringify(choiceError)
+        : choice?.error
+          ? "choice error"
+          : null,
     servedModel: typeof root.model === "string" ? root.model : null,
     servedProvider: typeof root.provider === "string" ? root.provider : null,
     generationId: typeof root.id === "string" ? root.id : null,
@@ -134,8 +153,19 @@ export function chatBody(config: OpenRouterRunConfig, messages: ChatMessage[], t
 export async function fetchOpenRouterChat(body: OpenRouterChatBody, init: { timeoutMs: number; apiKey: string }): Promise<unknown> {
   const blocked = paidRunBlockedReason(process.env);
   if (blocked) throw new GuardError("PAID_BLOCKED", blocked);
-  if (!process.env.OPENROUTER_MAX_SPEND_USD || !(Number(process.env.OPENROUTER_MAX_SPEND_USD) > 0)) {
-    throw new GuardError("SPEND_CAP_REQUIRED", "OPENROUTER_MAX_SPEND_USD must be set before a real OpenRouter request.");
+  const cap = Number(process.env.OPENROUTER_MAX_SPEND_USD);
+  const reserve = Number(process.env.OPENROUTER_REQUEST_RESERVE_USD);
+  if (!Number.isFinite(cap) || !(cap > 0)) {
+    throw new GuardError("SPEND_CAP_REQUIRED", "OPENROUTER_MAX_SPEND_USD must be a finite positive number before a real OpenRouter request.");
+  }
+  if (!Number.isFinite(reserve) || !(reserve > 0)) {
+    throw new GuardError("RESERVE_REQUIRED", "OPENROUTER_REQUEST_RESERVE_USD must be a finite positive number before a real OpenRouter request.");
+  }
+  if (body.provider.allow_fallbacks !== false) {
+    throw new GuardError("FALLBACK_FORBIDDEN", "A real request must forbid provider fallbacks.");
+  }
+  if (!Number.isFinite(body.max_tokens) || !(body.max_tokens > 0) || !Number.isFinite(init.timeoutMs) || !(init.timeoutMs > 0)) {
+    throw new GuardError("LIMITS_REQUIRED", "A real request needs a finite token ceiling and timeout.");
   }
   try {
     assertPaidExecutionAllowed(process.env, {
@@ -145,7 +175,8 @@ export async function fetchOpenRouterChat(body: OpenRouterChatBody, init: { time
       maxTurns: 1,
       timeoutMs: init.timeoutMs,
       maxRetries: 0,
-      maxSpendUsd: Number(process.env.OPENROUTER_MAX_SPEND_USD),
+      maxSpendUsd: cap,
+      requestReserveUsd: reserve,
       maxScenarios: 1,
       appUrl: "https://can-ai-yet.local",
       appTitle: "CanAIYet",
@@ -214,6 +245,16 @@ function clip(value: unknown): string {
 export class OpenRouterProvider implements AgentProvider {
   readonly providerId = "openrouter";
   readonly modelId: string;
+  readonly executionConfig: {
+    maxTokens: number;
+    maxTurns: number;
+    timeoutMs: number;
+    maxRetries: number;
+    maxSpendUsd: number | null;
+    requestReserveUsd: number | null;
+    maxScenarios: number;
+    allowFallbacks: false;
+  };
   private halted: string | null = null;
 
   constructor(
@@ -222,6 +263,16 @@ export class OpenRouterProvider implements AgentProvider {
     private readonly client: OpenRouterClient = fetchOpenRouterChat,
   ) {
     this.modelId = config.model;
+    this.executionConfig = {
+      maxTokens: config.maxTokens,
+      maxTurns: config.maxTurns,
+      timeoutMs: config.timeoutMs,
+      maxRetries: config.maxRetries,
+      maxSpendUsd: config.maxSpendUsd,
+      requestReserveUsd: config.requestReserveUsd,
+      maxScenarios: config.maxScenarios,
+      allowFallbacks: false,
+    };
   }
 
   async run(input: AgentRunInput, world: World): Promise<AgentRunResult> {
@@ -317,6 +368,36 @@ export class OpenRouterProvider implements AgentProvider {
     return { toolsCalled, finished: false, error: message, usage, benchmarkInvalid: true };
   }
 
+  private startAttempt(usage: ProviderUsage): void {
+    usage.attempts.push({
+      generationId: null,
+      servedModel: null,
+      servedProvider: null,
+      costUsd: null,
+      uncertain: true,
+      finishReason: null,
+    });
+    usage.requestCount += 1;
+  }
+
+  private completeAttempt(usage: ProviderUsage, parsed: ParsedResponse): void {
+    const attempt = usage.attempts[usage.attempts.length - 1] ?? {
+      generationId: null,
+      servedModel: null,
+      servedProvider: null,
+      costUsd: null,
+      uncertain: true,
+      finishReason: null,
+    };
+    if (usage.attempts.length === 0) usage.attempts.push(attempt);
+    attempt.generationId = parsed.generationId;
+    attempt.servedModel = parsed.servedModel;
+    attempt.servedProvider = parsed.servedProvider;
+    attempt.costUsd = parsed.costUsd;
+    attempt.finishReason = parsed.finishReason;
+    attempt.uncertain = this.ledger.uncertainAttempts > 0 || parsed.costUsd === null;
+  }
+
   private account(payload: unknown, usage: ProviderUsage): ParsedResponse | string {
     let parsed: ParsedResponse;
     try {
@@ -328,19 +409,11 @@ export class OpenRouterProvider implements AgentProvider {
     }
     usage.inputTokens += parsed.inputTokens;
     usage.outputTokens += parsed.outputTokens;
-    usage.requestCount += 1;
+    this.completeAttempt(usage, parsed);
     if (parsed.generationId) usage.generationIds.push(parsed.generationId);
     usage.servedModel = parsed.servedModel;
     if (parsed.servedProvider) usage.servedProviders.push(parsed.servedProvider);
     usage.servedProvider = parsed.servedProvider;
-    usage.attempts.push({
-      generationId: parsed.generationId,
-      servedModel: parsed.servedModel,
-      servedProvider: parsed.servedProvider,
-      costUsd: parsed.costUsd,
-      uncertain: this.ledger.uncertainAttempts > 0 || parsed.costUsd === null,
-      finishReason: parsed.finishReason,
-    });
     const cost = this.ledger.noteCost(parsed.costUsd);
     if (this.ledger.uncertainAttempts > 0 || parsed.costUsd === null) usage.costUsd = null;
     else if (usage.costUsd !== null) usage.costUsd += parsed.costUsd;
@@ -361,11 +434,12 @@ export class OpenRouterProvider implements AgentProvider {
     if (!apiKey) throw new GuardError("KEY_REQUIRED", "OPENROUTER_API_KEY is not set.");
     let last: unknown;
     for (let attempt = 0; attempt <= this.config.maxRetries; attempt += 1) {
-      const reserved = this.ledger.beginAttempt({ sameRequestRetry: attempt > 0 });
+      const reserved = this.ledger.beginAttempt();
       if (!reserved.ok) {
         this.halted = reserved.reason;
         throw new GuardError("SPEND_CAP", reserved.reason);
       }
+      this.startAttempt(usage);
       try {
         return await this.client(body, { timeoutMs: this.config.timeoutMs, apiKey });
       } catch (error) {

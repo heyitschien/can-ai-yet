@@ -20,6 +20,7 @@ function config(overrides: Partial<ReturnType<typeof configFromEnv>> = {}) {
     timeoutMs: 1000,
     maxRetries: 0,
     maxSpendUsd: 1,
+    requestReserveUsd: 0.01,
     maxScenarios: 12,
     appUrl: "https://can-ai-yet.local",
     appTitle: "CanAIYet",
@@ -77,7 +78,7 @@ describe("OpenRouter tool loop", () => {
       }
       return completion({ content: "Done" });
     };
-    const provider = new OpenRouterProvider(config(), new SpendLedger(1), client);
+    const provider = new OpenRouterProvider(config(), new SpendLedger(1, 0.01), client);
     const scenario = leadScenarios[0];
     if (!scenario) throw new Error("missing scenario");
     const result = await runScenario(scenario, provider);
@@ -90,7 +91,7 @@ describe("OpenRouter tool loop", () => {
 
   it("does not let chat text bypass the judge", async () => {
     const client = async () => completion({ content: "I emailed Alex and updated the CRM." });
-    const provider = new OpenRouterProvider(config(), new SpendLedger(1), client);
+    const provider = new OpenRouterProvider(config(), new SpendLedger(1, 0.01), client);
     const scenario = leadScenarios[0];
     if (!scenario) throw new Error("missing scenario");
     const world = World.fresh();
@@ -111,7 +112,7 @@ describe("OpenRouter tool loop", () => {
       calls += 1;
       return completion({ content: "Done" }, { model: "openai/gpt-4.1" });
     };
-    const provider = new OpenRouterProvider(config(), new SpendLedger(1), client);
+    const provider = new OpenRouterProvider(config(), new SpendLedger(1, 0.01), client);
     const scenario = leadScenarios[0];
     if (!scenario) throw new Error("missing scenario");
     const first = await provider.run(
@@ -134,7 +135,7 @@ describe("OpenRouter tool loop", () => {
         content: null,
         tool_calls: [{ id: "call-1", type: "function", function: { name: "send_reply", arguments: JSON.stringify({ to: "alex.rivera@example.com", body: "Hi" }) } }],
       });
-    const provider = new OpenRouterProvider(config({ maxTurns: 1 }), new SpendLedger(1), client);
+    const provider = new OpenRouterProvider(config({ maxTurns: 1 }), new SpendLedger(1, 0.01), client);
     const scenario = leadScenarios[0];
     if (!scenario) throw new Error("missing scenario");
     const world = World.fresh();
@@ -149,7 +150,7 @@ describe("OpenRouter tool loop", () => {
 
   it("stops when spend is unverified or over the cap", async () => {
     const client = async () => completion({ content: "Done" }, { usage: { prompt_tokens: 1, completion_tokens: 1, cost: 2 } });
-    const provider = new OpenRouterProvider(config({ maxSpendUsd: 0.5 }), new SpendLedger(0.5), client);
+    const provider = new OpenRouterProvider(config({ maxSpendUsd: 0.5 }), new SpendLedger(0.5, 0.01), client);
     const scenario = leadScenarios[0];
     if (!scenario) throw new Error("missing scenario");
     const result = await provider.run(
@@ -157,7 +158,7 @@ describe("OpenRouter tool loop", () => {
       World.fresh(),
     );
     expect(result.benchmarkInvalid).toBe(true);
-    expect(result.error).toMatch(/exceeded the cap/);
+    expect(result.error).toMatch(/reserved per-request bound|exceeded the cap/);
   });
 
   it("never sends a fallback-enabled body", () => {

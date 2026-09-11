@@ -34,6 +34,7 @@ function remote(overrides: Partial<RemoteCapability> = {}): RemoteCapability {
     modelProvider: "stale-provider",
     modelName: "stale-model",
     configurationLabel: "old",
+    id: "cap-1",
     ...overrides,
   };
 }
@@ -54,6 +55,9 @@ function run(overrides: Partial<RemoteRun> = {}): RemoteRun {
     totalCostUsd: 0.02,
     medianRuntimeSeconds: 1.2,
     published: true,
+    status: "completed",
+    benchmarkValid: true,
+    capabilityId: "cap-1",
     ...overrides,
   };
 }

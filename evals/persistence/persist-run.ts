@@ -90,6 +90,8 @@ export function buildPersistPayload(suite: SuiteResult, scenarios: Scenario[]): 
         servedProviders: suite.provenance?.servedProviders ?? [],
         generationIds: suite.provenance?.generationIds ?? [],
         attempts: suite.provenance?.attempts ?? [],
+        executionConfig: suite.provenance?.executionConfig ?? null,
+        expectedScenarioSlugs: scenarios.map((scenario) => scenario.slug),
         allowFallbacks: false,
         benchmarkValid: suite.benchmarkValid !== false,
         invalidReasons: suite.invalidReasons ?? [],
@@ -165,12 +167,30 @@ export async function persistIntentionalRun(writer: EvidenceWriter, suite: Suite
   const scenarioIds = await writer.upsertScenarios(payload.scenarios);
   const runId = await writer.insertRun(payload.run);
   await writer.insertResults(runId, payload.results, scenarioIds);
-  if (payload.results.length !== scenarios.length) {
-    throw new Error("Refusing to settle a run that does not have one result per scenario.");
+  if (!resultMembershipMatches(suite, scenarios) || !recomputedTotalsMatch(suite)) {
+    return { runId, accepted: false };
   }
   const settled = suite.benchmarkValid === false ? "failed" : "completed";
   if (writer.markRunSettled) await writer.markRunSettled(runId, settled);
   return { runId, accepted: false };
+}
+
+function resultMembershipMatches(suite: SuiteResult, scenarios: Scenario[]): boolean {
+  const expected = scenarios.map((scenario) => scenario.id);
+  const actual = suite.results.map((result) => result.scenarioId);
+  if (actual.length !== expected.length || new Set(actual).size !== expected.length) return false;
+  return expected.every((id) => actual.includes(id));
+}
+
+function recomputedTotalsMatch(suite: SuiteResult): boolean {
+  const successCount = suite.results.filter((result) => result.success).length;
+  const criticalFailureCount = suite.results.filter((result) => result.critical).length;
+  return (
+    suite.totalCount === suite.results.length &&
+    suite.successCount === successCount &&
+    suite.failureCount === suite.results.length - successCount &&
+    suite.criticalFailureCount === criticalFailureCount
+  );
 }
 
 export type AcceptDecision =

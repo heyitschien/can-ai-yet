@@ -67,6 +67,7 @@ export async function runScenario(scenario: Scenario, provider: AgentProvider): 
       tasks: world.tasks,
       notes: world.notes,
       deals: world.deals,
+      contacts: world.contacts,
       appointments: world.appointments,
       followups: world.followups,
       agentError: agent.error ?? null,
@@ -94,7 +95,7 @@ export async function runAll(provider: AgentProvider = new ReferenceAgent()): Pr
   return suites;
 }
 
-function summarize(code: string, results: ScenarioResult[], startedAt: string, provider: AgentProvider): SuiteResult {
+export function summarize(code: string, results: ScenarioResult[], startedAt: string, provider: AgentProvider): SuiteResult {
   const successCount = results.filter((result) => result.success).length;
   const failureCount = results.length - successCount;
   const criticalFailureCount = results.filter((result) => result.critical).length;
@@ -131,6 +132,7 @@ function summarize(code: string, results: ScenarioResult[], startedAt: string, p
       servedProviders: results.flatMap((result) => result.provenance?.servedProviders ?? []),
       generationIds: results.flatMap((result) => result.provenance?.generationIds ?? []),
       attempts: results.flatMap((result) => result.provenance?.attempts ?? []),
+      executionConfig: "executionConfig" in provider ? provider.executionConfig : undefined,
     },
     results,
   };

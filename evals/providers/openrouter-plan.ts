@@ -21,6 +21,7 @@ export type DryRunPlan = {
   timeoutMs: number;
   maxRetries: number;
   maxSpendUsd: number | null;
+  requestReserveUsd: number | null;
   maxHttpRequests: number;
   estimatedMaxOutputTokens: number;
   estimatedMaxCostUsd: null;
@@ -49,6 +50,7 @@ export function buildCap001DryRunPlan(config: OpenRouterRunConfig, env: Record<s
     timeoutMs: config.timeoutMs,
     maxRetries: config.maxRetries,
     maxSpendUsd: config.maxSpendUsd,
+    requestReserveUsd: config.requestReserveUsd,
     maxHttpRequests: maxHttpRequests(scenarios.length, config),
     estimatedMaxOutputTokens: estimateOutputTokenCeiling(scenarios.length, config),
     estimatedMaxCostUsd: null,

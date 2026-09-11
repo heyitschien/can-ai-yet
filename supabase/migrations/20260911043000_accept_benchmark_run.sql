@@ -14,6 +14,10 @@ declare
   v_run public.test_runs%rowtype;
   v_expected integer;
   v_actual integer;
+  v_distinct integer;
+  v_success integer;
+  v_failure integer;
+  v_critical integer;
   v_prior uuid;
   v_valid boolean;
   v_updated integer;
@@ -40,9 +44,51 @@ begin
   end if;
 
   v_expected := v_run.total_count;
-  select count(*) into v_actual from public.test_results where test_run_id = p_run_id;
-  if v_actual <> v_expected or v_expected < 1 then
+  select count(*), count(distinct scenario_id)
+    into v_actual, v_distinct
+  from public.test_results
+  where test_run_id = p_run_id;
+  if v_actual <> v_expected or v_distinct <> v_expected or v_expected < 1 then
     raise exception 'result_count_mismatch';
+  end if;
+
+  if exists (
+    select 1
+    from public.test_results as result
+    join public.test_scenarios as scenario on scenario.id = result.scenario_id
+    where result.test_run_id = p_run_id
+      and scenario.capability_id is distinct from v_run.capability_id
+  ) then
+    raise exception 'result_capability_mismatch';
+  end if;
+
+  if v_run.tool_configuration ? 'expectedScenarioSlugs' then
+    if (
+      select coalesce(jsonb_agg(scenario.slug order by scenario.slug), '[]'::jsonb)
+      from public.test_results as result
+      join public.test_scenarios as scenario on scenario.id = result.scenario_id
+      where result.test_run_id = p_run_id
+    ) is distinct from (
+      select coalesce(jsonb_agg(value order by value), '[]'::jsonb)
+      from jsonb_array_elements_text(v_run.tool_configuration -> 'expectedScenarioSlugs')
+    ) then
+      raise exception 'result_membership_mismatch';
+    end if;
+  end if;
+
+  select
+    count(*) filter (where success),
+    count(*) filter (where not success),
+    count(*) filter (where critical)
+  into v_success, v_failure, v_critical
+  from public.test_results
+  where test_run_id = p_run_id;
+
+  if v_success <> v_run.success_count
+    or v_failure <> v_run.failure_count
+    or v_critical <> v_run.critical_failure_count
+    or v_run.success_count + v_run.failure_count <> v_run.total_count then
+    raise exception 'result_totals_mismatch';
   end if;
 
   select accepted_test_run_id into v_prior

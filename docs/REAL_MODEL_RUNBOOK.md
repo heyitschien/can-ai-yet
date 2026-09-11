@@ -20,13 +20,13 @@ A chat reply is not a pass. Only tool calls through `World.call` change the simu
 
 1. Confirm the exact model ID on OpenRouter. Do not use `openrouter/auto`, a brand name, or a routing suffix such as `:nitro` or `:floor`.
 2. Confirm the live price. This repository does not quote a price.
-3. Set a hard spend cap.
+3. Set a hard spend cap and a per-request reserve. The first request is refused unless the reserve is a finite amount no larger than the cap.
 4. Run the dry-run and read it. Dry-run makes zero paid requests.
 5. A human sets `CANAIYET_PAID_RUN=1` and runs `--execute`. Agents do not do that without a separate approval.
 
 Suggested candidate to verify, not a confirmed live ID and not an approval: `google/gemini-3-flash-preview`, seen on OpenRouter's public tool-calling docs during preparation. Check the catalog again before spend.
 
-Default ceiling for a full CAP-001 dry-run: 12 scenarios, 8 turns each, 1 retry. That is up to 192 HTTP requests if retries are left at the default. Lower the caps before a first paid run.
+Default ceiling for a full CAP-001 dry-run: 12 scenarios, 8 turns each, 1 retry. That is up to 192 HTTP requests if retries are left at the default. The first paid smoke is one scenario only. Lower the caps before that run.
 
 ---
 
@@ -38,6 +38,7 @@ Put these in the environment. Do not commit them.
 OPENROUTER_API_KEY=
 OPENROUTER_MODEL=provider/exact-model-id
 OPENROUTER_MAX_SPEND_USD=1
+OPENROUTER_REQUEST_RESERVE_USD=
 OPENROUTER_MAX_TURNS=8
 OPENROUTER_MAX_TOKENS=800
 OPENROUTER_TIMEOUT_MS=45000
@@ -70,7 +71,7 @@ Read the printed plan: model, scenario count, caps, git SHA, fixture version, an
 Only after the dry-run looks right and a human has approved the model ID, expected request count, and spend cap:
 
 ```text
-CANAIYET_PAID_RUN=1 pnpm exec tsx scripts/run-openrouter-cap001.ts --execute
+CANAIYET_PAID_RUN=1 OPENROUTER_MAX_SCENARIOS=1 OPENROUTER_REQUEST_RESERVE_USD=<finite-usd> pnpm exec tsx scripts/run-openrouter-cap001.ts --execute
 ```
 
 Add `--persist` only when the run should also write unpublished `test_scenarios`, `test_runs`, and `test_results`. Persistence does not set `accepted_test_run_id`.
@@ -108,7 +109,7 @@ That prints a plan and writes nothing.
 To accept a completed unpublished run:
 
 ```text
-CANAIYET_ACCEPT_RUN=1 pnpm exec tsx scripts/publish-results.ts --accept --run-id <uuid>
+CANAIYET_ACCEPT_RUN=1 CANAIYET_REVIEWED_BY="<reviewer name>" pnpm exec tsx scripts/publish-results.ts --accept --run-id <uuid>
 ```
 
 If the capability already has a different accepted run, add `--replace-accepted`. Do not do that to the current reference baseline unless a human explicitly wants the public page to move.
@@ -129,7 +130,7 @@ Request reserve USD:
 Persistence: unpublished review artifact only
 ```
 
-The spend cap is a pre-dispatch reservation, not a promise that one request cannot overshoot if the gateway omits a price. If a cost is missing or a retry may already have been billed, the run stops and is not a measured score.
+A missing reserve, an unknown charge, or a cost above the reserve stops the run. That is not a measured score. The first paid smoke is one scenario, with the reserve set by a human.
 
 ## What not to do
 

@@ -5,6 +5,7 @@ import type { PublishedRecord } from "@/lib/evidence/load";
 export type EvidenceSource = "accepted-run" | "repository-artifact";
 
 export type RemoteCapability = {
+  id?: string;
   code: string;
   slug: string;
   title: string;
@@ -50,6 +51,7 @@ export type RemoteRun = {
   status?: string;
   benchmarkValid?: boolean;
   capabilityCode?: string;
+  capabilityId?: string;
 };
 
 export type RemoteResult = {
@@ -123,9 +125,10 @@ function fromLocal(record: PublishedRecord): PairedEvidence {
 function chainComplete(remote: RemoteCapability, run: RemoteRun | null, results: RemoteResult[] | null): boolean {
   if (!remote.acceptedRunId || !run || !results) return false;
   if (run.id !== remote.acceptedRunId || !run.published) return false;
-  if (run.status && run.status !== "completed") return false;
-  if (run.benchmarkValid === false) return false;
+  if (run.status !== "completed") return false;
+  if (run.benchmarkValid !== true) return false;
   if (run.capabilityCode && run.capabilityCode !== remote.code) return false;
+  if (!remote.id || !run.capabilityId || run.capabilityId !== remote.id) return false;
   if (results.length !== run.totalCount) return false;
   const slugs = results.map((result) => result.slug);
   if (new Set(slugs).size !== results.length) return false;

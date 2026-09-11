@@ -45,6 +45,7 @@ function supabasePublic() {
 }
 
 type Row = {
+  id: string;
   code: string;
   slug: string;
   title: string;
@@ -80,6 +81,7 @@ function num(value: unknown): number | null {
 function toRemote(row: Row): RemoteCapability {
   const category = Array.isArray(row.categories) ? row.categories[0] : row.categories;
   return {
+    id: row.id,
     code: row.code,
     slug: row.slug,
     title: row.title,
@@ -110,6 +112,9 @@ function toRemote(row: Row): RemoteCapability {
 
 type RunRow = {
   id: string;
+  capability_id: string;
+  status: string;
+  tool_configuration: { benchmarkValid?: boolean } | null;
   model_provider: string;
   model_name: string;
   fixture_version: string;
@@ -149,6 +154,9 @@ function toRun(row: RunRow): RemoteRun {
     totalCostUsd: num(row.total_cost_usd),
     medianRuntimeSeconds: num(row.median_runtime_seconds),
     published: row.published,
+    status: row.status,
+    benchmarkValid: row.tool_configuration?.benchmarkValid === true,
+    capabilityId: row.capability_id,
   };
 }
 
