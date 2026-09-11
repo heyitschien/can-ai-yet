@@ -13,9 +13,12 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   const capability = await getPublishedBySlug(slug);
   if (!capability) return { title: "Capability" };
+  const title = `Can AI ${capability.title}? Current Capability Test`;
   return {
-    title: `Can AI ${capability.title}? Current Capability Test`,
+    title,
     description: capability.shortDescription,
+    openGraph: { title, description: capability.shortDescription },
+    twitter: { title, description: capability.shortDescription },
   };
 }
 
