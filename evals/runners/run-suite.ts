@@ -35,7 +35,7 @@ export async function runScenario(scenario: Scenario, provider: AgentProvider): 
   const started = performance.now();
   const world = World.fresh();
   prepareWorld(scenario, world);
-  await provider.run(
+  const agent = await provider.run(
     {
       capabilityCode: scenario.capabilityCode,
       instruction: scenario.instruction,
@@ -55,13 +55,23 @@ export async function runScenario(scenario: Scenario, provider: AgentProvider): 
     failureCode: judged.success ? null : scenario.failureCode,
     failureExplanation: judged.success ? null : judged.failures.join(" "),
     runtimeSeconds,
-    costUsd: 0,
+    costUsd: agent.usage ? agent.usage.costUsd : 0,
+    inputTokens: agent.usage?.inputTokens,
+    outputTokens: agent.usage?.outputTokens,
+    benchmarkInvalid: agent.benchmarkInvalid === true,
+    provenance: agent.usage,
     actualState: {
       sent: world.sent,
       flags: world.flags,
       escalations: world.escalations,
-      tasks: world.tasks.map((task) => task.title),
+      tasks: world.tasks,
+      notes: world.notes,
+      deals: world.deals,
+      appointments: world.appointments,
       followups: world.followups,
+      agentError: agent.error ?? null,
+      toolsCalled: agent.toolsCalled,
+      provenance: agent.usage ?? null,
     },
   };
 }
@@ -74,7 +84,7 @@ export async function runCapability(code: string, provider: AgentProvider = new 
   for (const scenario of scenarios) {
     results.push(await runScenario(scenario, provider));
   }
-  return summarize(code, results, startedAt);
+  return summarize(code, results, startedAt, provider);
 }
 
 export async function runAll(provider: AgentProvider = new ReferenceAgent()): Promise<SuiteResult[]> {
@@ -84,15 +94,18 @@ export async function runAll(provider: AgentProvider = new ReferenceAgent()): Pr
   return suites;
 }
 
-function summarize(code: string, results: ScenarioResult[], startedAt: string): SuiteResult {
+function summarize(code: string, results: ScenarioResult[], startedAt: string, provider: AgentProvider): SuiteResult {
   const successCount = results.filter((result) => result.success).length;
   const failureCount = results.length - successCount;
   const criticalFailureCount = results.filter((result) => result.critical).length;
   const scored = calculateStatus({ successCount, totalCount: results.length, criticalFailureCount });
+  const invalidReasons = results
+    .filter((result) => result.benchmarkInvalid)
+    .map((result) => `${result.scenarioId}: ${String(result.actualState.agentError ?? "benchmark configuration was not honored")}`);
   return {
     capabilityCode: code,
-    provider: REFERENCE_PROVIDER,
-    model: REFERENCE_MODEL,
+    provider: provider.providerId ?? REFERENCE_PROVIDER,
+    model: provider.modelId ?? REFERENCE_MODEL,
     fixtureVersion: FIXTURE_VERSION,
     environmentVersion: ENVIRONMENT_VERSION,
     gitSha: gitSha(),
@@ -106,8 +119,28 @@ function summarize(code: string, results: ScenarioResult[], startedAt: string): 
     status: scored.status,
     supervision: scored.supervision,
     cappedByCriticalFailure: scored.cappedByCriticalFailure,
-    totalCostUsd: 0,
+    totalCostUsd: sumCost(results),
     medianRuntimeSeconds: median(results.map((result) => result.runtimeSeconds)),
+    benchmarkValid: invalidReasons.length === 0,
+    invalidReasons,
+    inputTokens: sumUsage(results, "inputTokens"),
+    outputTokens: sumUsage(results, "outputTokens"),
+    provenance: {
+      requestedModel: provider.modelId ?? REFERENCE_MODEL,
+      servedModels: results.map((result) => result.provenance?.servedModel).filter((value): value is string => Boolean(value)),
+      servedProviders: results.flatMap((result) => result.provenance?.servedProviders ?? []),
+      generationIds: results.flatMap((result) => result.provenance?.generationIds ?? []),
+      attempts: results.flatMap((result) => result.provenance?.attempts ?? []),
+    },
     results,
   };
+}
+
+function sumCost(results: ScenarioResult[]): number | null {
+  if (results.some((result) => result.costUsd === null)) return null;
+  return results.reduce((sum, result) => sum + (result.costUsd ?? 0), 0);
+}
+
+function sumUsage(results: ScenarioResult[], field: "inputTokens" | "outputTokens"): number {
+  return results.reduce((sum, result) => sum + (result[field] ?? 0), 0);
 }

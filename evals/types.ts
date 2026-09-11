@@ -54,13 +54,40 @@ export type AgentRunInput = {
   payload: Record<string, unknown>;
 };
 
+export type ProviderAttempt = {
+  generationId: string | null;
+  servedModel: string | null;
+  servedProvider: string | null;
+  costUsd: number | null;
+  uncertain: boolean;
+  finishReason: string | null;
+};
+
+export type ProviderUsage = {
+  inputTokens: number;
+  outputTokens: number;
+  costUsd: number | null;
+  requestCount: number;
+  requestedModel: string;
+  servedModel: string | null;
+  servedProvider: string | null;
+  servedProviders: string[];
+  generationIds: string[];
+  attempts: ProviderAttempt[];
+};
+
 export type AgentRunResult = {
   toolsCalled: string[];
   finished: boolean;
   error?: string;
+  usage?: ProviderUsage;
+  /** True when the configured benchmark was not honored. Do not publish this as a model score. */
+  benchmarkInvalid?: boolean;
 };
 
 export interface AgentProvider {
+  readonly providerId?: string;
+  readonly modelId?: string;
   run(input: AgentRunInput, world: import("@/evals/environments/world").World): Promise<AgentRunResult>;
 }
 
@@ -73,7 +100,11 @@ export type ScenarioResult = {
   failureCode: FailureCode | null;
   failureExplanation: string | null;
   runtimeSeconds: number;
-  costUsd: number;
+  costUsd: number | null;
+  inputTokens?: number;
+  outputTokens?: number;
+  benchmarkInvalid?: boolean;
+  provenance?: ProviderUsage;
   actualState: Record<string, unknown>;
 };
 
@@ -94,7 +125,18 @@ export type SuiteResult = {
   status: "green" | "yellow" | "red" | "gray";
   supervision: "low" | "medium" | "high" | "not_recommended";
   cappedByCriticalFailure: boolean;
-  totalCostUsd: number;
+  totalCostUsd: number | null;
   medianRuntimeSeconds: number;
+  benchmarkValid?: boolean;
+  invalidReasons?: string[];
+  inputTokens?: number;
+  outputTokens?: number;
+  provenance?: {
+    requestedModel: string;
+    servedModels: string[];
+    servedProviders: string[];
+    generationIds: string[];
+    attempts: ProviderAttempt[];
+  };
   results: ScenarioResult[];
 };

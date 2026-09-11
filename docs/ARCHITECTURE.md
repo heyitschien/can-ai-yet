@@ -222,7 +222,7 @@ Exact test run
               └── pass/fail + failure code
 ```
 
-The current implementation is not fully normalized this way yet. See `EVIDENCE_SOURCE_OF_TRUTH_PLAN.md`.
+The public page now refuses to pair a database headline with scenario detail from a different source. If no accepted test-run chain is published, both headline and detail come from the repository reference-agent artifact. A completed OpenRouter run can be stored unpublished; it does not become this chain until a human accepts it. No frontier-model run has been accepted. See `EVIDENCE_SOURCE_OF_TRUTH_PLAN.md` and `REAL_MODEL_RUNBOOK.md`.
 
 ---
 

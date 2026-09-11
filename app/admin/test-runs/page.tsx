@@ -15,7 +15,7 @@ export default async function AdminRunsPage() {
         {(evidence?.suites ?? []).map((suite) => (
           <li key={suite.capabilityCode}>
             <Link href={`/admin/test-runs/${suite.capabilityCode}`}>
-              {suite.capabilityCode} · {suite.model} · {suite.successCount}/{suite.totalCount} · failures {suite.failureCount} · ${suite.totalCostUsd}
+              {suite.capabilityCode} · {suite.model} · {suite.successCount}/{suite.totalCount} · failures {suite.failureCount} · {suite.totalCostUsd === null ? "cost not measured" : `$${suite.totalCostUsd}`}
             </Link>
           </li>
         ))}

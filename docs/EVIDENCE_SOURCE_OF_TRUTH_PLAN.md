@@ -1,7 +1,9 @@
 # Evidence Source-of-Truth Plan
 
 **Status:** EXPLANATORY / RECOMMENDED FOUNDATION  
-**Purpose:** Explain the current evidence split, why it is risky, and what the target architecture should be before real-model results are published.
+**Purpose:** Explain the evidence split, why it is risky, and what the target architecture should be before real-model results are published.
+
+**Implementation note (CAY-20260910-04):** The public read path no longer combines a Supabase headline with repository scenario detail. Until an accepted test-run chain exists, the page uses the repository reference-agent artifact as one source. Intentional OpenRouter runs can be stored as unpublished `test_runs` / `test_results` and do not set `accepted_test_run_id`. The published baseline has not moved.
 
 ---
 

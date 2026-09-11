@@ -10,6 +10,7 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "eval": "tsx scripts/run-evals.ts",
+    "eval:openrouter": "tsx scripts/run-openrouter-cap001.ts",
     "seed": "tsx scripts/seed.ts",
     "publish:results": "tsx scripts/publish-results.ts"
   },

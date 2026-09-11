@@ -52,6 +52,8 @@ It is **not** a frontier-model benchmark.
 
 The first real-model path has not yet been accepted or run.
 
+An OpenRouter adapter and a dry-run command now exist for CAP-001. That is preparation, not a frontier-model result. See `REAL_MODEL_RUNBOOK.md`.
+
 ---
 
 ## 3. Do we need a separate API integration for every model?

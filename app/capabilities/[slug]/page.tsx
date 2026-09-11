@@ -2,8 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { StatusMark } from "@/components/capability/status-mark";
-import { getPublishedBySlug } from "@/lib/data/public-data";
-import { localRecord } from "@/lib/data/public-data";
+import { getPublishedPage } from "@/lib/data/public-data";
 import { EVIDENCE_LABEL, STATUS_HINT, SUPERVISION_LABEL } from "@/lib/domain";
 import { formatCost, formatPercent, formatRuntime, formatTestedDate } from "@/lib/format";
 
@@ -11,7 +10,8 @@ export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
-  const capability = await getPublishedBySlug(slug);
+  const page = await getPublishedPage(slug);
+  const capability = page?.capability ?? null;
   if (!capability) return { title: "Capability" };
   const title = `Can AI ${capability.title}? Current Capability Test`;
   return {
@@ -24,10 +24,10 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function CapabilityPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const capability = await getPublishedBySlug(slug);
-  if (!capability) notFound();
-  const record = localRecord(slug);
-  const results = record?.suite?.results ?? [];
+  const page = await getPublishedPage(slug);
+  if (!page) notFound();
+  const capability = page.capability;
+  const results = page.results;
 
   return (
     <article className="site-wrap py-14">
@@ -70,7 +70,7 @@ export default async function CapabilityPage({ params }: { params: Promise<{ slu
 
       <Section title="What we tested">
         <p className="leading-7">
-          Each scenario starts from the Acme Services fixture, version {record?.suite?.fixtureVersion ?? "acme-v1"}. The agent gets only the tools for that task. Software then checks what actually changed. A confident message is not a pass.
+          Each scenario starts from the Acme Services fixture, version {page.fixtureVersion ?? "acme-v1"}. The agent gets only the tools for that task. Software then checks what actually changed. A confident message is not a pass.
         </p>
         <ul className="mt-4 divide-y divide-[var(--line)] border-y border-[var(--line)]">
           {results.map((result) => (
@@ -97,9 +97,8 @@ export default async function CapabilityPage({ params }: { params: Promise<{ slu
           <Stat label="Model/API cost" value={formatCost(capability.currentCostUsd)} />
           <Stat label="Configuration" value={capability.modelName ?? "Not recorded"} />
         </div>
-        <p className="mt-4 text-sm text-[var(--muted)]">
-          Cost is $0 because this accepted run used the local reference agent, not a paid model API. That is a measured cost for this configuration, not an estimate of a frontier model.
-        </p>
+        <p className="mt-4 text-sm text-[var(--muted)]">{costNote(capability.modelName, capability.currentCostUsd)}</p>
+        <p className="mt-2 text-sm text-[var(--muted)]">{page.note}</p>
       </Section>
 
       <Section title="Common failure modes">
@@ -163,6 +162,14 @@ export default async function CapabilityPage({ params }: { params: Promise<{ slu
       </div>
     </article>
   );
+}
+
+function costNote(modelName: string | null, cost: number | null): string {
+  if (modelName === "reference-agent-v1") {
+    return "Cost is $0 because this accepted run used the local reference agent, not a paid model API. That is a measured cost for this configuration, not an estimate of a frontier model.";
+  }
+  if (cost === null) return "This accepted run did not record a measured model/API cost. That is not the same as a $0 cost.";
+  return "Cost is the measured model/API cost recorded on this accepted run. It is not an estimate of every model.";
 }
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {

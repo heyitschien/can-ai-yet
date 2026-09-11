@@ -29,6 +29,8 @@ function isoDates(value: string): string[] {
 
 export class ReferenceAgent implements AgentProvider {
   readonly name = "reference-agent-v1";
+  readonly providerId = "reference";
+  readonly modelId = "reference-agent-v1";
 
   async run(input: AgentRunInput, world: World): Promise<AgentRunResult> {
     const toolsCalled: string[] = [];
