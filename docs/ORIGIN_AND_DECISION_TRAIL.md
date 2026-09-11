@@ -284,8 +284,8 @@ Future agents should preserve these principles:
 3. **Evidence, not claims.** Verify what actually happened.
 4. **Failures are valuable data.** Do not hide them.
 5. **Search is also sensing.** Unknown/repeated queries reveal demand.
-6. **The dataset is the compounding asset.** The website is only its public window.
-7. **Do not prematurely build the grand platform.** Earn the larger abstraction by running trustworthy tests first.
+6. **The dataset is the compounding asset.** The website is only its public window. The asset is the capability list, demand trail, frozen tasks, judges, outcomes, failure types, and cost history. It is not OpenRouter, and it is not whichever model was tested last. OpenRouter is a window onto a changing model supply. CanAIYet is the intelligence layer, not a router.
+7. **Do not prematurely build the grand platform.** Earn the larger abstraction by running trustworthy tests first. Spend the next dollar only when the last result was reviewed and demand, or a missing demand check, says the next test is worth it.
 
 ---
 

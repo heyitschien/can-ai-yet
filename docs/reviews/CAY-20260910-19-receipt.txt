@@ -1,0 +1,18 @@
+RECEIPT: CAY-20260910-19
+ROLE: coordinator / strategic curator
+MISSION: preserve the strategic/economic thesis and close the night without changing benchmark evidence
+BRANCH: feature/cay-20260910-04-openrouter-prep
+PRE-RECEIPT DOC HEAD: 73da22c764a46e2e9f3120e6085263280e0a0d25
+STRATEGIC DOC: docs/CAPABILITY_INTELLIGENCE_THESIS.md
+END-OF-DAY RESTART: docs/reviews/CAY-20260910-19.md
+INDEX UPDATED: docs/AGENT_SYSTEM_INDEX.md
+CHANNEL LOG UPDATED: docs/CHANNEL_LOG.md
+PRESERVED INSIGHTS: decision-intelligence layer; probabilistic capability intelligence; measurement-cost vs wrong-deployment-cost asymmetry; reusable research economics; longitudinal capability history; demand-gated research; possible moat as accumulated demand+taxonomy+frozen tests+failure/reliability/cost/provenance history; free→pro→API→custom-eval hypotheses; solo-founder automation/judgment split; staged capital allocation; falsification/stop logic; “do not fund the database, fund uncertainty reduction”; “when is it safe to let AI act?”
+EVIDENCE CHANGED: no
+FROZEN CAP-001 CHANGED: no
+PAID REQUESTS: 0
+PUBLICATION: no
+ACCEPTED_TEST_RUN_ID CHANGED: no
+MERGE: no
+NEXT SESSION: independent CAP-001 fairness/publication review; then Demand Scout (#6); then business/ROI validation (#8). No second model merely for comparison.
+STATUS: WRAPPED_FOR_NIGHT

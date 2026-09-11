@@ -1,7 +1,9 @@
 # Evidence Source-of-Truth Plan
 
 **Status:** EXPLANATORY / RECOMMENDED FOUNDATION  
-**Purpose:** Explain the current evidence split, why it is risky, and what the target architecture should be before real-model results are published.
+**Purpose:** Explain the evidence split, why it is risky, and what the target architecture should be before real-model results are published.
+
+**Implementation note (CAY-20260910-04):** The public read path no longer combines a Supabase headline with repository scenario detail. Until an accepted test-run chain exists, the page uses the repository reference-agent artifact as one source. Intentional OpenRouter runs can be stored as unpublished `test_runs` / `test_results` and do not set `accepted_test_run_id`. The published baseline has not moved.
 
 ---
 
@@ -235,3 +237,26 @@ That worked while we were building the school.
 Before real students start taking important exams, we want the report card and every marked answer to belong to the same saved exam.
 
 Then nobody has to guess which notes created which grade.
+
+---
+
+## 10. Repeated trials must not overwrite one another
+
+A later attempt at the same scenario is a new trial. It is not an update to the earlier row.
+
+Store each trial beside the others. A result row, or the JSON kept inside it until a later schema change, needs:
+
+- scenario ID;
+- repeat index and a trial ID that includes the git SHA, model, provider, and scenario;
+- outcome: pass, fail, or invalid;
+- failure mode, such as `TOOL_LOOP`, `NO_PROGRESS`, or `TURN_BUDGET`, when a scored stop ended the attempt;
+- provenance: model, provider/route, generation IDs, fixture, environment, git SHA;
+- input tokens, output tokens, cache read/write tokens when the gateway returns them, cost, runtime;
+- tool trace;
+- validity state, so an HTTP 402 stop cannot be stored as a finished model score.
+
+Do not replace a pass with a later fail, or a fail with a later pass. Public percentages wait until the repeat count supports a rate. Until then, the honest report is a count such as `1/2`.
+
+An explicit scenario subset is a labeled segment. It is not a full capability score, and it must not be stitched to a segment from a different git SHA or config. Accepted evidence still requires one clean full run. This note does not add a production migration. New OpenRouter artifacts already carry the trial fields so a later store does not have to invent them.
+
+The first full valid real-model file is `docs/reviews/runs/CAP-001-openrouter-2026-09-11T06-51-59-982Z.json`, from head `d7504c0`. Treat that JSON as immutable review evidence. Do not regenerate it to improve a score. A later judge or fixture change must be a new version, not an edit that rewrites this result. GitHub is the reproducibility trail. Supabase is the public chain only after `accepted_test_run_id` is set on purpose. That field was not set for this run.

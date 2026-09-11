@@ -22,6 +22,8 @@ Before material work, use `docs/AGENT_SYSTEM_INDEX.md` as the map, then read in 
 
 Use receipt IDs in the form `CAY-YYYYMMDD-NN`. Post ACKs, handoffs, evidence, blockers, and review verdicts on Issue #1.
 
+When a slice is finished, do not stop in chat. Commit, push, open or update a draft PR, post the Issue #1 handoff, and append `docs/CHANNEL_LOG.md`. See `docs/COMMUNICATION_PROTOCOL.md`. Do not merge. Do not wait to be asked.
+
 Do not fabricate benchmark evidence, relabel reference-agent results as frontier-model results, weaken fixtures to improve scores, or run uncontrolled paid-model loops.
 
 Builder STOP after a bounded mission reaches `READY_FOR_REVIEW`; acceptance must be explicit in Issue #1.

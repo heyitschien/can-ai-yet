@@ -1,9 +1,23 @@
 # CanAIYet — Recommended Next Missions
 
 **Status:** CURRENT EXECUTION RECOMMENDATION  
-**Date:** 2026-09-10  
+**Date:** 2026-09-11  
 **Operational channel:** GitHub Issue #1  
 **Who does the work:** see `docs/FOUR_AGENT_SYSTEM.md`. This file says what happens next. It does not reassign roles.
+
+## Stopping point after the first full run
+
+CAY-20260910-16 is unpublished review evidence, not a public score. Wrap-up: `docs/reviews/CAY-20260910-18.md`.
+
+Tomorrow, in this order:
+
+1. Review whether CAP-001 is fair enough to publish, using the fairness matrix. Do not rewrite the frozen exam.
+2. Decide whether that run can become accepted evidence, with more than a 4/12 headline.
+3. Only then start Issue #6, Demand Scout. It stays parked. Do not start Google API work from this note.
+4. Then use Issue #8 for a staged cost model. Do not spend the next $25 until that review says the information is worth it.
+5. Do not add a second model just to have a second model.
+
+Four truths stay separate: the lab worked; this model result was mixed; publication is still pending; commercial demand is not proven.
 
 ## Current state
 
@@ -73,10 +87,13 @@ The canonical product promise is not “we designed tests.” It is “we test r
 - Record exact model/provider/version where available.
 - Add explicit cost/token accounting and a maximum-spend guard.
 - Do not automatically run paid model evals in normal CI.
+- Spend is demand-gated. Do not benchmark every capability or model. Prefer the test that teaches the most per dollar. Do not turn a tiny sample into a reliability percentage.
 
 ## Suggested first provider
 
 Implement one provider correctly. The architecture already anticipates provider adapters; there is no need to build a multi-model router yet.
+
+Preparation status: an OpenRouter CAP-001 adapter, dry-run command, and unpublished persistence path exist. No paid run has been executed or accepted. See `REAL_MODEL_RUNBOOK.md`.
 
 ## Acceptance
 
@@ -196,4 +213,4 @@ The next leverage point is **evidence quality**, not surface-area growth.
 
 # One-sentence direction
 
-**Keep the current reference agent as the laboratory's calibration robot, put one real AI model through CAP-001, store every result as durable evidence, independently review it, and only then let the public product make the claim.**
+**The first real CAP-001 run is saved and unpublished. Review whether that exam is fair enough to publish, then let demand decide the next dollar. Do not rewrite the exam after seeing the score.**

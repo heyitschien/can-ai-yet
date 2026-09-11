@@ -54,13 +54,89 @@ export type AgentRunInput = {
   payload: Record<string, unknown>;
 };
 
+export type ModelStopMode = "TOOL_LOOP" | "NO_PROGRESS" | "TURN_BUDGET";
+
+export type TrialRecord = {
+  scenarioId: string;
+  repeatIndex: number;
+  trialId: string;
+  outcome: "pass" | "fail" | "invalid";
+  failureMode: ModelStopMode | null;
+  validity: "valid" | "invalid";
+  inputTokens: number | null;
+  outputTokens: number | null;
+  costUsd: number | null;
+  runtimeSeconds: number;
+  cacheReadTokens: number | null;
+  cacheWriteTokens: number | null;
+};
+
+export type RunSegment = {
+  kind: "full" | "explicit-segment" | "prefix-segment";
+  scenarioIds: string[];
+  omittedScenarioIds: string[];
+  requested: string | null;
+  executedOrder: "frozen-suite-order";
+  combinable: false;
+  acceptedEvidence: "requires-one-clean-full-run";
+  note: string;
+};
+
+export type ProviderAttempt = {
+  generationId: string | null;
+  servedModel: string | null;
+  servedProvider: string | null;
+  costUsd: number | null;
+  uncertain: boolean;
+  finishReason: string | null;
+  cacheReadTokens?: number | null;
+  cacheWriteTokens?: number | null;
+  router?: {
+    selectedProvider: string | null;
+    strategy: string | null;
+    attempt: number | null;
+    attempts: unknown[];
+    pipeline: unknown[];
+  } | null;
+};
+
+export type ProviderUsage = {
+  inputTokens: number;
+  outputTokens: number;
+  costUsd: number | null;
+  requestCount: number;
+  requestedModel: string;
+  servedModel: string | null;
+  servedProvider: string | null;
+  servedProviders: string[];
+  generationIds: string[];
+  attempts: ProviderAttempt[];
+  cacheReadTokens?: number | null;
+  cacheWriteTokens?: number | null;
+};
+
+export type ToolTraceEntry = {
+  name: string;
+  arguments: Record<string, unknown>;
+  ok: boolean;
+  result: unknown;
+};
+
 export type AgentRunResult = {
   toolsCalled: string[];
   finished: boolean;
   error?: string;
+  usage?: ProviderUsage;
+  toolTrace?: ToolTraceEntry[];
+  /** True when the configured benchmark was not honored. Do not publish this as a model score. */
+  benchmarkInvalid?: boolean;
+  /** Scored stop when the experiment stayed valid. Not a reason to throw the run away. */
+  failureMode?: ModelStopMode;
 };
 
 export interface AgentProvider {
+  readonly providerId?: string;
+  readonly modelId?: string;
   run(input: AgentRunInput, world: import("@/evals/environments/world").World): Promise<AgentRunResult>;
 }
 
@@ -73,7 +149,13 @@ export type ScenarioResult = {
   failureCode: FailureCode | null;
   failureExplanation: string | null;
   runtimeSeconds: number;
-  costUsd: number;
+  costUsd: number | null;
+  inputTokens?: number;
+  outputTokens?: number;
+  benchmarkInvalid?: boolean;
+  provenance?: ProviderUsage;
+  failureMode?: ModelStopMode | null;
+  trial?: TrialRecord;
   actualState: Record<string, unknown>;
 };
 
@@ -94,7 +176,20 @@ export type SuiteResult = {
   status: "green" | "yellow" | "red" | "gray";
   supervision: "low" | "medium" | "high" | "not_recommended";
   cappedByCriticalFailure: boolean;
-  totalCostUsd: number;
+  totalCostUsd: number | null;
   medianRuntimeSeconds: number;
+  benchmarkValid?: boolean;
+  invalidReasons?: string[];
+  inputTokens?: number;
+  outputTokens?: number;
+  provenance?: {
+    requestedModel: string;
+    servedModels: string[];
+    servedProviders: string[];
+    generationIds: string[];
+    attempts: ProviderAttempt[];
+    executionConfig?: unknown;
+  };
   results: ScenarioResult[];
+  segment?: RunSegment;
 };
