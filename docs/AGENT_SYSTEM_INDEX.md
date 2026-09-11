@@ -13,7 +13,7 @@ Two lists. Do not treat them as the same thing.
 5. Accepted evidence and the exact repository state.
 6. GitHub Issue #1 — the live work order.
 
-`ORIGIN_AND_DECISION_TRAIL.md`, `EXPLAINED_LIKE_IM_FIVE.md`, and `CAPABILITY_INTELLIGENCE_THESIS.md` are explanation/strategy, not authority. `FOUR_AGENT_SYSTEM_SUMMARY.md` is a refresher, not a second architecture. `can-ai-yet-status.pdf` is a dated human snapshot, not a work order.
+`ORIGIN_AND_DECISION_TRAIL.md`, `EXPLAINED_LIKE_IM_FIVE.md`, `CAPABILITY_INTELLIGENCE_THESIS.md`, and `FALSIFICATION_AND_PHASE_THRESHOLDS.md` are explanation/strategy, not authority. `FOUR_AGENT_SYSTEM_SUMMARY.md` is a refresher, not a second architecture. `can-ai-yet-status.pdf` is a dated human snapshot, not a work order.
 
 ## Human reading order
 
@@ -26,8 +26,9 @@ These explain the product. They do not outrank the authority list above.
 5. `EVIDENCE_SOURCE_OF_TRUTH_PLAN.md` — why headline and detail must come from the same accepted run.
 6. `REAL_MODEL_RUNBOOK.md` — how a human runs or refuses a CAP-001 OpenRouter test.
 7. `CAPABILITY_INTELLIGENCE_THESIS.md` — the executive strategic thesis: why capability intelligence may be valuable, the economics, possible moat, demand loop, monetization hypotheses, falsification, and solo-founder discipline.
-8. `FOUR_AGENT_SYSTEM.md` — who scouts, runs, judges, and publishes.
-9. `NEXT_MISSIONS.md` — what should happen next.
+8. `FALSIFICATION_AND_PHASE_THRESHOLDS.md` — how reality earns the next dollar, provider-native-eval threat assumptions, stage gates, stop/narrow/pivot logic, and the path from lab to action layer.
+9. `FOUR_AGENT_SYSTEM.md` — who scouts, runs, judges, and publishes.
+10. `NEXT_MISSIONS.md` — what should happen next.
 
 ## First read for a fresh agent
 
@@ -37,7 +38,7 @@ These explain the product. They do not outrank the authority list above.
 4. `FOUR_AGENT_SYSTEM.md`
 5. `NEXT_MISSIONS.md`
 6. Issue #1, including the latest receipt.
-7. `CAPABILITY_INTELLIGENCE_THESIS.md` when strategic/economic direction is needed.
+7. `CAPABILITY_INTELLIGENCE_THESIS.md` and `FALSIFICATION_AND_PHASE_THRESHOLDS.md` when strategic/economic direction is needed.
 8. `ORIGIN_AND_DECISION_TRAIL.md` and `EXPLAINED_LIKE_IM_FIVE.md` when the why or the plain explanation is needed.
 
 ## Name map
@@ -55,6 +56,10 @@ The first full real-model wrap-up is `reviews/CAY-20260910-18.md`. It is a revie
 The end-of-day strategic restart point is `reviews/CAY-20260910-19.md`. It preserves what was learned, what remains unproven, and the smallest next-session sequence without changing the frozen exam or accepted evidence.
 
 The next-morning thought record is `reviews/CAY-20260911-01-agent-lab-and-market-validation.md`. It preserves the agent-laboratory framing, the OpenRouter abstraction analogy, the five-year asset/acquisition thought experiment, the distinction between plausible seed capabilities and measured demand, and the external validation gates required before treating the project as a business.
+
+The origin-chain record is `reviews/CAY-20260911-03-origin-chain-why-now.md`. It preserves why evaluation literacy from the Trading Lab, cheap frontier inference, agentic engineering, and the OpenRouter trigger converged now rather than earlier.
+
+`FALSIFICATION_AND_PHASE_THRESHOLDS.md` is the standing strategic kill-switch document. It records working provider-commoditization probabilities, competitive checks, staged thresholds, and explicit continue/narrow/pivot/stop conditions so the project does not become attached to its own story.
 
 ## Stable rule
 
