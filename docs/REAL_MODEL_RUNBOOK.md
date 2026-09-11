@@ -84,7 +84,7 @@ The command refuses to run when `CI`, `GITHUB_ACTIONS`, or `VERCEL` is set. Ordi
 
 If the gateway serves a different model, omits cost while a spend cap is set, or cannot honor the requested configuration, the run is invalid. Do not publish it as a model score.
 
-A review artifact is written under `evals/runs/`. That folder is not accepted public evidence. `evals/accepted/latest.json` is the reference baseline and is not overwritten by this command.
+A review artifact is written under `evals/runs/`. That folder is local scratch so a half-written file is not pushed by accident. The JSON itself is an asset. After a paid run, copy it to `docs/reviews/runs/` and commit that copy. Do not leave the only copy in the ignored folder. The copy is still unpublished review evidence. It does not change `evals/accepted/latest.json` and it does not make the run public.
 
 ---
 

@@ -5,7 +5,7 @@ Short scan log. Newest first.
 ## CAY-20260910-13b — 2026-09-10
 
 STATUS: evidence saved  
-What: Saved the three paid-run JSON files to GitHub. The local `evals/runs` folder stays ignored so future runs are not published by accident.  
+What: Saved the three paid-run JSON files to GitHub. Those files are the evidence. Future paid runs must be copied to `docs/reviews/runs/` and committed too.  
 Files: `docs/reviews/runs/`  
 Next: human review. Do not rerun, publish, or merge.
 
