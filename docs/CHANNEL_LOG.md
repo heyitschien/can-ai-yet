@@ -2,6 +2,16 @@
 
 Short scan log. Newest first.
 
+## CAY-20260910-12 — 2026-09-10
+
+STATUS: SMOKE_RAN — local unpublished artifact only  
+What: One paid CAP-001 smoke. LEAD-001, `google/gemini-3.8-flash`, provider `google-ai-studio`. No persist, no accept, no merge.  
+Smoke head: `4859498961319755e7a14339a77685d991658388`  
+Result: lab path worked. Served model and Google AI Studio matched. Judge failed. Benchmark invalid because the model hit 6 turns still calling tools. Cost about $0.01.  
+Artifact: `evals/runs/CAP-001-openrouter-2026-09-11T05-27-42-711Z.json` (gitignored)  
+Handoff: https://github.com/heyitschien/can-ai-yet/issues/1#issuecomment-5629938288  
+Next: human reads the artifact. Do not rerun, publish, or merge.
+
 ## CAY-20260910-10 — 2026-09-10
 
 STATUS: READY_FOR_REVIEW  
