@@ -2,7 +2,7 @@
 
 **Status:** OPERATING PROTOCOL  
 **Primary channel:** GitHub Issue **#1 — Agent Communication Channel — CanAIYet Mission Control**  
-**Applies to:** ChatGPT, Cursor, reviewers, operators, and future coding agents.
+**Applies to:** ChatGPT/Solace, Cursor, Grok, reviewers, operators, and future coding agents.
 
 This repository uses one persistent GitHub issue as the cross-agent coordination channel, in the same spirit as the communication issues used across the other projects. Code belongs in commits/PRs. Durable coordination, handoffs, evidence, review verdicts, and blockers belong in Issue #1.
 
@@ -12,9 +12,12 @@ When instructions disagree, use this order:
 
 1. `canonical-build-doc.md` — product/build authority.
 2. This protocol — coordination rules.
-3. `docs/NEXT_MISSIONS.md` — current recommended execution sequence.
-4. Accepted evidence and exact repository state.
-5. Issue #1 — current operational handoffs.
+3. `docs/FOUR_AGENT_SYSTEM.md` — logical agent roles, current tool assignments, and separation of duties.
+4. `docs/NEXT_MISSIONS.md` — current recommended execution sequence.
+5. Accepted evidence and exact repository state.
+6. Issue #1 — current operational handoffs.
+
+`docs/AGENT_SYSTEM_INDEX.md` is the navigation map for the documentation set.
 
 Do not silently reinterpret the canonical product thesis. Surface conflicts in Issue #1 and STOP.
 
@@ -23,16 +26,22 @@ Do not silently reinterpret the canonical product thesis. Surface conflicts in I
 ### Human owner
 Sets priorities, approves material scope changes, destructive database changes, public claims, and uncontrolled/meaningful model spend.
 
-### Builder
-Implements only the bounded work order. The builder does not self-accept its own work.
+### Scout
+Finds relevant external changes and proposes bounded review/retest work. Scout does not alter benchmark truth or publish results.
 
-### Reviewer
-Inspects the exact commit/PR independently. A summary from the builder is not evidence.
+### Builder / Test Runner
+Implements only the bounded work order and/or executes the approved evaluation. The builder does not self-accept its own work.
+
+### Reviewer / Judge
+Inspects the exact commit/PR or run independently. A summary from the builder is not evidence.
+
+### Coordinator / Publisher
+Turns accepted evidence and human intent into the next bounded work order or publish candidate. It does not invent or upgrade claims beyond accepted evidence.
 
 ### Operator
 Runs explicit migrations, benchmark runs, deployments, or other environment-sensitive actions when authorized.
 
-One agent may perform different roles at different times, but each handoff must state the role being performed.
+The preferred MVP engine assignments are defined in `docs/FOUR_AGENT_SYSTEM.md`. One underlying platform may perform different roles at different times, but each handoff must state the role being performed and independence must be preserved.
 
 ## 3. Receipt IDs
 
@@ -48,7 +57,7 @@ Use the receipt in Issue #1 comments, commit/PR summaries when practical, and re
 
 ```text
 RECEIPT: CAY-YYYYMMDD-NN
-ROLE: builder | reviewer | operator
+ROLE: scout | coordinator | builder | reviewer | operator | publisher
 MISSION:
 CANONICAL BASIS:
 EXACT HEAD / PR:
@@ -74,6 +83,10 @@ Possible branches:
 `READY_FOR_REVIEW → CHANGES_REQUESTED → BUILD`
 
 `ANY STATE → BLOCKED`
+
+For capability intelligence work, the fuller loop is:
+
+`SCOUT_FINDING → REVIEW/RETEST_DECISION → APPROVED_RUN → JUDGE → ACCEPTED_EVIDENCE → PUBLISH_CANDIDATE → HUMAN_GATE_WHEN_REQUIRED`
 
 After completing the requested mission, **builder STOP** until review or a new work order is posted.
 
@@ -144,3 +157,19 @@ Acceptance belongs in Issue #1 with an explicit `ACCEPTED` verdict and receipt I
 Issue #1 is the operational ledger, not a dumping ground. Keep comments concise enough for another agent to read quickly, but include links/SHAs and failure details needed to independently verify the work.
 
 If discussion becomes a separate product decision, create a dedicated document or issue and link it back to Issue #1. The persistent channel should always retain the current state and the next handoff.
+
+## 11. Durable shared memory
+
+No agent should depend on another agent's private conversational memory to know project state.
+
+Project memory is reconstructed from:
+
+```text
+canonical docs
++ agent-system docs
++ GitHub Issue #1 receipts
++ commits / PRs
++ accepted evaluation artifacts / Supabase rows
+```
+
+This makes the operating system portable across model changes, new agent sessions, devices, and future vendors.
