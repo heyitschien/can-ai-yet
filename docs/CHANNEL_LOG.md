@@ -2,6 +2,15 @@
 
 Short scan log. Newest first.
 
+## CAY-20260911-02 — 2026-09-11
+
+STATUS: STRATEGY_PRESERVED  
+What: Extended the morning thought record with the authority–evidence principle, the current measurement timing window, the idea of longitudinal capability history as a record of machine-labor delegation, and the custom-evaluation bootstrap hypothesis. No benchmark, scenario, judge, accepted evidence, spend, publication, or build authority changed.  
+Document: `docs/reviews/CAY-20260911-01-agent-lab-and-market-validation.md`  
+Commit: `f3b79294` plus this channel-log commit  
+PR: https://github.com/heyitschien/can-ai-yet/pull/2  
+Next: return to the existing execution order — independent CAP-001 fairness/publication review, then Demand Scout (#6). Do not turn the five-year possibility into near-term scope.
+
 ## CAY-20260910-19 — 2026-09-11
 
 STATUS: WRAPPED_FOR_NIGHT  
