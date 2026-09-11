@@ -7,7 +7,7 @@ Short scan log. Newest first.
 STATUS: READY_FOR_REVIEW  
 What: Corrected PR #2 against review findings F1–F8. No paid run. No merge.  
 Branch: `feature/cay-20260910-04-openrouter-prep`  
-Commit: filled after push  
+Commit: `9c00c6a`  
 PR: https://github.com/heyitschien/can-ai-yet/pull/2  
 Next: fresh independent Codex re-review. Do not merge. Do not spend.
 
