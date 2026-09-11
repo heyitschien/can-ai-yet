@@ -13,7 +13,7 @@ Two lists. Do not treat them as the same thing.
 5. Accepted evidence and the exact repository state.
 6. GitHub Issue #1 — the live work order.
 
-`ORIGIN_AND_DECISION_TRAIL.md` and `EXPLAINED_LIKE_IM_FIVE.md` are explanation, not authority. `FOUR_AGENT_SYSTEM_SUMMARY.md` is a refresher, not a second architecture. `can-ai-yet-status.pdf` is a dated human snapshot, not a work order.
+`ORIGIN_AND_DECISION_TRAIL.md`, `EXPLAINED_LIKE_IM_FIVE.md`, and `CAPABILITY_INTELLIGENCE_THESIS.md` are explanation/strategy, not authority. `FOUR_AGENT_SYSTEM_SUMMARY.md` is a refresher, not a second architecture. `can-ai-yet-status.pdf` is a dated human snapshot, not a work order.
 
 ## Human reading order
 
@@ -25,8 +25,9 @@ These explain the product. They do not outrank the authority list above.
 4. `MODEL_EVALUATION_STRATEGY.md` — which configurations to test, why one gateway is enough, and how spend is demand-gated.
 5. `EVIDENCE_SOURCE_OF_TRUTH_PLAN.md` — why headline and detail must come from the same accepted run.
 6. `REAL_MODEL_RUNBOOK.md` — how a human runs or refuses a CAP-001 OpenRouter test.
-7. `FOUR_AGENT_SYSTEM.md` — who scouts, runs, judges, and publishes.
-8. `NEXT_MISSIONS.md` — what should happen next.
+7. `CAPABILITY_INTELLIGENCE_THESIS.md` — the executive strategic thesis: why capability intelligence may be valuable, the economics, possible moat, demand loop, monetization hypotheses, falsification, and solo-founder discipline.
+8. `FOUR_AGENT_SYSTEM.md` — who scouts, runs, judges, and publishes.
+9. `NEXT_MISSIONS.md` — what should happen next.
 
 ## First read for a fresh agent
 
@@ -36,7 +37,8 @@ These explain the product. They do not outrank the authority list above.
 4. `FOUR_AGENT_SYSTEM.md`
 5. `NEXT_MISSIONS.md`
 6. Issue #1, including the latest receipt.
-7. `ORIGIN_AND_DECISION_TRAIL.md` and `EXPLAINED_LIKE_IM_FIVE.md` when the why or the plain explanation is needed.
+7. `CAPABILITY_INTELLIGENCE_THESIS.md` when strategic/economic direction is needed.
+8. `ORIGIN_AND_DECISION_TRAIL.md` and `EXPLAINED_LIKE_IM_FIVE.md` when the why or the plain explanation is needed.
 
 ## Name map
 
@@ -49,6 +51,8 @@ GitHub Issue #1 — **Agent Communication Channel — CanAIYet Mission Control**
 `CHANNEL_LOG.md` is the short scan log. Newest entry first. It does not replace Issue #1.
 
 The first full real-model wrap-up is `reviews/CAY-20260910-18.md`. It is a review, not a second build authority. It keeps four truths apart: the lab worked, the model result was mixed, publication is still pending, and commercial demand is not proven.
+
+The end-of-day strategic restart point is `reviews/CAY-20260910-19.md`. It preserves what was learned, what remains unproven, and the smallest next-session sequence without changing the frozen exam or accepted evidence.
 
 ## Stable rule
 
