@@ -2,6 +2,14 @@
 
 Short scan log. Newest first.
 
+## CAY-20260911-08/09 — 2026-09-11 EOD
+
+STATUS: MERGED / LIVE  
+What: First CAP-001 Sonnet finding published to production. Canonical capability-report UI. 4/12 · 4 frozen-critical · single-run caveat.  
+Merge: `656e717` via PR #12  
+Live: https://canaiyet.com/capabilities/follow-up-with-sales-leads  
+Next tomorrow: Demand Scout PR #10 re-review → human Google setup → one `demand:smoke`. No new model spend tonight.
+
 ## CAY-20260911-09 — 2026-09-11
 
 STATUS: READY_FOR_REVIEW  
