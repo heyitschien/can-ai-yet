@@ -2,6 +2,18 @@
 
 Short scan log. Newest first.
 
+## CAY-20260911-11 — direction lock
+
+STATUS: STOPPED / NEXT WORK LOCKED  
+What: Milestone 1 complete. Official next sequence locked in `NEXT_MISSIONS.md` + finalized `EOD_2026-09-11.md`. Enterprise insight in `ENTERPRISE_ENVIRONMENT_VALIDATION.md`.  
+Queued: Issue #14 HubSpot transfer design (after Demand Scout smoke; design-first) · Issue #15 practitioner validation (parallel).  
+Tomorrow first: independent re-review of Demand Scout PR #10. Focus stays Sales / Revenue Operations. No HubSpot build yet.
+
+## Docs consolidate — strategy council review
+
+STATUS: DOCS_ONLY → main  
+What: Landed `reviews/CAY-20260912-01-independent-strategy-council-review.md` (NARROW / ACCEPTED WITH FINDINGS). Indexed Issues #14/#15 + CAY-11 lock. No code. No Demand Scout accept. No HubSpot start.
+
 ## Docs consolidate — 2026-09-11
 
 STATUS: DOCS_ONLY → main  

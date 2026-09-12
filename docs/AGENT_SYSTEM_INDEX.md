@@ -61,7 +61,11 @@ GitHub Issue #1 — **Agent Communication Channel — CanAIYet Mission Control**
 
 `CHANNEL_LOG.md` is the short scan log. Newest entry first. It does not replace Issue #1.
 
-Key review trail now on `main` (not build authority):
+### Locked restart (CAY-20260911-11)
+
+Official sequence is in `NEXT_MISSIONS.md` and `EOD_2026-09-11.md`. Tomorrow’s first job: independent re-review of Demand Scout PR #10, then one Google smoke, then freeze. After that: Issue **#14** HubSpot transfer design (design-only, review before build) and Issue **#15** practitioner decision-utility validation in parallel. Stay deep in Sales / Revenue Operations. HubSpot implementation is not authorized until the transfer design is reviewed.
+
+### Key review / strategy trail on `main` (not build authority)
 
 - `reviews/CAY-20260910-05.md` / `reviews/CAY-20260910-07.md` — independent reviews of OpenRouter prep (PR #2 still unmerged).
 - `reviews/CAY-20260910-18.md` — first full real-model wrap-up.
@@ -69,6 +73,7 @@ Key review trail now on `main` (not build authority):
 - `reviews/CAY-20260911-01-agent-lab-and-market-validation.md` — agent-lab / market-validation thought record.
 - `reviews/CAY-20260911-03-origin-chain-why-now.md` — origin-chain / why-now record.
 - `reviews/CAY-20260911-05.md` — fairness gate ACCEPTED for opening Demand Scout; naive bare 4/12 reliability headline still refused.
+- `reviews/CAY-20260912-01-independent-strategy-council-review.md` — post-publication strategy/construct-validity review (NARROW / ACCEPTED WITH FINDINGS).
 - `DECISION_RECORD_2026-09-11.md` / `EOD_2026-09-11.md` — Sep 11 strategy + stop point.
 - `ENTERPRISE_ENVIRONMENT_VALIDATION.md` — Sep 11 insight record for synthetic→real-stack→customer-staging validation and portable capability packs.
 
