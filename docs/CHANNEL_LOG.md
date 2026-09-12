@@ -2,6 +2,14 @@
 
 Short scan log. Newest first.
 
+## CAY-20260911-05 — 2026-09-11
+
+STATUS: ACCEPTED  
+What: Independent CAP-001 fairness/publication gate. Matrix class split accepted. Frozen integrity intact. Naive public 4/12 headline still not approved. Gate clears Demand Scout only.  
+Report: `docs/reviews/CAY-20260911-05.md`  
+Target: CAY-18 + raw run at `d7504c0`  
+Next: CAY-20260911-06 Demand Scout credentialless build from `main`. No Google live calls. No benchmark spend. No publish/merge of Sonnet result.
+
 ## CAY-20260911-04 — 2026-09-11
 
 STATUS: STRATEGY_PRESERVED  

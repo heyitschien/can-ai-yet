@@ -5,19 +5,25 @@
 **Operational channel:** GitHub Issue #1  
 **Who does the work:** see `docs/FOUR_AGENT_SYSTEM.md`. This file says what happens next. It does not reassign roles.
 
-## Stopping point after the first full run
+## Current stopping point
 
-CAY-20260910-16 is unpublished review evidence, not a public score. Wrap-up: `docs/reviews/CAY-20260910-18.md`.
+CAY-20260911-05 **ACCEPTED** the independent fairness/publication gate for the first Sonnet CAP-001 run. That clears Demand Scout. It does **not** publish the Sonnet result, accept it as public evidence, or merge PR #2.
 
-Tomorrow, in this order:
+Evidence trail (still unpublished review evidence):
 
-1. Review whether CAP-001 is fair enough to publish, using the fairness matrix. Do not rewrite the frozen exam.
-2. Decide whether that run can become accepted evidence, with more than a 4/12 headline.
-3. Only then start Issue #6, Demand Scout. It stays parked. Do not start Google API work from this note.
-4. Then use Issue #8 for a staged cost model. Do not spend the next $25 until that review says the information is worth it.
-5. Do not add a second model just to have a second model.
+- raw run: `docs/reviews/runs/CAP-001-openrouter-2026-09-11T06-51-59-982Z.json`
+- wrap: `docs/reviews/CAY-20260910-18.md`
+- fairness gate: `docs/reviews/CAY-20260911-05.md`
 
-Four truths stay separate: the lab worked; this model result was mixed; publication is still pending; commercial demand is not proven.
+Next, in this order:
+
+1. **Issue #6 / CAY-20260911-06 — Demand Scout** credentialless/mock-backed build from latest `main`. No live Google calls in CI. No automatic demand → benchmark trigger.
+2. Human Google Ads/Cloud setup, then one explicit `pnpm demand:smoke`.
+3. Issue #8 staged cost / business validation. Do not spend the next $25 until that review says the information is worth it.
+4. Do not add a second model just to have a second model.
+5. Separate human decision later: whether the Sonnet run can become accepted evidence with stratified wording (never a bare 4/12 headline).
+
+Four truths stay separate: the lab worked; this model result was mixed; publication of a public Sonnet claim is still pending; commercial demand is not proven.
 
 ## Current state
 
@@ -29,14 +35,13 @@ CanAIYet already has the major pieces of the intended MVP architecture:
 - simulated Acme Services business environment;
 - executable scenario suites for CAP-001 through CAP-010;
 - deterministic expected/forbidden-state judging;
-- accepted evidence artifact;
+- accepted evidence artifact (still `reference-agent-v1`);
+- one full frontier-model CAP-001 observation on Claude Sonnet 4.6, preserved as unpublished review evidence;
 - Supabase schema, RLS, request/event functions, and seed pipeline;
 - admin/cron/search/request foundations;
 - CI for lint, typecheck, unit tests, and build.
 
-The crucial limitation is that the accepted scores currently measure `reference-agent-v1`, a deterministic TypeScript reference implementation. They do **not** yet measure a frontier model such as an OpenAI, Anthropic, Google, or OpenRouter-served model.
-
-That means the laboratory is real, but the first real AI contestant has not yet entered it.
+The public accepted scores still measure `reference-agent-v1`. The first real AI contestant has entered the lab as review evidence only. Demand Scout is the next build so search demand can help choose what to test next.
 
 ---
 
