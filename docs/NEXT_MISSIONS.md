@@ -1,9 +1,24 @@
 # CanAIYet — Recommended Next Missions
 
 **Status:** CURRENT EXECUTION RECOMMENDATION  
-**Date:** 2026-09-10  
+**Date:** 2026-09-11  
 **Operational channel:** GitHub Issue #1  
 **Who does the work:** see `docs/FOUR_AGENT_SYSTEM.md`. This file says what happens next. It does not reassign roles.
+
+## Current stopping point
+
+CAY-20260911-05 accepted the CAP-001 fairness/publication gate (Demand Scout prerequisite only; Sonnet 4/12 still unpublished).  
+CAY-20260911-06 builds credentialless Demand Scout on this branch.
+
+Next:
+
+1. Independent review of Demand Scout (`READY_FOR_REVIEW` on Issue #1 / #6).
+2. Human Google Ads/Cloud setup using `docs/GOOGLE_ADS_DEMAND_SCOUT_SETUP.md`.
+3. One explicit `pnpm demand:smoke --seed "AI lead follow up" --country US --language en`.
+4. Issue #8 staged cost / business validation before meaningful next spend.
+5. Separate later decision: whether the Sonnet run can become accepted evidence with stratified wording (never a bare 4/12 headline).
+
+Four truths stay separate: the lab worked; the first frontier-model result was mixed; publication of a public Sonnet claim is still pending; commercial demand is not proven.
 
 ## Current state
 
@@ -15,14 +30,13 @@ CanAIYet already has the major pieces of the intended MVP architecture:
 - simulated Acme Services business environment;
 - executable scenario suites for CAP-001 through CAP-010;
 - deterministic expected/forbidden-state judging;
-- accepted evidence artifact;
+- accepted evidence artifact (still `reference-agent-v1` on `main`);
+- Demand Scout module + mock CLI path (`lib/demand`, `pnpm demand:*`);
 - Supabase schema, RLS, request/event functions, and seed pipeline;
 - admin/cron/search/request foundations;
 - CI for lint, typecheck, unit tests, and build.
 
-The crucial limitation is that the accepted scores currently measure `reference-agent-v1`, a deterministic TypeScript reference implementation. They do **not** yet measure a frontier model such as an OpenAI, Anthropic, Google, or OpenRouter-served model.
-
-That means the laboratory is real, but the first real AI contestant has not yet entered it.
+A full Claude Sonnet 4.6 CAP-001 observation exists as unpublished review evidence on the OpenRouter prep lineage / PR #2. It is not accepted public evidence on `main`.
 
 ---
 

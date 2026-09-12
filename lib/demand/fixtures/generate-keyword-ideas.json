@@ -1,0 +1,90 @@
+{
+  "results": [
+    {
+      "text": "ai lead follow up",
+      "keywordIdeaMetrics": {
+        "avgMonthlySearches": 2400,
+        "competition": "MEDIUM",
+        "competitionIndex": 55,
+        "lowTopOfPageBidMicros": 1200000,
+        "highTopOfPageBidMicros": 4500000,
+        "monthlySearchVolumes": [
+          { "year": 2026, "month": 6, "monthlySearches": 2200 },
+          { "year": 2026, "month": 7, "monthlySearches": 2400 },
+          { "year": 2026, "month": 8, "monthlySearches": 2600 }
+        ]
+      }
+    },
+    {
+      "text": "automate sales follow up with ai",
+      "keywordIdeaMetrics": {
+        "avgMonthlySearches": 880,
+        "competition": "LOW",
+        "competitionIndex": 32,
+        "lowTopOfPageBidMicros": 900000,
+        "highTopOfPageBidMicros": 3100000,
+        "monthlySearchVolumes": [
+          { "year": 2026, "month": 6, "monthlySearches": 720 },
+          { "year": 2026, "month": 7, "monthlySearches": 880 },
+          { "year": 2026, "month": 8, "monthlySearches": 960 }
+        ]
+      }
+    },
+    {
+      "text": "ai crm automation",
+      "keywordIdeaMetrics": {
+        "avgMonthlySearches": 5400,
+        "competition": "HIGH",
+        "competitionIndex": 78,
+        "lowTopOfPageBidMicros": 2100000,
+        "highTopOfPageBidMicros": 7800000,
+        "monthlySearchVolumes": [
+          { "year": 2026, "month": 6, "monthlySearches": 5100 },
+          { "year": 2026, "month": 7, "monthlySearches": 5400 },
+          { "year": 2026, "month": 8, "monthlySearches": 5700 }
+        ]
+      }
+    },
+    {
+      "text": "can chatgpt update crm",
+      "keywordIdeaMetrics": {
+        "avgMonthlySearches": 720,
+        "competition": "LOW",
+        "competitionIndex": 21,
+        "lowTopOfPageBidMicros": 600000,
+        "highTopOfPageBidMicros": 2200000,
+        "monthlySearchVolumes": [
+          { "year": 2026, "month": 6, "monthlySearches": 640 },
+          { "year": 2026, "month": 7, "monthlySearches": 720 },
+          { "year": 2026, "month": 8, "monthlySearches": 800 }
+        ]
+      }
+    },
+    {
+      "text": "ai image generator",
+      "keywordIdeaMetrics": {
+        "avgMonthlySearches": 110000,
+        "competition": "HIGH",
+        "competitionIndex": 91,
+        "lowTopOfPageBidMicros": 400000,
+        "highTopOfPageBidMicros": 1800000,
+        "monthlySearchVolumes": [
+          { "year": 2026, "month": 6, "monthlySearches": 100000 },
+          { "year": 2026, "month": 7, "monthlySearches": 110000 },
+          { "year": 2026, "month": 8, "monthlySearches": 120000 }
+        ]
+      }
+    },
+    {
+      "text": "missing metric keyword",
+      "keywordIdeaMetrics": {
+        "avgMonthlySearches": null,
+        "competition": null,
+        "competitionIndex": null,
+        "lowTopOfPageBidMicros": null,
+        "highTopOfPageBidMicros": null,
+        "monthlySearchVolumes": []
+      }
+    }
+  ]
+}
