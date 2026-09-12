@@ -2,6 +2,13 @@
 
 Short scan log. Newest first.
 
+## CAY-20260911-12 — HubSpot prediction frozen
+
+STATUS: PRE-REGISTRATION PRESERVED  
+What: `HUBSPOT_TRANSFER_PREDICTION_2026-09-11.md` on `main` and indexed. Compare eventual Issue #14 results against this file; do not rewrite it to fit outcomes.  
+Rule: do **not** build HubSpot to make the prediction true. Design from hypothesis + acceptance criteria after Demand Scout smoke.  
+Authorized tonight: nothing else. No HubSpot build, API calls, or model spend.
+
 ## CAY-20260911-11 — direction lock
 
 STATUS: STOPPED / NEXT WORK LOCKED  
