@@ -72,13 +72,45 @@ function asNumber(value: string | number | null | undefined): number | null {
   return Number.isFinite(n) ? n : null;
 }
 
-function parseMonthlyVolumes(
+const MONTH_OF_YEAR: Record<string, number> = {
+  JANUARY: 1,
+  FEBRUARY: 2,
+  MARCH: 3,
+  APRIL: 4,
+  MAY: 5,
+  JUNE: 6,
+  JULY: 7,
+  AUGUST: 8,
+  SEPTEMBER: 9,
+  OCTOBER: 10,
+  NOVEMBER: 11,
+  DECEMBER: 12,
+};
+
+/** Google Ads `MonthOfYear` enum names or numeric 1–12. Unknown → null (never 0). */
+export function parseMonthOfYear(value: string | number | null | undefined): number | null {
+  if (value === null || value === undefined || value === "") return null;
+  if (typeof value === "number") {
+    if (Number.isInteger(value) && value >= 1 && value <= 12) return value;
+    return null;
+  }
+  const trimmed = value.trim();
+  const asEnum = MONTH_OF_YEAR[trimmed.toUpperCase()];
+  if (asEnum) return asEnum;
+  const numeric = asNumber(trimmed);
+  if (numeric !== null && Number.isInteger(numeric) && numeric >= 1 && numeric <= 12) {
+    return numeric;
+  }
+  return null;
+}
+
+export function parseMonthlyVolumes(
   volumes: GoogleKeywordMetrics["monthlySearchVolumes"],
 ): MonthlySearchVolume[] {
   if (!volumes) return [];
   return volumes.map((row) => ({
-    year: asNumber(row.year) ?? 0,
-    month: asNumber(row.month) ?? 0,
+    year: asNumber(row.year),
+    month: parseMonthOfYear(row.month),
     monthlySearches: asNumber(row.monthlySearches),
   }));
 }

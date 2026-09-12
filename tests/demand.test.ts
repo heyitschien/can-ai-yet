@@ -10,11 +10,14 @@ import { clusterDemandRows } from "@/lib/demand/cluster";
 import {
   GoogleAdsDemandSource,
   classifyGoogleAdsHttpError,
+  parseMonthOfYear,
+  parseMonthlyVolumes,
   parseServiceAccountJson,
   redactSecrets,
   resetPlanningThrottleForTests,
 } from "@/lib/demand/google-ads";
 import { createDemandSource, resolveDemandMode } from "@/lib/demand";
+import { resolveTarget } from "@/lib/demand/cli";
 import { MockDemandSource } from "@/lib/demand/mock";
 import { normalizeKeyword } from "@/lib/demand/normalize";
 import { buildDemandReport, formatDemandReportText } from "@/lib/demand/report";
@@ -288,5 +291,55 @@ describe("report", () => {
     expect(text).toContain("Follow up with an inbound sales lead");
     expect(text).toContain("Demand Scout does not trigger benchmarks");
     expect(JSON.stringify(report)).toContain('"apiVersion":"v25"');
+  });
+});
+
+describe("CAY-07 blockers", () => {
+  it("rejects unsupported country/language instead of mislabeling US/en constants", () => {
+    const usEn = resolveTarget({ country: "US", language: "en" });
+    expect(usEn).toEqual({
+      country: "US",
+      language: "en",
+      geoTargetConstant: "geoTargetConstants/2840",
+      languageConstant: "languageConstants/1000",
+      network: "GOOGLE_SEARCH",
+    });
+
+    expect(() => resolveTarget({ country: "CA", language: "fr" })).toThrow(DemandError);
+    expect(() => resolveTarget({ country: "CA", language: "fr" })).toThrow(/Unsupported Demand Scout target/i);
+    expect(() => resolveTarget({ country: "GB", language: "en" })).toThrow(/Unsupported Demand Scout target/i);
+    expect(() => resolveTarget({ country: "US", language: "es" })).toThrow(/Unsupported Demand Scout target/i);
+  });
+
+  it("parses Google MonthOfYear enums and never invents month 0", () => {
+    expect(parseMonthOfYear("SEPTEMBER")).toBe(9);
+    expect(parseMonthOfYear("september")).toBe(9);
+    expect(parseMonthOfYear(9)).toBe(9);
+    expect(parseMonthOfYear("9")).toBe(9);
+    expect(parseMonthOfYear("NOT_A_MONTH")).toBeNull();
+    expect(parseMonthOfYear(0)).toBeNull();
+    expect(parseMonthOfYear(13)).toBeNull();
+
+    const volumes = parseMonthlyVolumes([
+      { year: 2026, month: "SEPTEMBER", monthlySearches: 2600 },
+      { year: "2026", month: "JUNE", monthlySearches: "2200" },
+      { year: 2026, month: "WEIRD", monthlySearches: 1 },
+      { year: null, month: null, monthlySearches: null },
+    ]);
+    expect(volumes[0]).toEqual({ year: 2026, month: 9, monthlySearches: 2600 });
+    expect(volumes[1]).toEqual({ year: 2026, month: 6, monthlySearches: 2200 });
+    expect(volumes[2]).toEqual({ year: 2026, month: null, monthlySearches: 1 });
+    expect(volumes[3]).toEqual({ year: null, month: null, monthlySearches: null });
+    expect(JSON.stringify(volumes)).not.toContain('"month":0');
+  });
+
+  it("mock fixtures with enum months produce numeric 1–12 months", async () => {
+    const cache = await tempCache();
+    const source = new MockDemandSource(cache, true);
+    const ideas = await source.discoverIdeas({ keyword: "AI lead follow up" }, DEFAULT_DEMAND_TARGET);
+    const lead = ideas.find((idea) => idea.keywordText === "ai lead follow up");
+    expect(lead?.monthlySearchVolumes.map((row) => row.month)).toEqual([6, 7, 8]);
+    const history = await source.getHistoricalMetrics(["ai lead follow up"], DEFAULT_DEMAND_TARGET);
+    expect(history[0]?.monthlySearchVolumes.map((row) => row.month)).toEqual([6, 7, 9]);
   });
 });

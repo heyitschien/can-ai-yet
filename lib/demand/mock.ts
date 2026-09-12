@@ -6,6 +6,7 @@ import {
   markCachedProvenance,
   type DemandCache,
 } from "@/lib/demand/cache";
+import { parseMonthlyVolumes } from "@/lib/demand/google-ads";
 import { normalizeKeyword } from "@/lib/demand/normalize";
 import type { DemandSource } from "@/lib/demand/source";
 import {
@@ -16,7 +17,6 @@ import {
   type DemandProvenance,
   type DemandSeed,
   type DemandTarget,
-  type MonthlySearchVolume,
 } from "@/lib/demand/types";
 
 interface FixtureMetrics {
@@ -25,7 +25,11 @@ interface FixtureMetrics {
   competitionIndex?: number | null;
   lowTopOfPageBidMicros?: number | null;
   highTopOfPageBidMicros?: number | null;
-  monthlySearchVolumes?: MonthlySearchVolume[];
+  monthlySearchVolumes?: Array<{
+    year?: string | number | null;
+    month?: string | number | null;
+    monthlySearches?: string | number | null;
+  }>;
 }
 
 interface FixtureIdeaRow {
@@ -47,7 +51,7 @@ function toIdea(
     keywordText: text,
     normalizedKeyword: normalizeKeyword(text),
     averageMonthlySearches: metrics?.avgMonthlySearches ?? null,
-    monthlySearchVolumes: metrics?.monthlySearchVolumes ?? [],
+    monthlySearchVolumes: parseMonthlyVolumes(metrics?.monthlySearchVolumes),
     competition: metrics?.competition ?? null,
     competitionIndex: metrics?.competitionIndex ?? null,
     lowTopOfPageBidMicros: metrics?.lowTopOfPageBidMicros ?? null,

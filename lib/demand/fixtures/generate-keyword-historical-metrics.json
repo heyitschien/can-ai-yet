@@ -9,9 +9,9 @@
         "lowTopOfPageBidMicros": 1200000,
         "highTopOfPageBidMicros": 4500000,
         "monthlySearchVolumes": [
-          { "year": 2026, "month": 6, "monthlySearches": 2200 },
-          { "year": 2026, "month": 7, "monthlySearches": 2400 },
-          { "year": 2026, "month": 8, "monthlySearches": 2600 }
+          { "year": 2026, "month": "JUNE", "monthlySearches": 2200 },
+          { "year": 2026, "month": "JULY", "monthlySearches": 2400 },
+          { "year": 2026, "month": "SEPTEMBER", "monthlySearches": 2600 }
         ]
       }
     },
@@ -24,9 +24,9 @@
         "lowTopOfPageBidMicros": 2100000,
         "highTopOfPageBidMicros": 7800000,
         "monthlySearchVolumes": [
-          { "year": 2026, "month": 6, "monthlySearches": 5100 },
-          { "year": 2026, "month": 7, "monthlySearches": 5400 },
-          { "year": 2026, "month": 8, "monthlySearches": 5700 }
+          { "year": 2026, "month": "JUNE", "monthlySearches": 5100 },
+          { "year": 2026, "month": "JULY", "monthlySearches": 5400 },
+          { "year": 2026, "month": "SEPTEMBER", "monthlySearches": 5700 }
         ]
       }
     },

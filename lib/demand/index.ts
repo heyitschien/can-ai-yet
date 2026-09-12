@@ -70,7 +70,10 @@ export { MockDemandSource } from "@/lib/demand/mock";
 export {
   GoogleAdsDemandSource,
   classifyGoogleAdsHttpError,
+  parseMonthOfYear,
+  parseMonthlyVolumes,
   parseServiceAccountJson,
   redactSecrets,
   resetPlanningThrottleForTests,
 } from "@/lib/demand/google-ads";
+export { resolveTarget, parseArgs } from "@/lib/demand/cli";

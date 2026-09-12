@@ -2,6 +2,13 @@
 
 Short scan log. Newest first.
 
+## CAY-20260911-07 — 2026-09-11
+
+STATUS: READY_FOR_REVIEW  
+What: Fixed PR #10 blockers — reject unsupported country/language (no silent US/en mislabel); parse Google `MonthOfYear` enums without inventing month `0`. Focused regression tests added.  
+Head: pending commit on `feature/cay-20260911-06-demand-scout`  
+Next: independent re-review. No Google live call. No model spend.
+
 ## CAY-20260911-06 — 2026-09-11
 
 STATUS: READY_FOR_REVIEW  

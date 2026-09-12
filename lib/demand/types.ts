@@ -18,8 +18,10 @@ export interface DemandSeed {
 }
 
 export interface MonthlySearchVolume {
-  year: number;
-  month: number;
+  /** Calendar year when known; null if Google omitted/unparseable. Never invent 0. */
+  year: number | null;
+  /** 1–12 when known; null if Google omitted/unparseable. Never invent 0. */
+  month: number | null;
   monthlySearches: number | null;
 }
 

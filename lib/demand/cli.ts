@@ -1,7 +1,21 @@
 import {
   DEFAULT_DEMAND_TARGET,
+  DemandError,
   type DemandTarget,
 } from "@/lib/demand/types";
+
+/** Explicit v1 mappings only. Never label one locale while querying another. */
+const SUPPORTED_TARGETS: Record<
+  string,
+  { country: string; language: string; geoTargetConstant: string; languageConstant: string }
+> = {
+  "US|en": {
+    country: "US",
+    language: "en",
+    geoTargetConstant: "geoTargetConstants/2840",
+    languageConstant: "languageConstants/1000",
+  },
+};
 
 export function parseArgs(argv: string[]): Record<string, string | boolean> {
   const out: Record<string, string | boolean> = {};
@@ -23,14 +37,19 @@ export function parseArgs(argv: string[]): Record<string, string | boolean> {
 export function resolveTarget(args: Record<string, string | boolean>): DemandTarget {
   const country = String(args.country ?? DEFAULT_DEMAND_TARGET.country).toUpperCase();
   const language = String(args.language ?? DEFAULT_DEMAND_TARGET.language).toLowerCase();
+  const mapped = SUPPORTED_TARGETS[`${country}|${language}`];
+  if (!mapped) {
+    throw new DemandError(
+      `Unsupported Demand Scout target country=${country} language=${language}. v1 supports only US/en. Refusing to mislabel Google geo/language constants.`,
+      { className: "config" },
+    );
+  }
   return {
     ...DEFAULT_DEMAND_TARGET,
-    country,
-    language,
-    geoTargetConstant:
-      country === "US" ? "geoTargetConstants/2840" : DEFAULT_DEMAND_TARGET.geoTargetConstant,
-    languageConstant:
-      language === "en" ? "languageConstants/1000" : DEFAULT_DEMAND_TARGET.languageConstant,
+    country: mapped.country,
+    language: mapped.language,
+    geoTargetConstant: mapped.geoTargetConstant,
+    languageConstant: mapped.languageConstant,
   };
 }
 

@@ -43,7 +43,9 @@ Ordinary CI must make zero Google calls. Tests use fixtures + mocks.
 
 ## Rate limits / errors
 
+- US/en only in v1; unsupported country/language fail closed (no silent US/en mislabel)
 - Planning calls are throttled to ~1 QPS in the adapter
+- Month trends accept Google `MonthOfYear` enums (e.g. `SEPTEMBER`); unknown months stay null, never `0`
 - Bounded retries with exponential backoff + jitter for transient/quota failures
 - `401` → auth config error
 - `403` → access/config error (often Basic Access or Ads user permissions)
