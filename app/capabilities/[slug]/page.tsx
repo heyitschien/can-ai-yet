@@ -15,24 +15,16 @@ export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
-  const finding = isCap001FirstFindingSlug(slug) ? loadCap001FirstFinding() : null;
-  if (finding) {
-    const title = `Can AI follow up with an inbound sales lead yet? First Sonnet finding`;
-    return {
-      title,
-      description: finding.publicWording.summary,
-      openGraph: { title, description: finding.publicWording.summary },
-      twitter: { title, description: finding.publicWording.summary },
-    };
-  }
   const capability = await getPublishedBySlug(slug);
   if (!capability) return { title: "Capability" };
+  const finding = isCap001FirstFindingSlug(slug) ? loadCap001FirstFinding() : null;
   const title = `Can AI ${capability.title}? Current Capability Test`;
+  const description = finding?.publicWording.summary ?? capability.shortDescription;
   return {
     title,
-    description: capability.shortDescription,
-    openGraph: { title, description: capability.shortDescription },
-    twitter: { title, description: capability.shortDescription },
+    description,
+    openGraph: { title, description },
+    twitter: { title, description },
   };
 }
 

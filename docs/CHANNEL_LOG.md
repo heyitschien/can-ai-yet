@@ -2,6 +2,13 @@
 
 Short scan log. Newest first.
 
+## CAY-20260911-09 — 2026-09-11
+
+STATUS: READY_FOR_REVIEW  
+What: Refit CAP-001 first finding into canonical capability-report architecture. Evidence facts unchanged. Duplicate scenario sections removed.  
+PR: #12  
+Next: independent UI/evidence review before merge/deploy.
+
 ## CAY-20260911-08 — 2026-09-11
 
 STATUS: READY_FOR_REVIEW  

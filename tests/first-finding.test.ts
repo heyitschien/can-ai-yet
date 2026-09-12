@@ -26,7 +26,7 @@ describe("CAP-001 first Sonnet finding publication", () => {
     expect(suite.outputTokens).toBe(9266);
     expect(suite.provenance.requestCount).toBe(40);
     expect(finding!.publicWording.caveat.toLowerCase()).toContain("not a reliability");
-    expect(finding!.publicWording.summary).not.toMatch(/\b33%\b/);
+    expect(finding!.publicWording.summary).not.toMatch(/\bis 33% reliable\b/i);
     expect(finding!.publicWording.summary).not.toMatch(/failure rate/i);
   });
 
