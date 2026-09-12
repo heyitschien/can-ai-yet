@@ -2,6 +2,13 @@
 
 Short scan log. Newest first.
 
+## Docs consolidate — 2026-09-11
+
+STATUS: DOCS_ONLY → main  
+What: Brought review/strategy docs from open PRs onto `main` without merging code PRs #2/#3/#5/#10.  
+Includes: thesis, falsification, runbook, CAY-05/07/13/19/01/03 reviews + earlier CAP-001 run JSONs.  
+Closed as superseded (docs landed): PRs that were review-doc vehicles once comments posted.
+
 ## CAY-20260911-08/09 — 2026-09-11 EOD
 
 STATUS: MERGED / LIVE  
