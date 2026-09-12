@@ -2,8 +2,16 @@ import Link from "next/link";
 import { EVIDENCE_LABEL, SUPERVISION_LABEL, type PublicCapability } from "@/lib/domain";
 import { formatPercent, formatTestedDate } from "@/lib/format";
 import { StatusMark } from "@/components/capability/status-mark";
+import { CAP_001_FIRST_FINDING_SLUG } from "@/lib/evidence/first-finding";
 
 export function CapabilityCard({ capability }: { capability: PublicCapability }) {
+  const isFirstFinding = capability.slug === CAP_001_FIRST_FINDING_SLUG;
+  const scoreLabel = isFirstFinding ? "Observed" : "Score";
+  const scoreValue =
+    isFirstFinding && capability.currentSuccesses != null && capability.currentTotal != null
+      ? `${capability.currentSuccesses}/${capability.currentTotal}`
+      : formatPercent(capability.currentScore);
+
   return (
     <Link
       href={`/capabilities/${capability.slug}`}
@@ -14,10 +22,13 @@ export function CapabilityCard({ capability }: { capability: PublicCapability })
         <StatusMark status={capability.status} />
       </div>
       <p className="mt-3 text-sm leading-6 text-[var(--muted)]">{capability.shortDescription}</p>
+      {isFirstFinding ? (
+        <p className="mt-3 text-xs text-[var(--yellow)]">Single frozen run — not a reliability estimate</p>
+      ) : null}
       <dl className="mt-5 grid grid-cols-2 gap-3 text-sm">
         <div>
-          <dt className="text-[var(--muted)]">Reliability</dt>
-          <dd className="num mt-1 text-lg">{formatPercent(capability.currentScore)}</dd>
+          <dt className="text-[var(--muted)]">{scoreLabel}</dt>
+          <dd className="num mt-1 text-lg">{scoreValue}</dd>
         </div>
         <div>
           <dt className="text-[var(--muted)]">Supervision</dt>

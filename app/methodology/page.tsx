@@ -34,7 +34,13 @@ export default function MethodologyPage() {
         <p>Green still means ready with supervision. We do not say autonomous, guaranteed, safe, or solved.</p>
         <h2 className="serif pt-4 text-2xl">Current published configuration</h2>
         <p>
-          The accepted runs on this site used a deterministic reference agent against Acme Services fixtures. Failures were produced by running that agent, then checking the database. They were not typed in as marketing numbers. A frontier-model configuration is a different test and is not published until that run exists.
+          Most accepted catalog rows still use a deterministic reference agent against Acme Services fixtures for harness
+          calibration. Those are not frontier-model claims.
+        </p>
+        <p>
+          CAP-001 now has a separate first public finding: one frozen Claude Sonnet 4.6 run (4 pass / 8 fail / 4
+          frozen-critical). That page reports a single observation with an explicit “not a reliability estimate”
+          caveat. It does not convert 4/12 into a percentage reliability claim.
         </p>
       </div>
     </article>

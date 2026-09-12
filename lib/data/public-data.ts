@@ -1,10 +1,55 @@
 import { createClient } from "@supabase/supabase-js";
 import type { CapabilityStatus, EvidenceLevel, PublicCapability, SupervisionLevel } from "@/lib/domain";
+import {
+  CAP_001_FIRST_FINDING_SLUG,
+  loadCap001FirstFinding,
+  type Cap001FirstFinding,
+} from "@/lib/evidence/first-finding";
 import { publishedRecords, recordBySlug, type PublishedRecord } from "@/lib/evidence/load";
+import { CATALOG } from "@/lib/content/catalog";
 
 const EVIDENCE: EvidenceLevel = "simulation";
 
+function firstFindingToPublic(finding: Cap001FirstFinding): PublicCapability | null {
+  const catalog = CATALOG.find((item) => item.slug === finding.capabilitySlug);
+  if (!catalog) return null;
+  const suite = finding.suite;
+  return {
+    id: catalog.code,
+    code: catalog.code,
+    slug: catalog.slug,
+    title: catalog.title,
+    shortDescription: catalog.shortDescription,
+    categorySlug: catalog.categorySlug,
+    categoryName: catalog.categoryName,
+    status: suite.status,
+    evidenceLevel: EVIDENCE,
+    supervisionLevel: suite.supervision,
+    currentScore: suite.score,
+    currentSuccesses: suite.successCount,
+    currentTotal: suite.totalCount,
+    currentCostUsd: suite.totalCostUsd,
+    currentRuntimeSeconds: suite.medianRuntimeSeconds,
+    currentCriticalFailures: suite.criticalFailureCount,
+    whatAiCanDo: suite.results.filter((row) => row.success).map((row) => row.title),
+    humanRequiredWhen: catalog.humanRequiredWhen,
+    commonFailureModes: suite.results
+      .filter((row) => !row.success)
+      .map((row) => `${row.title}. ${row.fairnessNote}`),
+    implementationBlueprint: catalog.implementationBlueprint,
+    lastTestedAt: suite.completedAt,
+    published: true,
+    synonyms: catalog.synonyms,
+    modelProvider: suite.provider,
+    modelName: suite.model,
+    configurationLabel:
+      "Claude Sonnet 4.6 via OpenRouter (Anthropic pin) · Acme Services simulation · single frozen run",
+    acceptedRunId: finding.publicationId,
+  };
+}
+
 export function toPublic(record: PublishedRecord): PublicCapability {
+  const isReference = (record.suite?.model ?? "").includes("reference");
   return {
     id: record.catalog.code,
     code: record.catalog.code,
@@ -31,7 +76,9 @@ export function toPublic(record: PublishedRecord): PublicCapability {
     synonyms: record.catalog.synonyms,
     modelProvider: record.suite?.provider ?? null,
     modelName: record.suite?.model ?? null,
-    configurationLabel: "Reference agent against the Acme Services simulation",
+    configurationLabel: isReference
+      ? "Reference agent against the Acme Services simulation"
+      : `${record.suite?.model ?? "Unknown model"} against the Acme Services simulation`,
     acceptedRunId: record.suite?.startedAt ?? null,
   };
 }
@@ -103,6 +150,21 @@ function fromRow(row: Row): PublicCapability {
   };
 }
 
+function withFirstFindingOverride(items: PublicCapability[]): PublicCapability[] {
+  const finding = loadCap001FirstFinding();
+  if (!finding) return items;
+  const published = firstFindingToPublic(finding);
+  if (!published) return items;
+  let replaced = false;
+  const next = items.map((item) => {
+    if (item.slug !== CAP_001_FIRST_FINDING_SLUG) return item;
+    replaced = true;
+    return published;
+  });
+  if (!replaced) next.unshift(published);
+  return next;
+}
+
 export async function listPublished(): Promise<PublicCapability[]> {
   const client = supabasePublic();
   if (client) {
@@ -111,12 +173,20 @@ export async function listPublished(): Promise<PublicCapability[]> {
       .select("*, categories(slug, name)")
       .eq("published", true)
       .order("code");
-    if (!error && data && data.length > 0) return (data as Row[]).map(fromRow);
+    if (!error && data && data.length > 0) {
+      return withFirstFindingOverride((data as Row[]).map(fromRow));
+    }
   }
-  return publishedRecords().map(toPublic);
+  return withFirstFindingOverride(publishedRecords().map(toPublic));
 }
 
 export async function getPublishedBySlug(slug: string): Promise<PublicCapability | null> {
+  if (slug === CAP_001_FIRST_FINDING_SLUG) {
+    const finding = loadCap001FirstFinding();
+    const published = finding ? firstFindingToPublic(finding) : null;
+    if (published) return published;
+  }
+
   const client = supabasePublic();
   if (client) {
     const { data, error } = await client
@@ -133,4 +203,8 @@ export async function getPublishedBySlug(slug: string): Promise<PublicCapability
 
 export function localRecord(slug: string) {
   return recordBySlug(slug);
+}
+
+export function localCap001FirstFinding() {
+  return loadCap001FirstFinding();
 }
