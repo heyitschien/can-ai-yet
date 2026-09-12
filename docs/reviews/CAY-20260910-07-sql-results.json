@@ -1,0 +1,49 @@
+{
+  "runtime": "PostgreSQL 18.3 (PGlite 0.5.8) on wasm32-unknown-emscripten, compiled by emcc (Emscripten gcc/clang-like replacement + linker emulating GNU ld) 3.1.74 (1092ec30a3fb1d46b1782ff1b4db5094d3d06ae5), 32-bit",
+  "observations": [
+    {
+      "check": "valid acceptance and identical reacceptance",
+      "outcome": "PASS"
+    },
+    {
+      "check": "existing-pointer conflict leaves new run unpublished",
+      "outcome": "PASS"
+    },
+    {
+      "check": "pointer failure rolls back publication",
+      "outcome": "PASS"
+    },
+    {
+      "check": "anon cannot insert benchmark runs or read unpublished runs",
+      "outcome": "PASS"
+    },
+    {
+      "check": "anon cannot call acceptance RPC",
+      "outcome": "PASS"
+    },
+    {
+      "check": "authenticated cannot insert benchmark runs or read unpublished runs",
+      "outcome": "PASS"
+    },
+    {
+      "check": "authenticated cannot call acceptance RPC",
+      "outcome": "PASS"
+    },
+    {
+      "check": "two copies of one scenario accepted as a two-scenario run",
+      "outcome": "DEFECT REPRODUCED"
+    },
+    {
+      "check": "result from another capability accepted",
+      "outcome": "DEFECT REPRODUCED"
+    },
+    {
+      "check": "1/1 success headline accepted with a failing result",
+      "outcome": "DEFECT REPRODUCED"
+    },
+    {
+      "check": "missing result rejected",
+      "outcome": "PASS"
+    }
+  ]
+}

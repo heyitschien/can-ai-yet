@@ -1,9 +1,24 @@
 # CanAIYet — Recommended Next Missions
 
 **Status:** CURRENT EXECUTION RECOMMENDATION  
-**Date:** 2026-09-10  
+**Date:** 2026-09-11  
 **Operational channel:** GitHub Issue #1  
 **Who does the work:** see `docs/FOUR_AGENT_SYSTEM.md`. This file says what happens next. It does not reassign roles.
+
+## Current stopping point
+
+CAY-20260911-08/09 published the first CAP-001 Sonnet finding to production with canonical capability-report UI. Evidence stays truthful: 4 pass / 8 fail / 4 frozen-critical · single-run caveat · not a reliability %.
+
+Demand Scout draft PR #10 corrections are READY_FOR_REVIEW and **not accepted yet**. No Google credentials / `demand:smoke` yet. Draft OpenRouter prep PR #2 remains unmerged code (harness path); its review docs now live on `main`.
+
+Next, in this order:
+
+1. Independent re-review of Demand Scout PR #10 → accept → human Google setup → one explicit `pnpm demand:smoke`.
+2. Issue #8 staged cost / business validation before further paid model spend.
+3. Do not add a second model just to have a second model.
+4. Keep reference-agent accepted baseline labeled as harness validation, separate from the published Sonnet finding.
+
+Four truths stay separate: the lab worked; this model result was mixed; a public Sonnet finding is live with caveats; commercial demand is not proven.
 
 ## Current state
 
@@ -15,14 +30,13 @@ CanAIYet already has the major pieces of the intended MVP architecture:
 - simulated Acme Services business environment;
 - executable scenario suites for CAP-001 through CAP-010;
 - deterministic expected/forbidden-state judging;
-- accepted evidence artifact;
+- accepted evidence artifact (still `reference-agent-v1` as harness baseline);
+- one published CAP-001 Sonnet 4.6 finding with stratified wording;
 - Supabase schema, RLS, request/event functions, and seed pipeline;
 - admin/cron/search/request foundations;
 - CI for lint, typecheck, unit tests, and build.
 
-The crucial limitation is that the accepted scores currently measure `reference-agent-v1`, a deterministic TypeScript reference implementation. They do **not** yet measure a frontier model such as an OpenAI, Anthropic, Google, or OpenRouter-served model.
-
-That means the laboratory is real, but the first real AI contestant has not yet entered it.
+The public accepted harness scores still measure `reference-agent-v1`. The first real AI contestant has a published finding with caveats. Demand Scout is the next build so search demand can help choose what to test next.
 
 ---
 
