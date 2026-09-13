@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   CAP001_EXPECTED_BASELINE_COUNTS,
+  CAP001_HUBSPOT_DEAL_ENV_LIFECYCLE,
   CAP001_HUBSPOT_METADATA_PROVISIONING,
   CAP001_HUBSPOT_SCENARIO_MAPPING,
   CAP001_HUBSPOT_SCOPE_MATRIX,
@@ -235,11 +236,22 @@ describe("HubSpot CAP-001 environment machinery (CAY-08)", () => {
 
   it("exact scope matrix: only deals are genuinely new; activities are adapter gaps", () => {
     expect(CAP001_HUBSPOT_SCOPE_MATRIX).toHaveLength(13);
+    expect(CAP001_HUBSPOT_DEAL_ENV_LIFECYCLE).toHaveLength(3);
     expect(genuinelyNewScopesFromMatrix()).toEqual([
       "crm.objects.deals.read",
       "crm.objects.deals.write",
     ]);
-    expect(toolRowsBlockedScope().map((row) => row.tool).sort()).toEqual(["get_deal", "update_deal"]);
+    expect(toolRowsBlockedScope().map((row) => row.tool).sort()).toEqual([
+      "env.archive_deal",
+      "env.authoritative_read_deal",
+      "env.seed_deal",
+      "get_deal",
+      "update_deal",
+    ]);
+    for (const row of toolRowsBlockedScope()) {
+      expect(row.endpoint).toContain("/crm/objects/2026-09/0-3");
+      expect(row.endpoint).not.toContain("/deals/");
+    }
     const adapterTools = toolRowsBlockedAdapter().map((row) => row.tool);
     expect(adapterTools).toEqual(
       expect.arrayContaining([

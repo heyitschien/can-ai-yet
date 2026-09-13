@@ -106,29 +106,31 @@ export const CAP001_HUBSPOT_SCOPE_MATRIX: readonly Cap001HubSpotScopeRow[] = [
   },
   {
     tool: "get_deal",
-    hubSpotRepresentation: "Deal",
+    hubSpotRepresentation: "Deal (object type 0-3)",
     action: "read",
     method: "GET",
-    endpoint: "/crm/objects/2026-09/deals/{dealId}",
+    endpoint: "/crm/objects/2026-09/0-3/{dealId}",
     apiVersion: "2026-09",
     requiredScopes: ["crm.objects.deals.read"],
     scopeLogic: "all",
     grant: "genuinely_new",
     liveBlock: "BLOCKED_SCOPE",
     docSource: "https://developers.hubspot.com/docs/api-reference/latest/crm/objects/deals/get-deal",
+    notes: "Official 2026-09 Deal reference uses object-type ID 0-3, not the /deals path alias.",
   },
   {
     tool: "update_deal",
-    hubSpotRepresentation: "Deal",
+    hubSpotRepresentation: "Deal (object type 0-3)",
     action: "update",
     method: "PATCH",
-    endpoint: "/crm/objects/2026-09/deals/{dealId}",
+    endpoint: "/crm/objects/2026-09/0-3/{dealId}",
     apiVersion: "2026-09",
     requiredScopes: ["crm.objects.deals.write"],
     scopeLogic: "all",
     grant: "genuinely_new",
     liveBlock: "BLOCKED_SCOPE",
     docSource: "https://developers.hubspot.com/docs/api-reference/latest/crm/objects/deals/update-deal",
+    notes: "Official 2026-09 Deal reference uses object-type ID 0-3, not the /deals path alias.",
   },
   {
     tool: "add_note",
@@ -248,6 +250,63 @@ export const CAP001_HUBSPOT_SCOPE_MATRIX: readonly Cap001HubSpotScopeRow[] = [
   },
 ];
 
+/**
+ * Environment-owned Deal lifecycle (not model-facing tools).
+ * Justifies crm.objects.deals.read/write for live CAP-001 seed → snapshot → reset,
+ * using the same official 2026-09 `0-3` object-type paths.
+ */
+export const CAP001_HUBSPOT_DEAL_ENV_LIFECYCLE: readonly Cap001HubSpotScopeRow[] = [
+  {
+    tool: "env.seed_deal",
+    hubSpotRepresentation: "Deal (object type 0-3)",
+    action: "create (baseline seed)",
+    method: "POST",
+    endpoint: "/crm/objects/2026-09/0-3",
+    apiVersion: "2026-09",
+    requiredScopes: ["crm.objects.deals.write"],
+    scopeLogic: "all",
+    grant: "genuinely_new",
+    liveBlock: "BLOCKED_SCOPE",
+    docSource: "https://developers.hubspot.com/docs/api-reference/latest/crm/objects/deals/create-deal",
+    notes: "Environment mechanics: materialize baseline CAP-001 deals during seedBaseline.",
+  },
+  {
+    tool: "env.authoritative_read_deal",
+    hubSpotRepresentation: "Deal (object type 0-3)",
+    action: "read (authoritative snapshot)",
+    method: "GET",
+    endpoint: "/crm/objects/2026-09/0-3/{dealId}",
+    apiVersion: "2026-09",
+    requiredScopes: ["crm.objects.deals.read"],
+    scopeLogic: "all",
+    grant: "genuinely_new",
+    liveBlock: "BLOCKED_SCOPE",
+    docSource: "https://developers.hubspot.com/docs/api-reference/latest/crm/objects/deals/get-deal",
+    notes: "Environment mechanics: complete fixture-graph snapshot requires deal visibility.",
+  },
+  {
+    tool: "env.archive_deal",
+    hubSpotRepresentation: "Deal (object type 0-3)",
+    action: "archive/reset cleanup",
+    method: "DELETE",
+    endpoint: "/crm/objects/2026-09/0-3/{dealId}",
+    apiVersion: "2026-09",
+    requiredScopes: ["crm.objects.deals.write"],
+    scopeLogic: "all",
+    grant: "genuinely_new",
+    liveBlock: "BLOCKED_SCOPE",
+    docSource: "https://developers.hubspot.com/docs/api-reference/latest/crm/objects/deals/delete-deal",
+    notes:
+      "Environment mechanics: reset/cleanup. Batch alternative documented as POST /crm/objects/2026-09/0-3/batch/archive (also deals.write).",
+  },
+];
+
+/** Combined tool + environment Deal rows used for grant/delta calculation. */
+export const CAP001_HUBSPOT_SCOPE_MATRIX_WITH_ENV: readonly Cap001HubSpotScopeRow[] = [
+  ...CAP001_HUBSPOT_SCOPE_MATRIX,
+  ...CAP001_HUBSPOT_DEAL_ENV_LIFECYCLE,
+];
+
 /** One-time test-account provisioning — not a runtime Service Key grant. */
 export const CAP001_HUBSPOT_METADATA_PROVISIONING = {
   strategy: "one_time_human_or_setup_path" as const,
@@ -273,7 +332,7 @@ export const CAP001_LIVE_ENVIRONMENT_SCOPE_BLOCKER =
   "Full CAP-001 live seed/preflight/authoritative snapshot requires baseline deals via crm.objects.deals.read/write (verified missing). Activity APIs (notes/tasks/meetings/emails) are contact-scoped per HubSpot Required Scopes — those are BLOCKED_ADAPTER until wired, not missing scopes.";
 
 export function genuinelyNewScopesFromMatrix(
-  rows: readonly Cap001HubSpotScopeRow[] = CAP001_HUBSPOT_SCOPE_MATRIX,
+  rows: readonly Cap001HubSpotScopeRow[] = CAP001_HUBSPOT_SCOPE_MATRIX_WITH_ENV,
 ): string[] {
   const needed = new Set<string>();
   for (const row of rows) {
@@ -290,7 +349,7 @@ export function toolRowsBlockedAdapter(
 }
 
 export function toolRowsBlockedScope(
-  rows: readonly Cap001HubSpotScopeRow[] = CAP001_HUBSPOT_SCOPE_MATRIX,
+  rows: readonly Cap001HubSpotScopeRow[] = CAP001_HUBSPOT_SCOPE_MATRIX_WITH_ENV,
 ): Cap001HubSpotScopeRow[] {
   return rows.filter((row) => row.liveBlock === "BLOCKED_SCOPE");
 }

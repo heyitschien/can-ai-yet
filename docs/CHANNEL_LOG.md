@@ -4,14 +4,21 @@ Short scan log. Newest first.
 
 ## CAY-20260913-08 — CAP-001 HubSpot environment machinery
 
-STATUS: READY_FOR_REVIEW (narrow provenance: exact scope/API matrix; BLOCKED_SCOPE vs BLOCKED_ADAPTER; per-family API versions; one-time metadata setup)  
-What: Least-authority HubSpot matrix from official Required Scopes docs — deals are the only genuinely new scopes; notes/tasks/meetings/emails use contacts scopes (adapter gaps). No Service Key change. Zero models; no live suite.  
+STATUS: READY_FOR_REVIEW (final provenance: Deal paths use documented `0-3`; env Deal lifecycle rows; PR tip refreshed)  
+What: Corrected exact Deal endpoints to `/crm/objects/2026-09/0-3…`; documented seed→read→archive for deals.read/write justification. Service Key unchanged. Zero models; no live suite.  
 Branch: `feature/cay-20260913-08-hubspot-cap001-env`  
 Base: `bdab3c1` (merged PR #23)
 
 ## CAY-20260913-08 — CAP-001 HubSpot environment machinery (prior tip)
 
-STATUS: READY_FOR_REVIEW (post CHANGES_REQUESTED: authoritative snapshot + mock/live port) — superseded by provenance tip above  
+STATUS: READY_FOR_REVIEW (narrow provenance: exact scope/API matrix; BLOCKED_SCOPE vs BLOCKED_ADAPTER; per-family API versions; one-time metadata setup) — superseded by Deal `0-3` tip above  
+What: Least-authority HubSpot matrix from official Required Scopes docs — deals are the only genuinely new scopes; notes/tasks/meetings/emails use contacts scopes (adapter gaps). No Service Key change. Zero models; no live suite.  
+Branch: `feature/cay-20260913-08-hubspot-cap001-env`  
+Base: `bdab3c1` (merged PR #23)
+
+## CAY-20260913-08 — CAP-001 HubSpot environment machinery (earlier tip)
+
+STATUS: READY_FOR_REVIEW (post CHANGES_REQUESTED: authoritative snapshot + mock/live port) — superseded  
 What: HubSpot-only CRM projection; mock vs live port; semantic vs live readiness; fixture-graph settle; same-runId reset clears scenario appointments; scope plan doc (no expansion). Zero models; no live suite.  
 Branch: `feature/cay-20260913-08-hubspot-cap001-env`  
 Base: `bdab3c1` (merged PR #23)

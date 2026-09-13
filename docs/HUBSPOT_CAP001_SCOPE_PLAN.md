@@ -39,8 +39,8 @@ Columns: **CanAIYet tool → HubSpot representation → action → endpoint/vers
 | `search_contact` | Contact search | search | `POST /crm/objects/2026-03/contacts/search` | `crm.objects.contacts.read` | already granted | `BLOCKED_ADAPTER` |
 | `get_contact` | Contact | read | `GET /crm/objects/2026-03/contacts/{contactId}` | `crm.objects.contacts.read` | already granted | `BLOCKED_ADAPTER` |
 | `create_task` | Task engagement | create | `POST /crm/objects/2026-09/tasks` | `crm.objects.contacts.write` | already granted | `BLOCKED_ADAPTER` |
-| `get_deal` | Deal | read | `GET /crm/objects/2026-09/deals/{dealId}` | `crm.objects.deals.read` | **genuinely new** | `BLOCKED_SCOPE` |
-| `update_deal` | Deal | update | `PATCH /crm/objects/2026-09/deals/{dealId}` | `crm.objects.deals.write` | **genuinely new** | `BLOCKED_SCOPE` |
+| `get_deal` | Deal (`0-3`) | read | `GET /crm/objects/2026-09/0-3/{dealId}` | `crm.objects.deals.read` | **genuinely new** | `BLOCKED_SCOPE` |
+| `update_deal` | Deal (`0-3`) | update | `PATCH /crm/objects/2026-09/0-3/{dealId}` | `crm.objects.deals.write` | **genuinely new** | `BLOCKED_SCOPE` |
 | `add_note` | Note engagement | create | `POST /crm/objects/2026-09/notes` | `crm.objects.contacts.write` | already granted | `BLOCKED_ADAPTER` |
 | `draft_reply` | Local draft | compose | `(local)` | none | not required | `LOCAL_ONLY` |
 | `send_reply` | Email engagement log (Envelope A) | create | `POST /crm/objects/2026-09/emails` | `crm.objects.contacts.write` **OR** `sales-email-read` | already granted (via contacts.write) | `BLOCKED_ADAPTER` |
@@ -49,6 +49,18 @@ Columns: **CanAIYet tool → HubSpot representation → action → endpoint/vers
 | `create_appointment` | Meeting engagement | create | `POST /crm/objects/2026-09/meetings` | `crm.objects.contacts.write` | already granted | `BLOCKED_ADAPTER` |
 | `escalate` | Task (and/or note) | create | `POST /crm/objects/2026-09/tasks` | `crm.objects.contacts.write` | already granted | `BLOCKED_ADAPTER` |
 | `flag` | Contact property / note | update | `PATCH /crm/objects/2026-03/contacts/{contactId}` | `crm.objects.contacts.write` | already granted | `BLOCKED_ADAPTER` |
+
+### Environment-owned Deal lifecycle (justifies live env scopes)
+
+These are **not** model-facing tools. They are the seed → authoritative read → reset path that keeps every CAP-001 scenario `BLOCKED_SCOPE` until Deals are authorized. Official 2026-09 Deal reference uses object-type ID **`0-3`**.
+
+| Env mechanic | HubSpot representation | Action | Endpoint / version | Required scope(s) | Grant | Live block |
+| --- | --- | --- | --- | --- | --- | --- |
+| `env.seed_deal` | Deal (`0-3`) | create (baseline seed) | `POST /crm/objects/2026-09/0-3` | `crm.objects.deals.write` | **genuinely new** | `BLOCKED_SCOPE` |
+| `env.authoritative_read_deal` | Deal (`0-3`) | read (authoritative snapshot) | `GET /crm/objects/2026-09/0-3/{dealId}` | `crm.objects.deals.read` | **genuinely new** | `BLOCKED_SCOPE` |
+| `env.archive_deal` | Deal (`0-3`) | archive/reset cleanup | `DELETE /crm/objects/2026-09/0-3/{dealId}` | `crm.objects.deals.write` | **genuinely new** | `BLOCKED_SCOPE` |
+
+Batch archive alternative (same write scope): `POST /crm/objects/2026-09/0-3/batch/archive`.
 
 ### Smallest future Service Key delta (if human later accepts full CAP-001 live env)
 
@@ -73,7 +85,7 @@ Create-property docs require a schemas/object-write family (`crm.schemas.contact
 
 - Contacts `2026-03` create / get / update / search Required Scopes
 - Notes / Tasks / Meetings / Emails `2026-09` create (and get) Required Scopes
-- Deals `2026-09` get / update Required Scopes (+ deals guide)
+- Deals guide / create / get / update / delete Required Scopes (`0-3` object-type paths on `2026-09`)
 - Properties create Required Scopes (setup-only)
 
 **Do not change the Service Key until this matrix is accepted and a separate human authorization receipt names the exact scopes.**

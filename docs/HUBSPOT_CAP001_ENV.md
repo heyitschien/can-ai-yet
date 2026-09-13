@@ -32,7 +32,7 @@
 | liveStatus READY | 0 |
 | liveStatus BLOCKED_SCOPE | 12 (environment-level deals gap) |
 | tool-matrix BLOCKED_ADAPTER | notes/tasks/meetings/emails/contacts/escalate/flag (scopes already held) |
-| tool-matrix BLOCKED_SCOPE | `get_deal` / `update_deal` only |
+| tool-matrix BLOCKED_SCOPE | `get_deal` / `update_deal` + env Deal lifecycle (`0-3` paths) |
 
 See also `docs/HUBSPOT_CAP001_SCOPE_PLAN.md` (exact matrix — no key expansion).
 
