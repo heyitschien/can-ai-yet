@@ -46,6 +46,11 @@ function buildReceipt(input: {
 /**
  * No-model HubSpot commissioning lifecycle.
  * Uses an injected transport (mock in CAY-05; live transport later under separate authorization).
+ *
+ * Safety rules:
+ * - once a contact ID is created, every failure path attempts best-effort cleanup;
+ * - primary failureClass is preserved (cleanup outcome is recorded separately);
+ * - cleanupVerified=true only on authoritative NOT_FOUND after archive.
  */
 export async function runHubSpotCommissioningLifecycle(input: {
   transport: HubSpotTransport;
@@ -71,8 +76,84 @@ export async function runHubSpotCommissioningLifecycle(input: {
     return { ok, receipt, failureClass };
   };
 
+  const verifyAuthoritativeAbsence = async (objectId: string): Promise<boolean> => {
+    const verify = await input.transport.getContact(objectId);
+    if (verify.ok) {
+      anomalies.push("contact still readable after cleanup");
+      operations.push({
+        operation: "verify_cleanup",
+        ok: false,
+        requestId: verify.requestId,
+        objectId,
+        failureClass: "INTEGRATION_FAILURE",
+        message: "Expected not-found after archive",
+      });
+      return false;
+    }
+    if (verify.notFound === true) {
+      operations.push({
+        operation: "verify_cleanup",
+        ok: true,
+        requestId: verify.requestId,
+        objectId,
+        notFound: true,
+        message: verify.message,
+      });
+      return true;
+    }
+    anomalies.push(
+      `cleanup verify failed without authoritative not-found (${verify.failureClass})`,
+    );
+    operations.push({
+      operation: "verify_cleanup",
+      ok: false,
+      requestId: verify.requestId,
+      objectId,
+      failureClass: verify.failureClass,
+      message: verify.message,
+      notFound: false,
+    });
+    return false;
+  };
+
+  /** Best-effort cleanup. Does not overwrite primary failureClass. */
+  const attemptCompensatingCleanup = async (objectId: string): Promise<void> => {
+    const cleanup = await input.transport.archiveContact(objectId);
+    if (!cleanup.ok) {
+      anomalies.push("cleanup failure must never be silently ignored");
+      anomalies.push(`compensating cleanup failed: ${cleanup.failureClass}`);
+      operations.push({
+        operation: "cleanup_contact",
+        ok: false,
+        requestId: cleanup.requestId,
+        objectId,
+        failureClass: cleanup.failureClass,
+        message: cleanup.message,
+      });
+      cleanupVerified = false;
+      return;
+    }
+    operations.push({
+      operation: "cleanup_contact",
+      ok: true,
+      requestId: cleanup.requestId,
+      objectId,
+    });
+    cleanupVerified = await verifyAuthoritativeAbsence(objectId);
+  };
+
+  const failAfterCreate = async (
+    objectId: string,
+    primary: HubSpotFailureClass,
+    record: HubSpotOperationRecord,
+  ): Promise<CommissioningLifecycleResult> => {
+    failureClass = primary;
+    operations.push(record);
+    await attemptCompensatingCleanup(objectId);
+    return finish(false);
+  };
+
   if (!input.config.credentialConfigured && input.config.authMechanism !== "none_configured") {
-    // Config inconsistency — treat as integration/setup defect, not a model failure.
     failureClass = "INTEGRATION_FAILURE";
     anomalies.push("credentialConfigured=false while authMechanism expects a credential");
     operations.push({
@@ -131,16 +212,15 @@ export async function runHubSpotCommissioningLifecycle(input: {
 
   const read1 = await input.transport.getContact(created.data.id);
   if (!read1.ok) {
-    failureClass = read1.failureClass;
-    operations.push({
+    return failAfterCreate(created.data.id, read1.failureClass, {
       operation: "read_contact",
       ok: false,
       requestId: read1.requestId,
       objectId: created.data.id,
       failureClass: read1.failureClass,
       message: read1.message,
+      notFound: read1.notFound,
     });
-    return finish(false);
   }
   operations.push({
     operation: "read_contact",
@@ -153,29 +233,26 @@ export async function runHubSpotCommissioningLifecycle(input: {
     cayCommissioningNote: "cay-commissioning-ok",
   });
   if (!updated.ok) {
-    failureClass = updated.failureClass;
-    operations.push({
+    return failAfterCreate(created.data.id, updated.failureClass, {
       operation: "update_contact",
       ok: false,
       requestId: updated.requestId,
       objectId: created.data.id,
       failureClass: updated.failureClass,
       message: updated.message,
+      notFound: updated.notFound,
     });
-    return finish(false);
   }
   if (updated.data.cayCommissioningNote !== "cay-commissioning-ok") {
-    failureClass = "INTEGRATION_FAILURE";
     anomalies.push("update did not persist cayCommissioningNote");
-    operations.push({
+    return failAfterCreate(created.data.id, "INTEGRATION_FAILURE", {
       operation: "update_contact",
       ok: false,
       requestId: updated.requestId,
       objectId: created.data.id,
-      failureClass,
+      failureClass: "INTEGRATION_FAILURE",
       message: "Authoritative state missing updated field",
     });
-    return finish(false);
   }
   operations.push({
     operation: "update_contact",
@@ -186,16 +263,15 @@ export async function runHubSpotCommissioningLifecycle(input: {
 
   const read2 = await input.transport.getContact(created.data.id);
   if (!read2.ok) {
-    failureClass = read2.failureClass;
-    operations.push({
+    return failAfterCreate(created.data.id, read2.failureClass, {
       operation: "read_contact",
       ok: false,
       requestId: read2.requestId,
       objectId: created.data.id,
       failureClass: read2.failureClass,
       message: read2.message,
+      notFound: read2.notFound,
     });
-    return finish(false);
   }
   operations.push({
     operation: "read_contact",
@@ -216,6 +292,7 @@ export async function runHubSpotCommissioningLifecycle(input: {
       failureClass: cleanup.failureClass,
       message: cleanup.message,
     });
+    cleanupVerified = false;
     return finish(false);
   }
   operations.push({
@@ -225,29 +302,13 @@ export async function runHubSpotCommissioningLifecycle(input: {
     objectId: created.data.id,
   });
 
-  const verify = await input.transport.getContact(created.data.id);
-  if (verify.ok) {
-    failureClass = "INTEGRATION_FAILURE";
-    anomalies.push("contact still readable after cleanup");
-    operations.push({
-      operation: "verify_cleanup",
-      ok: false,
-      requestId: verify.requestId,
-      objectId: created.data.id,
-      failureClass,
-      message: "Expected not-found after archive",
-    });
+  cleanupVerified = await verifyAuthoritativeAbsence(created.data.id);
+  if (!cleanupVerified) {
+    // Prefer an existing verify failure class if recorded; else integration.
+    const verifyOp = operations.find((row) => row.operation === "verify_cleanup" && !row.ok);
+    failureClass = verifyOp?.failureClass ?? "INTEGRATION_FAILURE";
     return finish(false);
   }
-  // Not-found after cleanup is success.
-  cleanupVerified = true;
-  operations.push({
-    operation: "verify_cleanup",
-    ok: true,
-    requestId: verify.requestId,
-    objectId: created.data.id,
-    message: verify.message,
-  });
 
   return finish(true);
 }

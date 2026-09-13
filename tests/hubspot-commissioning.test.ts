@@ -15,6 +15,10 @@ const baseConfig: HubSpotCommissioningConfig = {
   credentialConfigured: true,
 };
 
+function ops(result: Awaited<ReturnType<typeof runHubSpotCommissioningLifecycle>>) {
+  return result.receipt.operationSequence.map((row) => row.operation);
+}
+
 describe("HubSpot no-model commissioning (mock)", () => {
   it("runs preflight → create → read → update → read → cleanup → verify", async () => {
     const transport = new MockHubSpotTransport({ mode: "happy" });
@@ -25,7 +29,7 @@ describe("HubSpot no-model commissioning (mock)", () => {
     });
     expect(result.ok).toBe(true);
     expect(result.receipt.cleanupVerified).toBe(true);
-    expect(result.receipt.operationSequence.map((row) => row.operation)).toEqual([
+    expect(ops(result)).toEqual([
       "preflight",
       "create_contact",
       "read_contact",
@@ -82,16 +86,125 @@ describe("HubSpot no-model commissioning (mock)", () => {
     expect(result.failureClass).toBe("INTEGRATION_FAILURE");
   });
 
-  it("treats not-found after cleanup as verify success", async () => {
-    const transport = new MockHubSpotTransport({ mode: "happy" });
+  it("treats authoritative not-found after cleanup as verify success", async () => {
     const result = await runHubSpotCommissioningLifecycle({
-      transport,
+      transport: new MockHubSpotTransport({ mode: "happy" }),
       config: baseConfig,
       gitHead: "test-head",
     });
     const verify = result.receipt.operationSequence.find((row) => row.operation === "verify_cleanup");
     expect(verify?.ok).toBe(true);
+    expect(verify?.notFound).toBe(true);
     expect(verify?.message).toMatch(/not found/i);
+  });
+
+  it("after create failure on first read: preserves primary class and attempts cleanup", async () => {
+    const transport = new MockHubSpotTransport({
+      failAt: "first_read",
+      failureClass: "RUNTIME/API_FAILURE",
+    });
+    const result = await runHubSpotCommissioningLifecycle({
+      transport,
+      config: baseConfig,
+      gitHead: "test-head",
+    });
+    expect(result.ok).toBe(false);
+    expect(result.failureClass).toBe("RUNTIME/API_FAILURE");
+    expect(ops(result)).toEqual([
+      "preflight",
+      "create_contact",
+      "read_contact",
+      "cleanup_contact",
+      "verify_cleanup",
+    ]);
+    expect(result.receipt.cleanupVerified).toBe(true);
+    expect(transport.contacts.get("mock-contact-1")?.archived).toBe(true);
+  });
+
+  it("after create failure on update: preserves primary class and attempts cleanup", async () => {
+    const result = await runHubSpotCommissioningLifecycle({
+      transport: new MockHubSpotTransport({
+        failAt: "update",
+        failureClass: "PERMISSION_FAILURE",
+      }),
+      config: baseConfig,
+      gitHead: "test-head",
+    });
+    expect(result.ok).toBe(false);
+    expect(result.failureClass).toBe("PERMISSION_FAILURE");
+    expect(ops(result)).toContain("cleanup_contact");
+    expect(ops(result)).toContain("verify_cleanup");
+    expect(result.receipt.cleanupVerified).toBe(true);
+  });
+
+  it("after create failure on second read: attempts compensating cleanup", async () => {
+    const result = await runHubSpotCommissioningLifecycle({
+      transport: new MockHubSpotTransport({
+        failAt: "second_read",
+        failureClass: "INTEGRATION_FAILURE",
+      }),
+      config: baseConfig,
+      gitHead: "test-head",
+    });
+    expect(result.ok).toBe(false);
+    expect(result.failureClass).toBe("INTEGRATION_FAILURE");
+    expect(result.receipt.operationSequence.some((row) => row.operation === "cleanup_contact")).toBe(
+      true,
+    );
+  });
+
+  it("does not treat permission failure during verify as successful cleanup", async () => {
+    const result = await runHubSpotCommissioningLifecycle({
+      transport: new MockHubSpotTransport({ afterArchiveGet: "permission" }),
+      config: baseConfig,
+      gitHead: "test-head",
+    });
+    expect(result.ok).toBe(false);
+    expect(result.receipt.cleanupVerified).toBe(false);
+    expect(result.failureClass).toBe("PERMISSION_FAILURE");
+    const verify = result.receipt.operationSequence.find((row) => row.operation === "verify_cleanup");
+    expect(verify?.ok).toBe(false);
+    expect(verify?.notFound).toBe(false);
+  });
+
+  it("does not treat runtime failure during verify as successful cleanup", async () => {
+    const result = await runHubSpotCommissioningLifecycle({
+      transport: new MockHubSpotTransport({ afterArchiveGet: "runtime" }),
+      config: baseConfig,
+      gitHead: "test-head",
+    });
+    expect(result.ok).toBe(false);
+    expect(result.receipt.cleanupVerified).toBe(false);
+    expect(result.failureClass).toBe("RUNTIME/API_FAILURE");
+  });
+
+  it("when primary fails after create and compensating cleanup also fails, keep primary class", async () => {
+    class DualFailTransport extends MockHubSpotTransport {
+      override async archiveContact() {
+        return {
+          ok: false as const,
+          failureClass: "INTEGRATION_FAILURE" as const,
+          message: "Cleanup archive failed",
+          requestId: "mock-cleanup-fail",
+        };
+      }
+    }
+    const dual = new DualFailTransport({
+      failAt: "first_read",
+      failureClass: "RUNTIME/API_FAILURE",
+    });
+    const result = await runHubSpotCommissioningLifecycle({
+      transport: dual,
+      config: baseConfig,
+      gitHead: "test-head",
+    });
+    expect(result.ok).toBe(false);
+    expect(result.failureClass).toBe("RUNTIME/API_FAILURE");
+    expect(result.receipt.cleanupVerified).toBe(false);
+    expect(result.receipt.anomalies.some((item) => item.includes("compensating cleanup failed"))).toBe(
+      true,
+    );
+    expect(ops(result)).toContain("cleanup_contact");
   });
 
   it("never includes secret material in receipts", async () => {

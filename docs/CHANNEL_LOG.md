@@ -5,8 +5,8 @@ Short scan log. Newest first.
 ## CAY-20260913-05 — HubSpot no-model commissioning preparation
 
 STATUS: READY_FOR_REVIEW  
-What: Full RunConfig equality for transfer pairs; HubSpot commissioning mock adapter lifecycle; failure taxonomy + secret redaction; human setup runbook. Zero paid/live HubSpot.  
-Branch: `feature/cay-20260913-05-hubspot-commissioning-prep`  
+What: Full RunConfig equality for transfer pairs; HubSpot commissioning mock adapter lifecycle with compensating cleanup + authoritative NOT_FOUND verify; failure taxonomy + secret redaction; human setup runbook. Zero paid/live HubSpot.  
+Branch: `feature/cay-20260913-05-hubspot-commissioning-prep` → PR #21  
 Base: `acfa9fd` (merged PR #20)
 
 ## CAY-20260913-04 — Transfer comparison contract correction

@@ -50,6 +50,8 @@ export type HubSpotOperationRecord = {
   objectId?: string;
   failureClass?: HubSpotFailureClass;
   message?: string;
+  /** True when failure is an authoritative absence (not permission/runtime). */
+  notFound?: boolean;
 };
 
 export type HubSpotCommissioningReceipt = {
@@ -70,9 +72,20 @@ export type HubSpotCommissioningReceipt = {
   redactionStatus: "secrets_scrubbed";
 };
 
+/**
+ * Transport result.
+ * Failed reads that mean the object is gone must set `notFound: true`.
+ * Permission/runtime/integration errors must leave `notFound` unset/false.
+ */
 export type HubSpotTransportResult<T> =
   | { ok: true; data: T; requestId: string }
-  | { ok: false; failureClass: HubSpotFailureClass; message: string; requestId?: string };
+  | {
+      ok: false;
+      failureClass: HubSpotFailureClass;
+      message: string;
+      requestId?: string;
+      notFound?: boolean;
+    };
 
 export type HubSpotTransport = {
   preflight(): Promise<HubSpotTransportResult<{ scopesOk: boolean; apiVersion: string }>>;
