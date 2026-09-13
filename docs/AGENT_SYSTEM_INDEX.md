@@ -13,7 +13,9 @@ Two lists. Do not treat them as the same thing.
 5. Accepted evidence and the exact repository state.
 6. GitHub Issue #1 — the live work order.
 
-`ORIGIN_AND_DECISION_TRAIL.md`, `EXPLAINED_LIKE_IM_FIVE.md`, `DECISION_RECORD_2026-09-11.md`, `EOD_2026-09-11.md`, `CAPABILITY_INTELLIGENCE_THESIS.md`, `FALSIFICATION_AND_PHASE_THRESHOLDS.md`, `ENTERPRISE_ENVIRONMENT_VALIDATION.md`, and `HUBSPOT_TRANSFER_PREDICTION_2026-09-11.md` are explanation/strategy, not authority. `FOUR_AGENT_SYSTEM_SUMMARY.md` is a refresher, not a second architecture. `can-ai-yet-status.pdf` is a dated human snapshot, not a work order.
+`FALSIFICATION_OPERATING_METHOD.md` is the default learning/decision method for material hypotheses, but it does not independently authorize implementation, spend, deployment, or public claims.
+
+`ORIGIN_AND_DECISION_TRAIL.md`, `EXPLAINED_LIKE_IM_FIVE.md`, `DECISION_RECORD_2026-09-11.md`, `EOD_2026-09-11.md`, `CAPABILITY_INTELLIGENCE_THESIS.md`, `FALSIFICATION_AND_PHASE_THRESHOLDS.md`, `ENTERPRISE_ENVIRONMENT_VALIDATION.md`, `HUBSPOT_TRANSFER_PREDICTION_2026-09-11.md`, and `CAPABILITY_CONTROL_PLANE_HORIZON.md` are explanation/strategy, not build authority. `FOUR_AGENT_SYSTEM_SUMMARY.md` is a refresher, not a second architecture. `can-ai-yet-status.pdf` is a dated human snapshot, not a work order.
 
 ## First public CAP-001 finding (live)
 
@@ -26,7 +28,7 @@ Published under CAY-20260911-08/09:
 
 ## Human reading order
 
-These explain the product. They do not outrank the authority list above.
+These explain the product and operating method. They do not outrank the authority list above.
 
 1. `ARCHITECTURE.md` — how the website, lab, model, judge, and evidence fit together.
 2. `ACME_SERVICES_LAB.md` — the fictional company and tools.
@@ -34,12 +36,14 @@ These explain the product. They do not outrank the authority list above.
 4. `MODEL_EVALUATION_STRATEGY.md` — which configurations to test, why one gateway is enough, and how spend is demand-gated.
 5. `EVIDENCE_SOURCE_OF_TRUTH_PLAN.md` — why headline and detail must come from the same accepted run.
 6. `REAL_MODEL_RUNBOOK.md` — how a human runs or refuses a CAP-001 OpenRouter test.
-7. `CAPABILITY_INTELLIGENCE_THESIS.md` — strategic thesis: economics, moat hypotheses, demand loop, falsification.
-8. `ENTERPRISE_ENVIRONMENT_VALIDATION.md` — why the synthetic lab is a wind tunnel, how capability packs could progress into real vendor sandboxes/customer staging, and the HubSpot transfer experiment hypothesis.
-9. `HUBSPOT_TRANSFER_PREDICTION_2026-09-11.md` — pre-registered expectations for the CAP-001 HubSpot transfer; compare the eventual result against this record rather than rewriting the story afterward.
-10. `FALSIFICATION_AND_PHASE_THRESHOLDS.md` — stage gates and stop/narrow/pivot logic.
-11. `FOUR_AGENT_SYSTEM.md` — who scouts, runs, judges, and publishes.
-12. `NEXT_MISSIONS.md` — what should happen next.
+7. `FALSIFICATION_OPERATING_METHOD.md` — reusable operating discipline: form falsifiable hypotheses, design the cheapest serious test, preserve evidence, then continue/narrow/pivot/stop.
+8. `CAPABILITY_INTELLIGENCE_THESIS.md` — strategic thesis: economics, moat hypotheses, demand loop, falsification.
+9. `ENTERPRISE_ENVIRONMENT_VALIDATION.md` — why the synthetic lab is a wind tunnel, how capability packs could progress into real vendor sandboxes/customer staging, and the HubSpot transfer experiment hypothesis.
+10. `HUBSPOT_TRANSFER_PREDICTION_2026-09-11.md` — pre-registered expectations for the CAP-001 HubSpot transfer; compare the eventual result against this record rather than rewriting the story afterward.
+11. `FALSIFICATION_AND_PHASE_THRESHOLDS.md` — CanAIYet-specific stage gates and stop/narrow/pivot logic.
+12. `CAPABILITY_CONTROL_PLANE_HORIZON.md` — long-horizon hypothesis: capability graph, longitudinal evidence, and possible `measure → qualify → recommend → route → monitor → govern` progression; not a roadmap.
+13. `FOUR_AGENT_SYSTEM.md` — who scouts, runs, judges, and publishes.
+14. `NEXT_MISSIONS.md` — what should happen next.
 
 Demand Scout docs (sensor, not benchmark authority):
 
@@ -51,13 +55,14 @@ Demand Scout docs (sensor, not benchmark authority):
 
 1. This index.
 2. `../canonical-build-doc.md`
-3. `COMMUNICATION_PROTOCOL.md`
-4. `FOUR_AGENT_SYSTEM.md`
-5. `NEXT_MISSIONS.md`
-6. Issue #1, including the latest receipt.
-7. `CAPABILITY_INTELLIGENCE_THESIS.md`, `ENTERPRISE_ENVIRONMENT_VALIDATION.md`, `HUBSPOT_TRANSFER_PREDICTION_2026-09-11.md`, and `FALSIFICATION_AND_PHASE_THRESHOLDS.md` when strategic/economic/enterprise-validation direction is needed.
-8. `DEMAND_SCOUT_ARCHITECTURE.md` / `DEMAND_SCOUT_OPERATIONS.md` when working Issue #6 / PR #10.
-9. `ORIGIN_AND_DECISION_TRAIL.md` and `EXPLAINED_LIKE_IM_FIVE.md` when the why or the plain explanation is needed.
+3. `COMMUNICATION_PROTOCOL.md`.
+4. `FALSIFICATION_OPERATING_METHOD.md` when the mission exists to answer an uncertain strategic/product/market/capability/architecture question.
+5. `FOUR_AGENT_SYSTEM.md`.
+6. `NEXT_MISSIONS.md`.
+7. Issue #1, including the latest receipt.
+8. `CAPABILITY_INTELLIGENCE_THESIS.md`, `ENTERPRISE_ENVIRONMENT_VALIDATION.md`, `HUBSPOT_TRANSFER_PREDICTION_2026-09-11.md`, `FALSIFICATION_AND_PHASE_THRESHOLDS.md`, and `CAPABILITY_CONTROL_PLANE_HORIZON.md` when strategic/economic/enterprise-validation direction is needed.
+9. `DEMAND_SCOUT_ARCHITECTURE.md` / `DEMAND_SCOUT_OPERATIONS.md` when working Issue #6 / PR #10.
+10. `ORIGIN_AND_DECISION_TRAIL.md` and `EXPLAINED_LIKE_IM_FIVE.md` when the why or the plain explanation is needed.
 
 ## Name map
 
@@ -83,9 +88,11 @@ Official sequence is in `NEXT_MISSIONS.md` and `EOD_2026-09-11.md`. Tomorrow’s
 - `reviews/CAY-20260911-05.md` — fairness gate ACCEPTED for opening Demand Scout; naive bare 4/12 reliability headline still refused.
 - `reviews/CAY-20260912-01-independent-strategy-council-review.md` — post-publication strategy/construct-validity review (NARROW / ACCEPTED WITH FINDINGS).
 - `DECISION_RECORD_2026-09-11.md` / `EOD_2026-09-11.md` — Sep 11 strategy + stop point.
+- `FALSIFICATION_OPERATING_METHOD.md` — Sep 13 operating method for falsifiable hypothesis work across research/product/market/architecture decisions.
 - `ENTERPRISE_ENVIRONMENT_VALIDATION.md` — Sep 11 insight record for synthetic→real-stack→customer-staging validation and portable capability packs.
 - `HUBSPOT_TRANSFER_PREDICTION_2026-09-11.md` — pre-experiment prediction record; preserve unchanged and compare against eventual Issue #14 results to reduce hindsight bias.
+- `CAPABILITY_CONTROL_PLANE_HORIZON.md` — Sep 13 long-horizon hypothesis; preserve as strategy, not build authority.
 
 ## Stable rule
 
-The role contracts and evidence protocol matter more than any particular model vendor. Agent/model assignments can change later, but canonical product claims, provenance, independent review, and human approval boundaries must remain intact.
+The role contracts, falsification discipline, and evidence protocol matter more than any particular model vendor. Agent/model assignments can change later, but canonical product claims, provenance, independent review, human approval boundaries, and the distinction between hypothesis and accepted evidence must remain intact.
