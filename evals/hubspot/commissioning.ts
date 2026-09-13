@@ -189,7 +189,6 @@ export async function runHubSpotCommissioningLifecycle(input: {
     firstName: "Acme",
     lastName: "Commissioning",
     company: "Acme Services (synthetic)",
-    cayFixtureId: `${input.config.syntheticNamespace}-contact-1`,
   });
   if (!created.ok) {
     failureClass = created.failureClass;
@@ -230,7 +229,7 @@ export async function runHubSpotCommissioningLifecycle(input: {
   });
 
   const updated = await input.transport.updateContact(created.data.id, {
-    cayCommissioningNote: "cay-commissioning-ok",
+    jobTitle: "cay-commissioning-ok",
   });
   if (!updated.ok) {
     return failAfterCreate(created.data.id, updated.failureClass, {
@@ -243,15 +242,15 @@ export async function runHubSpotCommissioningLifecycle(input: {
       notFound: updated.notFound,
     });
   }
-  if (updated.data.cayCommissioningNote !== "cay-commissioning-ok") {
-    anomalies.push("update did not persist cayCommissioningNote");
+  if (updated.data.jobTitle !== "cay-commissioning-ok") {
+    anomalies.push("update did not persist jobtitle");
     return failAfterCreate(created.data.id, "INTEGRATION_FAILURE", {
       operation: "update_contact",
       ok: false,
       requestId: updated.requestId,
       objectId: created.data.id,
       failureClass: "INTEGRATION_FAILURE",
-      message: "Authoritative state missing updated field",
+      message: "Authoritative state missing updated jobtitle",
     });
   }
   operations.push({

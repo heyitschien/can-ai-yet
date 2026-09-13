@@ -71,7 +71,7 @@ export class MockHubSpotTransport implements HubSpotTransport {
     this.failAt = options.failAt ?? fromMode.failAt;
     this.failureClass = options.failureClass ?? fromMode.failureClass ?? "INTEGRATION_FAILURE";
     this.afterArchiveGet = options.afterArchiveGet ?? "not_found";
-    this.apiVersion = options.apiVersion ?? "2026-09";
+    this.apiVersion = options.apiVersion ?? "2026-03";
   }
 
   private nextRequestId(op: string): string {
@@ -104,7 +104,6 @@ export class MockHubSpotTransport implements HubSpotTransport {
     firstName: string;
     lastName: string;
     company: string;
-    cayFixtureId: string;
   }): Promise<HubSpotTransportResult<HubSpotSyntheticContact>> {
     if (this.failAt === "create") {
       return this.fail(this.failureClass, `Create failed: ${this.failureClass}`, "create");
@@ -116,8 +115,7 @@ export class MockHubSpotTransport implements HubSpotTransport {
       firstName: input.firstName,
       lastName: input.lastName,
       company: input.company,
-      cayCommissioningNote: null,
-      cayFixtureId: input.cayFixtureId,
+      jobTitle: null,
       archived: false,
     };
     this.contacts.set(id, contact);
@@ -155,9 +153,6 @@ export class MockHubSpotTransport implements HubSpotTransport {
     if (this.failAt === "second_read" && this.readCount === 2) {
       return this.fail(this.failureClass, `Second read failed: ${this.failureClass}`, "read");
     }
-    if (this.failAt === "verify" && contact === undefined) {
-      // Should not happen before archive; fall through.
-    }
 
     if (!contact) {
       return this.fail("INTEGRATION_FAILURE", `Contact not found: ${id}`, "read", true);
@@ -168,7 +163,7 @@ export class MockHubSpotTransport implements HubSpotTransport {
 
   async updateContact(
     id: string,
-    patch: { cayCommissioningNote: string },
+    patch: { jobTitle: string },
   ): Promise<HubSpotTransportResult<HubSpotSyntheticContact>> {
     if (this.failAt === "update") {
       return this.fail(this.failureClass, `Update failed: ${this.failureClass}`, "update");
@@ -177,7 +172,7 @@ export class MockHubSpotTransport implements HubSpotTransport {
     if (!contact || contact.archived) {
       return this.fail("INTEGRATION_FAILURE", `Contact not found: ${id}`, "update", true);
     }
-    const updated = { ...contact, cayCommissioningNote: patch.cayCommissioningNote };
+    const updated = { ...contact, jobTitle: patch.jobTitle };
     this.contacts.set(id, updated);
     return { ok: true, data: { ...updated }, requestId: this.nextRequestId("update") };
   }

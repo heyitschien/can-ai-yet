@@ -8,7 +8,7 @@ import type { HubSpotCommissioningConfig } from "@/evals/hubspot/types";
 const baseConfig: HubSpotCommissioningConfig = {
   environmentId: "hubspot-dev-test-v1",
   environmentVersion: "hubspot-transfer-v1",
-  apiVersion: "2026-09",
+  apiVersion: "2026-03",
   authMechanism: "service_key",
   portalId: "portal-test-nonsecret",
   syntheticNamespace: "cay-comm",
@@ -230,8 +230,9 @@ describe("HubSpot no-model commissioning (mock)", () => {
   it("wires EnvironmentManifest adapter versions without fabricating live portal values", () => {
     const env = hubspotCommissioningEnvironmentManifest();
     expect(env.environmentId).toBe("hubspot-dev-test-v1");
-    expect(env.adapterImplementationVersion).toBe("hubspot-commissioning-mock-v1");
-    expect(env.apiVersion).toBe("2026-09");
+    expect(env.adapterImplementationVersion).toBe("hubspot-commissioning-live-v1");
+    expect(env.apiVersion).toBe("2026-03");
     expect(env.envHeadSha).toBe("hubspot-env-head-unresolved");
+    expect(env.environmentPermissionMechanicsVersion).toBe("hubspot-envelope-a-contacts-rw-v1");
   });
 });
