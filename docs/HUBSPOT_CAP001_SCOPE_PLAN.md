@@ -14,21 +14,20 @@
 
 **Environment-level (all 12 live scenarios):** full CAP-001 live seed / preflight / authoritative snapshot needs baseline **deals**. Until `crm.objects.deals.read` + `crm.objects.deals.write` are granted, every scenario’s `liveStatus` stays `BLOCKED_SCOPE` for that environment reason — **not** because notes/tasks/meetings/emails need extra activity scopes.
 
-## Per-object API version provenance
+## Per-object / per-operation API version provenance
 
-HubSpot’s dated paths are **not** uniform. We do **not** stamp the whole environment as one date.
+HubSpot’s dated paths are **not** uniform across families **or** across operations on the same family. We do **not** stamp the whole environment as one date.
 
-| Object family | Pinned path | Why |
+| Object family | Summary pin | Operation authority |
 | --- | --- | --- |
-| Contacts | `2026-03` | Proven live in CAY-06; official dated docs still publish `/crm/objects/2026-03/contacts…` |
-| Notes | `2026-09` | Current Notes create/get Required Scopes pages |
-| Tasks | `2026-09` | Current Tasks create/get Required Scopes pages |
-| Meetings | `2026-09` | Current Meetings create/get Required Scopes pages |
-| Emails (engagement log) | `2026-09` | Current Emails create/get Required Scopes pages |
-| Deals | `2026-09` | Current Deals get/update/create Required Scopes pages |
-| Properties (setup-only) | `2026-09` | Create-property page; **not** a runtime Service Key grant |
+| Contacts | `2026-03` | search/get/update on dated `2026-03` contacts paths (proven CAY-06) |
+| Notes / Tasks / Meetings / Emails | `2026-09` | current activity Required Scopes pages |
+| Deals | **mixed (operation-level)** | create/read/update = `2026-09/0-3`; **archive = `2026-03`** |
+| Properties (setup-only) | `2026-09` | create-property; **not** a runtime Service Key grant |
 
-`EnvironmentManifest.apiVersion` remains the contacts pin (`2026-03`). `apiVersionsByObjectFamily` records the full map.
+`EnvironmentManifest.apiVersion` remains the contacts pin (`2026-03`).  
+`apiVersionsByObjectFamily` is a **summary** only.  
+`apiVersionsByOperation` + the exact matrix are authority when a family is mixed.
 
 ## Exact tool matrix
 
@@ -52,15 +51,18 @@ Columns: **CanAIYet tool → HubSpot representation → action → endpoint/vers
 
 ### Environment-owned Deal lifecycle (justifies live env scopes)
 
-These are **not** model-facing tools. They are the seed → authoritative read → reset path that keeps every CAP-001 scenario `BLOCKED_SCOPE` until Deals are authorized. Official 2026-09 Deal reference uses object-type ID **`0-3`**.
+These are **not** model-facing tools. They are the seed → authoritative read → reset path that keeps every CAP-001 scenario `BLOCKED_SCOPE` until Deals are authorized.
+
+Deal **object type ID** is **`0-3`** (Deal object definition). Create/read/update use official `2026-09/0-3` paths. **Archive must not inherit that version** — it is documented separately on the `2026-03` generic object template.
 
 | Env mechanic | HubSpot representation | Action | Endpoint / version | Required scope(s) | Grant | Live block |
 | --- | --- | --- | --- | --- | --- | --- |
 | `env.seed_deal` | Deal (`0-3`) | create (baseline seed) | `POST /crm/objects/2026-09/0-3` | `crm.objects.deals.write` | **genuinely new** | `BLOCKED_SCOPE` |
 | `env.authoritative_read_deal` | Deal (`0-3`) | read (authoritative snapshot) | `GET /crm/objects/2026-09/0-3/{dealId}` | `crm.objects.deals.read` | **genuinely new** | `BLOCKED_SCOPE` |
-| `env.archive_deal` | Deal (`0-3`) | archive/reset cleanup | `DELETE /crm/objects/2026-09/0-3/{dealId}` | `crm.objects.deals.write` | **genuinely new** | `BLOCKED_SCOPE` |
+| `env.archive_deal` | Deal (`0-3`) | archive/reset cleanup | `DELETE /crm/objects/2026-03/{objectType}/{objectId}` with `objectType=0-3` | `crm.objects.deals.write` | **genuinely new** | `BLOCKED_SCOPE` |
+| `env.batch_archive_deal` | Deal (`0-3`) | batch archive/reset | `POST /crm/objects/2026-03/0-3/batch/archive` | `crm.objects.deals.write` | **genuinely new** | `BLOCKED_SCOPE` |
 
-Batch archive alternative (same write scope): `POST /crm/objects/2026-09/0-3/batch/archive`.
+Effective single-archive URL after binding: `DELETE /crm/objects/2026-03/0-3/{objectId}` (from dated Deal archive reference + Deal object type ID). Do **not** copy create/read/update’s `2026-09` onto archive.
 
 ### Smallest future Service Key delta (if human later accepts full CAP-001 live env)
 
@@ -85,7 +87,9 @@ Create-property docs require a schemas/object-write family (`crm.schemas.contact
 
 - Contacts `2026-03` create / get / update / search Required Scopes
 - Notes / Tasks / Meetings / Emails `2026-09` create (and get) Required Scopes
-- Deals guide / create / get / update / delete Required Scopes (`0-3` object-type paths on `2026-09`)
+- Deals create / get / update Required Scopes (`0-3` on `2026-09`)
+- Deals archive Required Scopes on dated `2026-03` path (`DELETE /crm/objects/2026-03/{objectType}/{objectId}`; Deal `objectType=0-3`)
+- Deals batch archive on dated `2026-03` (`POST /crm/objects/2026-03/0-3/batch/archive`)
 - Properties create Required Scopes (setup-only)
 
 **Do not change the Service Key until this matrix is accepted and a separate human authorization receipt names the exact scopes.**

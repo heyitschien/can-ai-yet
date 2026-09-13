@@ -3,7 +3,10 @@ import {
   HUBSPOT_LAB_PORTAL_ID,
   HUBSPOT_LIVE_ADAPTER_VERSION,
 } from "@/evals/hubspot/api-version";
-import { HUBSPOT_CAP001_API_VERSIONS_BY_FAMILY } from "@/evals/hubspot/cap001/scope-matrix";
+import {
+  HUBSPOT_CAP001_API_VERSIONS_BY_FAMILY,
+  HUBSPOT_CAP001_API_VERSIONS_BY_OPERATION,
+} from "@/evals/hubspot/cap001/scope-matrix";
 import {
   HUBSPOT_CAP001_ADAPTER_VERSION,
   HUBSPOT_CAP001_PERMISSION_VERSION,
@@ -48,6 +51,7 @@ export function hubspotCap001EnvironmentManifest(
     /** Contacts-proven pin; full family map lives in apiVersionsByObjectFamily. */
     apiVersion: HUBSPOT_API_VERSION,
     apiVersionsByObjectFamily: { ...HUBSPOT_CAP001_API_VERSIONS_BY_FAMILY },
+    apiVersionsByOperation: { ...HUBSPOT_CAP001_API_VERSIONS_BY_OPERATION },
     seedResetVersion: HUBSPOT_CAP001_SEED_RESET_VERSION,
     snapshotProjectionVersion: HUBSPOT_CAP001_SNAPSHOT_VERSION,
     runnerVersion: HUBSPOT_CAP001_RUNNER_VERSION,

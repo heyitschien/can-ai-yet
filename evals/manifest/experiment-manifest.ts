@@ -58,8 +58,14 @@ export type EnvironmentManifestInput = {
    * Prefer `apiVersionsByObjectFamily` when families differ (HubSpot dated paths are not uniform).
    */
   apiVersion?: string;
-  /** Per-object-family HubSpot dated API paths (e.g. contacts=2026-03, deals=2026-09). */
+  /** Per-object-family HubSpot dated API paths (summary only when operations differ). */
   apiVersionsByObjectFamily?: Readonly<Record<string, string>>;
+  /**
+   * Operation-level HubSpot dated API pins when a family is not uniform
+   * (e.g. deals.create/read/update=2026-09, deals.archive=2026-03).
+   * Exact operation matrix remains authority when present.
+   */
+  apiVersionsByOperation?: Readonly<Record<string, string>>;
   snapshotProjectionVersion?: string;
   runnerVersion?: string;
   /** Environment-specific permission mechanics when distinct from portable contract. */
@@ -170,6 +176,9 @@ export function computeEnvironmentFingerprint(input: Omit<EnvironmentManifestInp
   const familyVersions = input.apiVersionsByObjectFamily
     ? Object.fromEntries(Object.entries(input.apiVersionsByObjectFamily).sort(([a], [b]) => a.localeCompare(b)))
     : undefined;
+  const operationVersions = input.apiVersionsByOperation
+    ? Object.fromEntries(Object.entries(input.apiVersionsByOperation).sort(([a], [b]) => a.localeCompare(b)))
+    : undefined;
   return sha({
     environmentId: input.environmentId,
     environmentVersion: input.environmentVersion,
@@ -178,6 +187,7 @@ export function computeEnvironmentFingerprint(input: Omit<EnvironmentManifestInp
     seedResetVersion: input.seedResetVersion ?? "seed-reset-v1",
     apiVersion: input.apiVersion ?? "n/a",
     apiVersionsByObjectFamily: familyVersions ?? "n/a",
+    apiVersionsByOperation: operationVersions ?? "n/a",
     snapshotProjectionVersion: input.snapshotProjectionVersion ?? "snapshot-v1",
     runnerVersion: input.runnerVersion ?? "runner-v1",
     environmentPermissionMechanicsVersion: input.environmentPermissionMechanicsVersion ?? "env-perms-v1",
@@ -311,6 +321,7 @@ export function defaultHubSpotEnvironment(
     seedResetVersion: overrides.seedResetVersion ?? "hubspot-seed-reset-v1",
     apiVersion: overrides.apiVersion ?? "2026-03",
     apiVersionsByObjectFamily: overrides.apiVersionsByObjectFamily,
+    apiVersionsByOperation: overrides.apiVersionsByOperation,
     snapshotProjectionVersion: overrides.snapshotProjectionVersion ?? "hubspot-snapshot-v1",
     runnerVersion: overrides.runnerVersion ?? "hubspot-cap001-runner-v1",
     environmentPermissionMechanicsVersion:

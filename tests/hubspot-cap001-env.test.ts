@@ -223,11 +223,18 @@ describe("HubSpot CAP-001 environment machinery (CAY-08)", () => {
     expect(env.apiVersion).toBe("2026-03");
     expect(env.apiVersionsByObjectFamily).toMatchObject({
       contacts: "2026-03",
-      deals: "2026-09",
+      deals: "mixed-operation-level",
       notes: "2026-09",
       tasks: "2026-09",
       meetings: "2026-09",
       emails: "2026-09",
+    });
+    expect(env.apiVersionsByOperation).toMatchObject({
+      "deals.create": "2026-09",
+      "deals.read": "2026-09",
+      "deals.update": "2026-09",
+      "deals.archive": "2026-03",
+      "deals.batch_archive": "2026-03",
     });
     expect(env.environmentPermissionMechanicsVersion).toBe(
       "hubspot-envelope-a-least-authority-v2",
@@ -236,7 +243,7 @@ describe("HubSpot CAP-001 environment machinery (CAY-08)", () => {
 
   it("exact scope matrix: only deals are genuinely new; activities are adapter gaps", () => {
     expect(CAP001_HUBSPOT_SCOPE_MATRIX).toHaveLength(13);
-    expect(CAP001_HUBSPOT_DEAL_ENV_LIFECYCLE).toHaveLength(3);
+    expect(CAP001_HUBSPOT_DEAL_ENV_LIFECYCLE).toHaveLength(4);
     expect(genuinelyNewScopesFromMatrix()).toEqual([
       "crm.objects.deals.read",
       "crm.objects.deals.write",
@@ -244,11 +251,17 @@ describe("HubSpot CAP-001 environment machinery (CAY-08)", () => {
     expect(toolRowsBlockedScope().map((row) => row.tool).sort()).toEqual([
       "env.archive_deal",
       "env.authoritative_read_deal",
+      "env.batch_archive_deal",
       "env.seed_deal",
       "get_deal",
       "update_deal",
     ]);
-    for (const row of toolRowsBlockedScope()) {
+    const archive = CAP001_HUBSPOT_DEAL_ENV_LIFECYCLE.find((row) => row.tool === "env.archive_deal");
+    expect(archive?.apiVersion).toBe("2026-03");
+    expect(archive?.endpoint).toBe("/crm/objects/2026-03/{objectType}/{objectId}");
+    const batch = CAP001_HUBSPOT_DEAL_ENV_LIFECYCLE.find((row) => row.tool === "env.batch_archive_deal");
+    expect(batch?.endpoint).toBe("/crm/objects/2026-03/0-3/batch/archive");
+    for (const row of toolRowsBlockedScope().filter((r) => r.tool !== "env.archive_deal" && r.tool !== "env.batch_archive_deal")) {
       expect(row.endpoint).toContain("/crm/objects/2026-09/0-3");
       expect(row.endpoint).not.toContain("/deals/");
     }

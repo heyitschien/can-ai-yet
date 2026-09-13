@@ -39,9 +39,10 @@ export const HUBSPOT_GRANTED_SCOPES = [
 ] as const;
 
 /**
- * Per-object-family API versions we pin for CAP-001.
- * Contacts stay on proven `2026-03` (CAY-06). Activity + deals current docs use `2026-09`.
- * Do not stamp the whole environment as a single date path.
+ * Per-object-family API version *summary* (not authority for every operation).
+ * Contacts stay on proven `2026-03` (CAY-06).
+ * Deals are **operation-level**: create/read/update use `2026-09`; archive uses `2026-03`.
+ * Exact operation matrix is the authority — see `HUBSPOT_CAP001_API_VERSIONS_BY_OPERATION`.
  */
 export const HUBSPOT_CAP001_API_VERSIONS_BY_FAMILY = {
   contacts: "2026-03",
@@ -49,10 +50,35 @@ export const HUBSPOT_CAP001_API_VERSIONS_BY_FAMILY = {
   tasks: "2026-09",
   meetings: "2026-09",
   emails: "2026-09",
-  deals: "2026-09",
+  /** Summary only — Deal archive is 2026-03; do not treat this as archive authority. */
+  deals: "mixed-operation-level",
   /** Properties create is setup-only; runtime Service Key must not hold schema-write. */
   properties: "2026-09",
 } as const;
+
+/**
+ * Operation-level HubSpot dated API pins for CAP-001.
+ * Never infer a destructive/reset path version from create/read/update of the same object family.
+ */
+export const HUBSPOT_CAP001_API_VERSIONS_BY_OPERATION = {
+  "contacts.search": "2026-03",
+  "contacts.read": "2026-03",
+  "contacts.write": "2026-03",
+  "notes.create": "2026-09",
+  "tasks.create": "2026-09",
+  "meetings.create": "2026-09",
+  "meetings.read": "2026-09",
+  "emails.create": "2026-09",
+  "deals.create": "2026-09",
+  "deals.read": "2026-09",
+  "deals.update": "2026-09",
+  "deals.archive": "2026-03",
+  "deals.batch_archive": "2026-03",
+  "properties.create": "2026-09",
+} as const;
+
+/** Official Deal object type ID (object definition). */
+export const HUBSPOT_DEAL_OBJECT_TYPE_ID = "0-3";
 
 export type HubSpotCap001ApiFamily = keyof typeof HUBSPOT_CAP001_API_VERSIONS_BY_FAMILY;
 
@@ -252,8 +278,8 @@ export const CAP001_HUBSPOT_SCOPE_MATRIX: readonly Cap001HubSpotScopeRow[] = [
 
 /**
  * Environment-owned Deal lifecycle (not model-facing tools).
- * Justifies crm.objects.deals.read/write for live CAP-001 seed → snapshot → reset,
- * using the same official 2026-09 `0-3` object-type paths.
+ * Justifies crm.objects.deals.read/write for live CAP-001 seed → snapshot → reset.
+ * Create/read/update use documented 2026-09 `0-3` paths; archive is a separate 2026-03 operation.
  */
 export const CAP001_HUBSPOT_DEAL_ENV_LIFECYCLE: readonly Cap001HubSpotScopeRow[] = [
   {
@@ -289,15 +315,32 @@ export const CAP001_HUBSPOT_DEAL_ENV_LIFECYCLE: readonly Cap001HubSpotScopeRow[]
     hubSpotRepresentation: "Deal (object type 0-3)",
     action: "archive/reset cleanup",
     method: "DELETE",
-    endpoint: "/crm/objects/2026-09/0-3/{dealId}",
-    apiVersion: "2026-09",
+    endpoint: "/crm/objects/2026-03/{objectType}/{objectId}",
+    apiVersion: "2026-03",
     requiredScopes: ["crm.objects.deals.write"],
     scopeLogic: "all",
     grant: "genuinely_new",
     liveBlock: "BLOCKED_SCOPE",
-    docSource: "https://developers.hubspot.com/docs/api-reference/latest/crm/objects/deals/delete-deal",
+    docSource:
+      "https://developers.hubspot.com/docs/api-reference/2026-03/crm/objects/deals/delete-deal",
     notes:
-      "Environment mechanics: reset/cleanup. Batch alternative documented as POST /crm/objects/2026-09/0-3/batch/archive (also deals.write).",
+      `Archive is operation-level provenance and must not inherit deals create/read/update 2026-09. Documented template DELETE /crm/objects/2026-03/{objectType}/{objectId}; bind objectType=${HUBSPOT_DEAL_OBJECT_TYPE_ID} from Deal object definition (effective DELETE /crm/objects/2026-03/0-3/{objectId}). Retrieved 2026-09-13.`,
+  },
+  {
+    tool: "env.batch_archive_deal",
+    hubSpotRepresentation: "Deal (object type 0-3)",
+    action: "batch archive/reset cleanup",
+    method: "POST",
+    endpoint: "/crm/objects/2026-03/0-3/batch/archive",
+    apiVersion: "2026-03",
+    requiredScopes: ["crm.objects.deals.write"],
+    scopeLogic: "all",
+    grant: "genuinely_new",
+    liveBlock: "BLOCKED_SCOPE",
+    docSource:
+      "https://developers.hubspot.com/docs/api-reference/2026-03/crm/objects/deals/batch/delete-deals",
+    notes:
+      "Exact dated batch-archive path (2026-03). Do not extrapolate batch archive from create/read/update 2026-09 or from the latest redirect alone.",
   },
 ];
 
