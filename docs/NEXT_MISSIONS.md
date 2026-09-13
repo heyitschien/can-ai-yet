@@ -7,207 +7,191 @@
 
 ## Current stopping point
 
-CAY-20260911-05 accepted the CAP-001 fairness/publication gate (Demand Scout prerequisite only; Sonnet 4/12 still unpublished).  
-CAY-20260911-06 builds credentialless Demand Scout on this branch.
+Milestone 1 is complete: CanAIYet has published its first independently reviewed real-model finding for **CAP-001 — Follow up with an inbound sales lead**.
 
-Next:
+Published observation:
 
-1. Independent review of Demand Scout (`READY_FOR_REVIEW` on Issue #1 / #6).
-2. Human Google Ads/Cloud setup using `docs/GOOGLE_ADS_DEMAND_SCOUT_SETUP.md`.
-3. One explicit `pnpm demand:smoke --seed "AI lead follow up" --country US --language en`.
-4. Issue #8 staged cost / business validation before meaningful next spend.
-5. Separate later decision: whether the Sonnet run can become accepted evidence with stratified wording (never a bare 4/12 headline).
+- Claude Sonnet 4.6
+- frozen 12-scenario CAP-001 suite
+- 4 pass / 8 fail
+- 4 observed failures met the frozen critical-failure criteria
+- single run only; **not a reliability percentage**
+- controlled synthetic Acme Services environment
+- deterministic world-state judging + independent review + public evidence
 
-Four truths stay separate: the lab worked; the first frontier-model result was mixed; publication of a public Sonnet claim is still pending; commercial demand is not proven.
+The instrument loop is therefore demonstrated once:
 
-## Current state
+```text
+frozen scenario suite
+→ real model
+→ controlled tools/world-state mutations
+→ deterministic judge
+→ preserved provenance/economics
+→ independent review
+→ public finding
+```
 
-CanAIYet already has the major pieces of the intended MVP architecture:
+What is **not** proven is whether this evidence transfers to real enterprise software or materially changes a real deployment/procurement/permission decision.
 
-- public Next.js product surface;
-- searchable capability catalog;
-- capability detail pages and methodology;
-- simulated Acme Services business environment;
-- executable scenario suites for CAP-001 through CAP-010;
-- deterministic expected/forbidden-state judging;
-- accepted evidence artifact (still `reference-agent-v1` on `main`);
-- Demand Scout module + mock CLI path (`lib/demand`, `pnpm demand:*`);
-- Supabase schema, RLS, request/event functions, and seed pipeline;
-- admin/cron/search/request foundations;
-- CI for lint, typecheck, unit tests, and build.
-
-A full Claude Sonnet 4.6 CAP-001 observation exists as unpublished review evidence on the OpenRouter prep lineage / PR #2. It is not accepted public evidence on `main`.
+Demand Scout PR #10 remains the immediate operational task. Its two independent-review correctness fixes are ready for re-review; no live Google commissioning call has been accepted yet.
 
 ---
 
-# Mission 1 — Make the evidence labeling impossible to misunderstand
+# Locked next-work sequence
 
-## Goal
+Do these in order unless the human owner explicitly changes priority.
 
-Keep the current reference-agent results useful as a harness calibration baseline while preventing visitors or future agents from mistaking those scores for measurements of contemporary frontier AI.
+## Mission A — Finish exactly one Demand Scout commissioning smoke
 
-## Why first
+Issue: **#6 — Demand Scout**
 
-Trust is the product. A technically accurate footnote is not enough if the headline can be misread.
+Sequence:
 
-## Expected work
+1. independently re-review PR #10 exact head and the two required fixes;
+2. accept credentialless Demand Scout V1 only if provenance, month parsing, tests, and secret safety are clean;
+3. walk the human owner through Google Cloud / Google Ads configuration;
+4. configure server-only credentials locally;
+5. run exactly **one** explicit read-only `pnpm demand:smoke` request;
+6. preserve a redacted provenance/data-quality receipt;
+7. independently inspect the returned rows and target metadata;
+8. **freeze Demand Scout expansion**.
 
-- Audit homepage, cards, capability headers, admin, structured metadata, and grounded-answer copy.
-- Label reference results explicitly as **Reference baseline / harness validation** or equivalent.
-- Do not describe them as proof of what frontier AI can do today.
-- Preserve the results; do not delete the baseline.
-- Add tests covering evidence/provider labeling if practical.
+Do not immediately add scheduling, Supabase demand tables, broad discovery, embeddings/HDBSCAN/LLM clustering, or autonomous demand→benchmark execution.
 
-## Acceptance
-
-A reasonable visitor cannot confuse `reference-agent-v1` with a tested frontier model.
-
----
-
-# Mission 2 — Run CAP-001 with one real frontier-model provider
-
-## Goal
-
-Complete the first genuine end-to-end CanAIYet evaluation:
-
-`CAP-001 scenarios → real model → simulated tools → deterministic judge → persisted run → human review → accepted evidence`
-
-## Why this is the breakthrough
-
-The canonical product promise is not “we designed tests.” It is “we test real work so you do not have to guess.” The existing harness proves we can define and judge the work. A real provider proves the actual product loop.
-
-## Constraints
-
-- Start with CAP-001 only.
-- Keep the existing scenario definitions frozen for the run.
-- The model must not see expected or forbidden assertions.
-- The model should receive only the allowed tools for each scenario.
-- Tool calls must mutate the same controlled `World` that the judge inspects.
-- No LLM-as-judge for deterministic business outcomes.
-- Record exact model/provider/version where available.
-- Add explicit cost/token accounting and a maximum-spend guard.
-- Do not automatically run paid model evals in normal CI.
-
-## Suggested first provider
-
-Implement one provider correctly. The architecture already anticipates provider adapters; there is no need to build a multi-model router yet.
-
-## Acceptance
-
-All CAP-001 scenarios can execute against a real model through the common provider boundary, and the result is reproducible and distinguishable from the reference baseline.
+The purpose of this smoke is to learn what the real Google data looks like, not to turn Demand Scout into the product.
 
 ---
 
-# Mission 3 — Make Supabase the durable evidence ledger
+## Mission B — CAP-001 Reality Transfer Test design
 
-## Goal
+Issue: **#14 — CAP-001 Reality Transfer Test — HubSpot sandbox**
 
-Persist accepted benchmark provenance as normalized database evidence rather than only capability summaries.
+After the one Demand Scout smoke, design the next major technical falsification experiment:
 
-## Current gap
+> Can the same CAP-001 capability test move from our deterministic synthetic CRM into one real CRM test environment while preserving useful comparability, reproducibility, and authoritative judging?
 
-The schema already contains `test_scenarios`, `test_runs`, `test_results`, and `accepted_test_run_id`, but the current seed path primarily writes capability summary rows while detailed scenario results remain in `evals/accepted/latest.json`.
+First target: **HubSpot developer test environment**.
 
-## Expected work
+The first deliverable is **design only**. Define:
 
-- Persist scenario definitions/IDs in `test_scenarios`.
-- Insert each intentional benchmark execution into `test_runs`.
-- Insert each scenario outcome into `test_results`.
-- Preserve failure explanations and criticality.
-- Mark acceptance explicitly instead of equating “latest” with “accepted.”
-- Set `capabilities.accepted_test_run_id` only after approval.
-- Generate public capability summary fields from the accepted run.
-- Keep Git/repository evidence as a reproducibility artifact rather than the only detailed evidence store.
+- what capability/scenario semantics remain invariant;
+- synthetic action → HubSpot object/API mapping;
+- fixture seed/reset strategy;
+- permissions/OAuth envelope;
+- deterministic judge strategy;
+- provenance/evidence requirements;
+- expected engineering/model/API cost;
+- explicit CONTINUE / NARROW / PIVOT criteria.
 
-## Why
+Then STOP for independent review before building the integration or spending on a new model run.
 
-The long-term asset is the historical capability dataset. Normalized run/result history enables real charts, model/config comparisons, regression detection, provenance, and trustworthy historical change.
-
----
-
-# Mission 4 — Close the engineering proof gaps
-
-## Goal
-
-Meet the canonical testing/security definition of done around the first real vertical slice.
-
-## Work
-
-Add or verify:
-
-- capability DB query integration test;
-- request submission integration test;
-- persisted test-run integration test;
-- admin authorization/mutation coverage;
-- homepage/search/capability/request UI flow tests;
-- RLS/database security tests proving anonymous users cannot mutate benchmark evidence;
-- evaluation harness tests proving forbidden-state violations fail;
-- `scripts/publish-results.ts`, which is currently referenced by `package.json` but absent, or remove/replace the command with a documented intentional mechanism.
-
-Do not turn this into a giant test-framework project. Cover the trust boundary and first vertical slice.
+Do not broaden to Salesforce, Dynamics, CAP-002+, or customer production systems in this mission.
 
 ---
 
-# Who executes these missions
+## Mission C — Practitioner decision-utility validation
 
-Role assignments live in `docs/FOUR_AGENT_SYSTEM.md`. For this sequence:
+Issue: **#15 — Practitioner validation — does CAP-001 evidence change a real decision?**
 
-- **Coordinator (ChatGPT/Solace)** writes the bounded work order and does not accept the builder's own summary.
-- **Builder (Cursor)** implements the labeling, provider path, persistence, and tests after the plan is approved. It does not spend model money until a spend cap is approved.
-- **Independent reviewer (fresh Cursor context)** checks the exact head before any public claim changes.
-- **Human owner** approves meaningful spend, destructive database changes, and publication of a real-model score.
-- **Scout (Grok)** is not required for the first CAP-001 implementation. It starts when we watch for later changes that should trigger a retest.
+Run this learning track in parallel with the HubSpot transfer work.
 
-# Mission 5 — Independently accept the first real CAP-001 run
+Show the published CAP-001 report to people close to actual agent deployment/evaluation and ask decision questions, not praise questions.
 
-## Flow
+The key test is:
 
-1. Freeze fixture/scenario version.
-2. Record exact git SHA.
-3. Record provider/model configuration and spend cap.
-4. Execute CAP-001.
-5. Persist the run and individual results.
-6. Inspect all failures.
-7. Rerun suspicious/non-deterministic cases when justified without changing the expected answer.
-8. Independent reviewer checks exact evidence.
-9. Explicitly accept or reject the run.
-10. Only then update the public capability result.
+> **Would this evidence materially change a deployment, permission, supervision, model-selection, internal-testing, or procurement decision?**
 
-## Success condition
+Strong signals:
 
-A visitor can open CAP-001 and see a genuine frontier-model score, exactly what passed/failed, evidence level = simulation, model/configuration, date, supervision guidance, and enough provenance to reproduce the claim.
+- a concrete decision is changed or sharpened;
+- a practitioner asks for real-stack/private/staging evaluation;
+- they want the failure traces/methodology for an actual deployment;
+- they ask whether CanAIYet can run the capability pack in their environment;
+- they introduce the person who owns assurance/testing;
+- willingness-to-pay emerges naturally and specifically.
 
-At that moment the core CanAIYet loop is alive.
+Weak/negative signals are equally important:
 
----
+- "interesting" but no changed decision;
+- internal evals fully solve the need;
+- synthetic evidence is considered non-transferable;
+- no interest in private/staging testing.
 
-# After that
-
-Repeat the same disciplined loop for CAP-002 and CAP-003 before racing to broaden the benchmark.
-
-A few deeply credible capabilities are strategically more valuable than many weakly measured pages.
-
-Once multiple accepted runs exist, add history/change views from real recorded deltas. Once multiple models/configurations have enough comparable evidence, consider comparison views. Do not publish a leaderboard merely because the schema can support one.
+Do not broaden the benchmark merely to get positive reactions.
 
 ---
 
-# What not to do now
+# The strategic experiment ladder
 
-Do not prioritize:
+CanAIYet should climb only when the previous level earns the next one:
 
-- more frontend polish for its own sake;
-- hundreds of new capabilities;
-- a multi-model router;
-- autonomous score publishing;
-- complicated agent orchestration;
-- production customer integrations;
-- a generic AI news feed;
-- a model leaderboard without comparable evidence.
+```text
+LEVEL 1 — deterministic synthetic wind tunnel     ✅ demonstrated
+        ↓
+LEVEL 2 — real software sandbox + synthetic data  ← next technical falsification
+        ↓
+LEVEL 3 — customer staging/sandbox environment    ← only if Level 2 transfers + demand exists
+        ↓
+LEVEL 4 — production-derived private regressions  ← only if customers pull us there
+```
 
-The next leverage point is **evidence quality**, not surface-area growth.
+The working thesis is not that companies should trust CanAIYet **instead of** their internal evals.
+
+The stronger hypothesis is that CanAIYet could become a standardized capability-test and independent evidence layer that complements internal evals and eventually runs inside customer staging environments.
+
+See `docs/ENTERPRISE_ENVIRONMENT_VALIDATION.md`.
+
+---
+
+# Focus discipline
+
+Stay deep in **Sales / Revenue Operations** for now rather than opening many vertical labs.
+
+CAP-001 already exercises reusable primitives:
+
+- CRM state;
+- identity resolution;
+- customer communication;
+- scheduling;
+- policy/pricing authority;
+- opt-outs;
+- escalation;
+- permissions.
+
+New domains/categories must earn entry through evidence and demand. Do not build Sales + Support + HR + Finance + Legal labs in parallel.
+
+---
+
+# What we are trying to falsify next
+
+The highest-value technical hypothesis is:
+
+> **A portable capability test designed in CanAIYet's controlled lab can produce useful, comparable evidence when moved into real enterprise software.**
+
+The highest-value product hypothesis is:
+
+> **Relevant practitioners find the evidence decision-useful enough to change how they deploy, supervise, select, or request evaluation of agents.**
+
+Either hypothesis may fail. A clean negative result is a successful experiment because it prevents broader sunk cost.
+
+---
+
+# Hard stops
+
+Until separately authorized:
+
+- no broad Demand Scout expansion after the one smoke;
+- no autonomous benchmark spend from demand data;
+- no CAP-002+ expansion merely because the lab works;
+- no multi-CRM integration project;
+- no production customer data;
+- no certification claims;
+- no reliability percentage from the one Sonnet run;
+- no large multi-model leaderboard campaign;
+- no customer-environment build before the HubSpot transfer design is reviewed.
 
 ---
 
 # One-sentence direction
 
-**Keep the current reference agent as the laboratory's calibration robot, put one real AI model through CAP-001, store every result as durable evidence, independently review it, and only then let the public product make the claim.**
+**Close the Demand Scout experiment with one real read-only smoke, then test whether CAP-001 transfers into one real HubSpot environment while simultaneously asking real practitioners whether the published evidence changes an actual decision.**
