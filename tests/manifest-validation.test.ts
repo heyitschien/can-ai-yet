@@ -147,6 +147,55 @@ describe("transfer-comparison gate", () => {
       }),
     ).toBe("INCOMPARABLE");
   });
+
+  it("any relevant RunConfig control difference makes transfer INCOMPARABLE", () => {
+    const capability = defaultCapabilityContract();
+    const synthetic = defaultSyntheticEnvironment();
+    const hubspot = defaultHubSpotEnvironment();
+    const base = defaultRunConfig({
+      model: "anthropic/claude-sonnet-4.6",
+      provider: "openrouter",
+      route: "default",
+      permissionEnvelope: "envelope-a",
+      maxSpendUsd: 1,
+      maxTurns: 8,
+      maxTokens: 800,
+      maxRetries: 0,
+      allowFallbacks: false,
+    });
+    const diffs: Array<Partial<typeof base>> = [
+      { route: "other-route" },
+      { permissionEnvelope: "envelope-b" },
+      { maxSpendUsd: 2 },
+      { maxTurns: 9 },
+      { maxTokens: 900 },
+      { maxRetries: 1 },
+      { allowFallbacks: true },
+      { provider: "direct" },
+    ];
+    for (const diff of diffs) {
+      expect(
+        compareTransferPair({
+          capabilityA: capability,
+          capabilityB: capability,
+          environmentA: synthetic,
+          environmentB: hubspot,
+          runConfigA: base,
+          runConfigB: { ...base, ...diff },
+        }),
+      ).toBe("INCOMPARABLE");
+    }
+    expect(
+      compareTransferPair({
+        capabilityA: capability,
+        capabilityB: capability,
+        environmentA: synthetic,
+        environmentB: hubspot,
+        runConfigA: base,
+        runConfigB: { ...base },
+      }),
+    ).toBe("COMPARABLE_TRANSFER_PAIR");
+  });
 });
 
 describe("run receipt validation", () => {
