@@ -65,7 +65,7 @@ Comparable experiments use two fingerprints — see `evals/manifest/experiment-m
 Gates (do not confuse them):
 
 - **Cross-model (synthetic):** same CapabilityContract + same EnvironmentManifest/head; different model allowed → `COMPARABLE_MODEL_RUNS`.
-- **Synthetic ↔ HubSpot transfer:** same CapabilityContract + intentionally different EnvironmentManifest; same model/config held fixed → `COMPARABLE_TRANSFER_PAIR`.
+- **Synthetic ↔ HubSpot transfer:** same CapabilityContract + intentionally different EnvironmentManifest; **full RunConfig equality** (model/provider/route/permission envelope/limits/fallbacks) held fixed → `COMPARABLE_TRANSFER_PAIR`.
 
 Different accepted environment heads are not model-comparable. Different capability-contract fingerprints make transfer pairs incomparable.
 

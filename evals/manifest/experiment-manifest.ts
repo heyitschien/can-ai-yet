@@ -211,10 +211,25 @@ export function compareModelRuns(input: {
   return "COMPARABLE_MODEL_RUNS";
 }
 
+/** Fixed-model transfer runs require full relevant RunConfig equality. */
+export function runConfigsEqualForTransfer(a: RunConfig, b: RunConfig): boolean {
+  return (
+    a.model === b.model &&
+    a.provider === b.provider &&
+    (a.route ?? "") === (b.route ?? "") &&
+    (a.permissionEnvelope ?? "") === (b.permissionEnvelope ?? "") &&
+    (a.maxSpendUsd ?? null) === (b.maxSpendUsd ?? null) &&
+    (a.maxTurns ?? null) === (b.maxTurns ?? null) &&
+    (a.maxTokens ?? null) === (b.maxTokens ?? null) &&
+    (a.maxRetries ?? null) === (b.maxRetries ?? null) &&
+    a.allowFallbacks === b.allowFallbacks
+  );
+}
+
 /**
  * Synthetic ↔ HubSpot (or other env) reality transfer:
  * same CapabilityContract + intentionally different EnvironmentManifest;
- * same chosen model/configuration held fixed.
+ * same chosen model/configuration held fixed (full RunConfig equality).
  */
 export function compareTransferPair(input: {
   capabilityA: CapabilityContractManifest;
@@ -233,9 +248,7 @@ export function compareTransferPair(input: {
   if (input.environmentA.environmentId === input.environmentB.environmentId) {
     return "INCOMPARABLE";
   }
-  if (input.runConfigA.model !== input.runConfigB.model) return "INCOMPARABLE";
-  if (input.runConfigA.provider !== input.runConfigB.provider) return "INCOMPARABLE";
-  if ((input.runConfigA.permissionEnvelope ?? "") !== (input.runConfigB.permissionEnvelope ?? "")) {
+  if (!runConfigsEqualForTransfer(input.runConfigA, input.runConfigB)) {
     return "INCOMPARABLE";
   }
   return "COMPARABLE_TRANSFER_PAIR";
@@ -284,11 +297,11 @@ export function defaultHubSpotEnvironment(
     environmentVersion: overrides.environmentVersion ?? "hubspot-transfer-v1",
     fixtureVersion: overrides.fixtureVersion ?? FIXTURE_VERSION,
     envHeadSha: overrides.envHeadSha ?? "hubspot-env-head-placeholder",
-    adapterImplementationVersion: overrides.adapterImplementationVersion ?? "hubspot-adapter-planned-v1",
+    adapterImplementationVersion: overrides.adapterImplementationVersion ?? "hubspot-commissioning-mock-v1",
     seedResetVersion: overrides.seedResetVersion ?? "hubspot-seed-reset-planned-v1",
     apiVersion: overrides.apiVersion ?? "2026-09",
     snapshotProjectionVersion: overrides.snapshotProjectionVersion ?? "hubspot-snapshot-planned-v1",
-    runnerVersion: overrides.runnerVersion,
+    runnerVersion: overrides.runnerVersion ?? "hubspot-commissioning-runner-v1",
     environmentPermissionMechanicsVersion:
       overrides.environmentPermissionMechanicsVersion ?? "hubspot-envelope-a-v1",
   });

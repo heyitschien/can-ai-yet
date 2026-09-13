@@ -212,9 +212,11 @@ Preserve at minimum:
 **Do not confuse the two comparison gates:**
 
 - **Claude-vs-GPT (within synthetic):** same CapabilityContract + same EnvironmentManifest/head; model may differ.
-- **Synthetic-vs-HubSpot transfer:** same CapabilityContract + intentionally different EnvironmentManifest; hold the same model/config so environment is the primary changed variable.
+- **Synthetic-vs-HubSpot transfer:** same CapabilityContract + intentionally different EnvironmentManifest; hold the **full** RunConfig fixed (model, provider, route, permission envelope, max spend/turns/tokens/retries, fallback policy) so environment is the primary changed variable.
 
 Calling synthetic and HubSpot the “same LabManifest” is incorrect — they share the capability/transfer contract, not the environment-specific lab fingerprint.
+
+**No-model commissioning prep:** mock lifecycle + human setup runbook live in `docs/HUBSPOT_COMMISSIONING_SETUP.md` and `evals/hubspot/` (live smoke still separately authorized).
 
 ---
 
