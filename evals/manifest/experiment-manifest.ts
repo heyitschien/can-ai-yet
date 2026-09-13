@@ -299,7 +299,7 @@ export function defaultHubSpotEnvironment(
     envHeadSha: overrides.envHeadSha ?? "hubspot-env-head-placeholder",
     adapterImplementationVersion: overrides.adapterImplementationVersion ?? "hubspot-commissioning-live-v1",
     seedResetVersion: overrides.seedResetVersion ?? "hubspot-seed-reset-planned-v1",
-    apiVersion: overrides.apiVersion ?? "2026-09",
+    apiVersion: overrides.apiVersion ?? "2026-03",
     snapshotProjectionVersion: overrides.snapshotProjectionVersion ?? "hubspot-snapshot-planned-v1",
     runnerVersion: overrides.runnerVersion ?? "hubspot-commissioning-runner-v1",
     environmentPermissionMechanicsVersion:

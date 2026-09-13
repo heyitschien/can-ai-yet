@@ -14,12 +14,13 @@
 
 ### Real transport Stage A (CAY-06) — no live mutation in Stage A
 
-- Official Contacts path pinned: `POST/GET/PATCH/DELETE https://api.hubapi.com/crm/objects/2026-09/contacts`
-  - Source: HubSpot latest Contacts API guide
+- Official Contacts path pinned: `POST/GET/PATCH/DELETE https://api.hubapi.com/crm/objects/2026-03/contacts`
+  - Source: HubSpot Contacts OpenAPI/reference (`/crm/objects/2026-03/{objectType}`); intentionally the documented version, not a guessed newer date
 - Standard properties only: `email`, `firstname`, `lastname`, `company`, `jobtitle`
 - Harmless update field: standard `jobtitle` = `cay-commissioning-ok`
 - Synthetic namespace convention: `{namespace}.acme.contact@example.invalid`
 - Live smoke script is **fail-closed** unless `CAY_HUBSPOT_LIVE_SMOKE=AUTHORIZED`
+- `pnpm hubspot:commissioning-smoke` loads repo-local `.env.local` for `HUBSPOT_SERVICE_KEY` (never prints the key)
 
 ## Frozen non-secret environment (2026-09-13)
 
@@ -29,7 +30,7 @@
 | Portal / test account ID | `247381023` |
 | Auth | Service Key `CanAIYet CAP-001 Commissioning` |
 | Scopes | `crm.objects.contacts.read`, `crm.objects.contacts.write` |
-| API version | `2026-09` |
+| API version | `2026-03` |
 | Adapter version | `hubspot-commissioning-live-v1` |
 | Hubs (creation snapshot) | Sales Enterprise; other hubs Free |
 | Trial note | 90-day Enterprise window refreshes on API activity (dynamic) |
@@ -43,6 +44,8 @@ Exactly one authorized command shape:
 ```bash
 CAY_HUBSPOT_LIVE_SMOKE=AUTHORIZED CAY_GIT_HEAD=$(git rev-parse HEAD) pnpm hubspot:commissioning-smoke
 ```
+
+The script loads `.env.local` from the repo root before reading `HUBSPOT_SERVICE_KEY`. Shell-exported env still wins over the file. The key is never printed.
 
 Lifecycle: preflight → create one namespaced contact → read → update `jobtitle` → read → DELETE/archive → authoritative 404/`notFound` verify.
 

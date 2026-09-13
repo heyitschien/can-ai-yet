@@ -4,11 +4,11 @@ Short scan log. Newest first.
 
 ## CAY-20260913-06 — HubSpot Stage A live transport (no mutation)
 
-STATUS: READY_FOR_REVIEW  
-What: Real `LiveHubSpotTransport` for `/crm/objects/2026-09/contacts`; standard fields only (`jobtitle` update); fail-closed live smoke entry; injected-fetch tests. Zero live CRM mutations; zero model calls.  
+STATUS: READY_FOR_REVIEW (post CHANGES_REQUESTED: API `2026-03` + `.env.local` loader)  
+What: Real `LiveHubSpotTransport` for `/crm/objects/2026-03/contacts`; standard fields only (`jobtitle` update); fail-closed live smoke + deterministic `.env.local` load (never prints key). Zero live CRM mutations; zero model calls.  
 Branch: `feature/cay-20260913-06-hubspot-live-transport` (tip SHA in Linear / PR)  
 Base: `4a0d1c9` (merged PR #21)  
-Evidence: `pnpm test` 85 pass; lint/typecheck/build green; smoke without auth fails closed.
+Evidence: `pnpm test`; lint/typecheck/build; smoke without auth fails closed.
 
 ## CAY-20260913-05 — HubSpot no-model commissioning preparation
 

@@ -1,21 +1,21 @@
 /**
- * Official HubSpot Contacts API path/version choice for CAY-06 Stage A.
+ * Official HubSpot Contacts API path/version choice for CAY-06.
  *
- * Source (2026-09-13): HubSpot Developers “Contacts API” under api-reference/latest
- * https://developers.hubspot.com/docs/api-reference/latest/crm/objects/contacts/guide
+ * Decision (CAY-06 Stage A correction): pin documented `2026-03`.
+ * HubSpot migration guidance: copy the documented endpoint path exactly;
+ * do not guess newer date versions from changelogs or guide HTML drift.
  *
- * Confirmed endpoints use date-based versioning:
- *   POST/GET/PATCH/DELETE `/crm/objects/2026-09/contacts[...]`
+ * Primary sources (Contacts reference / OpenAPI):
+ * - https://developers.hubspot.com/docs/api-reference/latest/crm/objects/contacts/get-contacts
+ *   → `GET /crm/objects/2026-03/{objectType}`
+ * - https://developers.hubspot.com/docs/api-reference/latest/crm/objects/contacts/create-contact
+ *   → `POST /crm/objects/2026-03/{objectType}`
  *
- * Related: `/2026-09/` enforces admin CRM write-validation rules
- * https://developers.hubspot.com/changelog/crm-api-write-validation-enforcement
- *
- * Decision: pin `2026-09` — matches latest Contacts guide and prior design assumption.
  * Do not fall back to legacy `/crm/v3/...` for new live commissioning.
  */
 
 export const HUBSPOT_API_HOST = "https://api.hubapi.com";
-export const HUBSPOT_API_VERSION = "2026-09";
+export const HUBSPOT_API_VERSION = "2026-03";
 export const HUBSPOT_CONTACTS_PATH = `/crm/objects/${HUBSPOT_API_VERSION}/contacts`;
 export const HUBSPOT_CONTACTS_URL = `${HUBSPOT_API_HOST}${HUBSPOT_CONTACTS_PATH}`;
 
@@ -42,4 +42,4 @@ export const HUBSPOT_CONTACT_PROPERTIES = [
 ] as const;
 
 export const HUBSPOT_API_VERSION_SOURCE =
-  "https://developers.hubspot.com/docs/api-reference/latest/crm/objects/contacts/guide";
+  "https://developers.hubspot.com/docs/api-reference/latest/crm/objects/contacts/get-contacts";

@@ -71,7 +71,7 @@ export class MockHubSpotTransport implements HubSpotTransport {
     this.failAt = options.failAt ?? fromMode.failAt;
     this.failureClass = options.failureClass ?? fromMode.failureClass ?? "INTEGRATION_FAILURE";
     this.afterArchiveGet = options.afterArchiveGet ?? "not_found";
-    this.apiVersion = options.apiVersion ?? "2026-09";
+    this.apiVersion = options.apiVersion ?? "2026-03";
   }
 
   private nextRequestId(op: string): string {

@@ -1,3 +1,6 @@
+import { mkdtempSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { describe, expect, it, vi } from "vitest";
 import {
   HUBSPOT_API_VERSION,
@@ -8,6 +11,11 @@ import {
 import { classifyHubSpotHttpStatus } from "@/evals/hubspot/http";
 import { assertHubSpotLiveSmokeAuthorized, isHubSpotLiveSmokeAuthorized } from "@/evals/hubspot/live-gate";
 import { LiveHubSpotTransport } from "@/evals/hubspot/live-transport";
+import {
+  HUBSPOT_SERVICE_KEY_ENV,
+  isHubSpotServiceKeyConfigured,
+  loadRepoEnvLocal,
+} from "@/evals/hubspot/local-env";
 import { assertNoSecrets } from "@/evals/hubspot/redact";
 
 function jsonResponse(status: number, body: unknown, headers: Record<string, string> = {}): Response {
@@ -46,7 +54,7 @@ describe("HubSpot HTTP status classification", () => {
 });
 
 describe("LiveHubSpotTransport (injected fetch)", () => {
-  it("builds create request against /crm/objects/2026-09/contacts with standard properties only", async () => {
+  it("builds create request against /crm/objects/2026-03/contacts with standard properties only", async () => {
     const fetchImpl = vi.fn(async (url: string | URL, init?: RequestInit) => {
       expect(String(url)).toBe(HUBSPOT_CONTACTS_URL);
       expect(init?.method).toBe("POST");
@@ -218,8 +226,47 @@ describe("live smoke authorization gate", () => {
     expect(() => assertHubSpotLiveSmokeAuthorized({ CAY_HUBSPOT_LIVE_SMOKE: "AUTHORIZED" })).not.toThrow();
   });
 
-  it("pins API version 2026-09", () => {
-    expect(HUBSPOT_API_VERSION).toBe("2026-09");
-    expect(HUBSPOT_CONTACTS_URL).toContain("/crm/objects/2026-09/contacts");
+  it("pins API version 2026-03", () => {
+    expect(HUBSPOT_API_VERSION).toBe("2026-03");
+    expect(HUBSPOT_CONTACTS_URL).toContain("/crm/objects/2026-03/contacts");
+  });
+});
+
+describe("local .env.local loader for HubSpot smoke", () => {
+  it("loads HUBSPOT_SERVICE_KEY presence without exposing the value", () => {
+    const dir = mkdtempSync(join(tmpdir(), "cay-hubspot-env-"));
+    writeFileSync(
+      join(dir, ".env.local"),
+      `${HUBSPOT_SERVICE_KEY_ENV}=super-secret-test-value-do-not-print\n`,
+      "utf8",
+    );
+    const env: Record<string, string | undefined> = {};
+    const result = loadRepoEnvLocal({ cwd: dir, env });
+
+    expect(result.fileLoaded).toBe(true);
+    expect(result.serviceKeyConfigured).toBe(true);
+    expect(isHubSpotServiceKeyConfigured(env)).toBe(true);
+    expect(JSON.stringify(result)).not.toContain("super-secret-test-value-do-not-print");
+    // Value is in env for the process, but presence helpers never return it.
+    expect(env[HUBSPOT_SERVICE_KEY_ENV]).toBeDefined();
+  });
+
+  it("does not override an already-set shell env value", () => {
+    const dir = mkdtempSync(join(tmpdir(), "cay-hubspot-env-"));
+    writeFileSync(join(dir, ".env.local"), `${HUBSPOT_SERVICE_KEY_ENV}=from-file\n`, "utf8");
+    const env: Record<string, string | undefined> = {
+      [HUBSPOT_SERVICE_KEY_ENV]: "from-shell",
+    };
+    loadRepoEnvLocal({ cwd: dir, env });
+    expect(env[HUBSPOT_SERVICE_KEY_ENV]).toBe("from-shell");
+  });
+
+  it("fail-closes presence when file and key are absent", () => {
+    const dir = mkdtempSync(join(tmpdir(), "cay-hubspot-env-"));
+    const env: Record<string, string | undefined> = {};
+    const result = loadRepoEnvLocal({ cwd: dir, env });
+    expect(result.fileLoaded).toBe(false);
+    expect(result.serviceKeyConfigured).toBe(false);
+    expect(isHubSpotServiceKeyConfigured(env)).toBe(false);
   });
 });
