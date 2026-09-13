@@ -41,6 +41,12 @@ These explain the product. They do not outrank the authority list above.
 11. `FOUR_AGENT_SYSTEM.md` — who scouts, runs, judges, and publishes.
 12. `NEXT_MISSIONS.md` — what should happen next.
 
+Demand Scout docs (sensor, not benchmark authority):
+
+- `DEMAND_SCOUT_ARCHITECTURE.md`
+- `GOOGLE_ADS_DEMAND_SCOUT_SETUP.md`
+- `DEMAND_SCOUT_OPERATIONS.md`
+
 ## First read for a fresh agent
 
 1. This index.
@@ -50,7 +56,8 @@ These explain the product. They do not outrank the authority list above.
 5. `NEXT_MISSIONS.md`
 6. Issue #1, including the latest receipt.
 7. `CAPABILITY_INTELLIGENCE_THESIS.md`, `ENTERPRISE_ENVIRONMENT_VALIDATION.md`, `HUBSPOT_TRANSFER_PREDICTION_2026-09-11.md`, and `FALSIFICATION_AND_PHASE_THRESHOLDS.md` when strategic/economic/enterprise-validation direction is needed.
-8. `ORIGIN_AND_DECISION_TRAIL.md` and `EXPLAINED_LIKE_IM_FIVE.md` when the why or the plain explanation is needed.
+8. `DEMAND_SCOUT_ARCHITECTURE.md` / `DEMAND_SCOUT_OPERATIONS.md` when working Issue #6 / PR #10.
+9. `ORIGIN_AND_DECISION_TRAIL.md` and `EXPLAINED_LIKE_IM_FIVE.md` when the why or the plain explanation is needed.
 
 ## Name map
 

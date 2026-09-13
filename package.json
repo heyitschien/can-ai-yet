@@ -11,14 +11,20 @@
     "test": "vitest run",
     "eval": "tsx scripts/run-evals.ts",
     "seed": "tsx scripts/seed.ts",
-    "publish:results": "tsx scripts/publish-results.ts"
+    "publish:results": "tsx scripts/publish-results.ts",
+    "demand:discover": "tsx scripts/demand-discover.ts",
+    "demand:history": "tsx scripts/demand-history.ts",
+    "demand:smoke": "tsx scripts/demand-smoke.ts"
   },
   "pnpm": {
-    "onlyBuiltDependencies": ["esbuild"]
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",
     "@supabase/supabase-js": "^2.116.0",
+    "google-auth-library": "^11.0.2",
     "lucide-react": "^1.44.0",
     "next": "16.3.4",
     "react": "19.2.8",

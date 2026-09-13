@@ -2,6 +2,13 @@
 
 Short scan log. Newest first.
 
+## CAY-20260912-03 — Demand Scout sync with main
+
+STATUS: READY_FOR_REVIEW  
+What: Merged current `main` into `feature/cay-20260911-06-demand-scout` to clear PR #10 dirty/conflicting merge state. Docs conflicts only (index, channel log, next missions). No Demand Scout feature expansion. Zero live Google / model spend in this receipt.  
+PR: #10  
+Next: independent review of synchronized exact head.
+
 ## CAY-20260911-12 — HubSpot prediction frozen
 
 STATUS: PRE-REGISTRATION PRESERVED  
@@ -50,6 +57,21 @@ What: First public CAP-001 Sonnet finding publication candidate. Headline + 12 r
 Public page: `/capabilities/follow-up-with-sales-leads`  
 Report: `docs/public/CAP-001-SONNET-4.6-FIRST-FINDING.md`  
 Next: independent review of exact publication head before merge/deploy.
+
+## CAY-20260911-07 — 2026-09-11
+
+STATUS: READY_FOR_REVIEW  
+What: Fixed PR #10 blockers — reject unsupported country/language (no silent US/en mislabel); parse Google `MonthOfYear` enums without inventing month `0`. Focused regression tests added.  
+Branch: `feature/cay-20260911-06-demand-scout`  
+Next: independent re-review. No Google live call. No model spend.
+
+## CAY-20260911-06 — 2026-09-11
+
+STATUS: READY_FOR_REVIEW  
+What: Credentialless Demand Scout build — Google Ads v25 adapter, mock fixtures, cache, clustering, CLI, docs. Zero live Google calls in default/CI path. No developer token. No benchmark spend.  
+Branch: `feature/cay-20260911-06-demand-scout`  
+Docs: `docs/DEMAND_SCOUT_ARCHITECTURE.md`, `docs/GOOGLE_ADS_DEMAND_SCOUT_SETUP.md`, `docs/DEMAND_SCOUT_OPERATIONS.md`  
+Next: independent review → human Google setup → one explicit `pnpm demand:smoke`.
 
 ## Earlier
 
