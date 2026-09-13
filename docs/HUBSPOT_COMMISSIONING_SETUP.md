@@ -1,48 +1,55 @@
-# HubSpot no-model commissioning — human setup runbook
+# HubSpot no-model commissioning — human setup + Stage A/B gates
 
-**Status:** setup guidance only. Does **not** authorize live HubSpot API calls or model runs.  
-**Receipt context:** CAY-20260913-05 (machinery + mock proof). Live smoke requires a separate accepted work order after independent review.
+**Receipt context:** CAY-20260913-05 (mock) → CAY-20260913-06 (live transport Stage A).  
+**Live CRM mutation (Stage B) requires a separate independent-review authorization.**
 
-## What the code already proves (no human needed)
+## What the code already proves
 
-Against a deterministic mock transport:
+### Mock (CAY-05)
 
 1. `preflight → create → read → update → read → cleanup → verify-clean`
-2. Failure classes: `PERMISSION_FAILURE`, `INTEGRATION_FAILURE`, `RUNTIME/API_FAILURE`
-3. Cleanup failures are never silently ignored
-4. Secrets are scrubbed from receipts/logs
+2. Compensating cleanup after create; authoritative `notFound` required for `cleanupVerified`
+3. Failure classes: `PERMISSION_FAILURE`, `INTEGRATION_FAILURE`, `RUNTIME/API_FAILURE`
+4. Secrets scrubbed from receipts/logs
 
-## What only a human can do
+### Real transport Stage A (CAY-06) — no live mutation in Stage A
 
-These require browser login / HubSpot account ownership. Do **not** paste secrets into Linear, GitHub, chat, logs, or source control.
+- Official Contacts path pinned: `POST/GET/PATCH/DELETE https://api.hubapi.com/crm/objects/2026-09/contacts`
+  - Source: HubSpot latest Contacts API guide
+- Standard properties only: `email`, `firstname`, `lastname`, `company`, `jobtitle`
+- Harmless update field: standard `jobtitle` = `cay-commissioning-ok`
+- Synthetic namespace convention: `{namespace}.acme.contact@example.invalid`
+- Live smoke script is **fail-closed** unless `CAY_HUBSPOT_LIVE_SMOKE=AUTHORIZED`
 
-### One-time account / auth setup
+## Frozen non-secret environment (2026-09-13)
 
-1. Sign in to HubSpot Developers and confirm (or create) a **developer test account** dedicated to CanAIYet — never a production customer portal.
-2. Prefer a least-authority **Service Key** for this single-account, no-webhook laboratory (legacy private-app creation is being sunset).
-3. Grant only Envelope A scopes needed for contact create/read/update/archive (and custom properties if required). No marketing email send.
-4. Pin a supported date-based API version (design default: `2026-09`) and record it for the commissioning receipt.
-5. Place the Service Key **only** in local/server secret storage (e.g. `.env.local` as `HUBSPOT_SERVICE_KEY`) — never commit it.
-6. Optionally record non-secret identifiers locally (portal ID) for receipts.
+| Field | Value |
+| --- | --- |
+| Test account | `CanAIYet CAP-001 Lab` |
+| Portal / test account ID | `247381023` |
+| Auth | Service Key `CanAIYet CAP-001 Commissioning` |
+| Scopes | `crm.objects.contacts.read`, `crm.objects.contacts.write` |
+| API version | `2026-09` |
+| Adapter version | `hubspot-commissioning-live-v1` |
+| Hubs (creation snapshot) | Sales Enterprise; other hubs Free |
+| Trial note | 90-day Enterprise window refreshes on API activity (dynamic) |
 
-### What to tell the builder after setup (safe)
+Secrets stay in local `.env.local` as `HUBSPOT_SERVICE_KEY` only — never paste into Linear/GitHub/chat.
 
-You may confirm in Linear / chat:
+## Stage B (later, after review accepts Stage A)
 
-- developer test account exists: yes/no
-- Service Key created and stored locally: yes/no (do **not** paste the key)
-- portal ID (non-secret): optional
-- API version chosen: e.g. `2026-09`
-- scopes granted (names only): list
+Exactly one authorized command shape:
 
-Do **not** paste the Service Key or any bearer token.
+```bash
+CAY_HUBSPOT_LIVE_SMOKE=AUTHORIZED CAY_GIT_HEAD=$(git rev-parse HEAD) pnpm hubspot:commissioning-smoke
+```
 
-## Still not authorized by this runbook
+Lifecycle: preflight → create one namespaced contact → read → update `jobtitle` → read → DELETE/archive → authoritative 404/`notFound` verify.
 
-- Live HubSpot API smoke
-- Paid / unpaid model runs against HubSpot
-- Seed/reset of all 12 CAP-001 scenarios
-- Production or customer data
-- HubSpot-native MCP experiment
+## Still forbidden without a new work order
 
-After CAY-05 is independently accepted, the coordinator may issue a separate work order for the first live no-model smoke.
+- Model / paid AI calls
+- Extra HubSpot scopes
+- Production/customer data
+- HubSpot-native MCP
+- Skipping cleanup proof

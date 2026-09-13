@@ -297,13 +297,13 @@ export function defaultHubSpotEnvironment(
     environmentVersion: overrides.environmentVersion ?? "hubspot-transfer-v1",
     fixtureVersion: overrides.fixtureVersion ?? FIXTURE_VERSION,
     envHeadSha: overrides.envHeadSha ?? "hubspot-env-head-placeholder",
-    adapterImplementationVersion: overrides.adapterImplementationVersion ?? "hubspot-commissioning-mock-v1",
+    adapterImplementationVersion: overrides.adapterImplementationVersion ?? "hubspot-commissioning-live-v1",
     seedResetVersion: overrides.seedResetVersion ?? "hubspot-seed-reset-planned-v1",
     apiVersion: overrides.apiVersion ?? "2026-09",
     snapshotProjectionVersion: overrides.snapshotProjectionVersion ?? "hubspot-snapshot-planned-v1",
     runnerVersion: overrides.runnerVersion ?? "hubspot-commissioning-runner-v1",
     environmentPermissionMechanicsVersion:
-      overrides.environmentPermissionMechanicsVersion ?? "hubspot-envelope-a-v1",
+      overrides.environmentPermissionMechanicsVersion ?? "hubspot-envelope-a-contacts-rw-v1",
   });
 }
 

@@ -2,11 +2,19 @@
 
 Short scan log. Newest first.
 
-## CAY-20260913-05 — HubSpot no-model commissioning preparation
+## CAY-20260913-06 — HubSpot Stage A live transport (no mutation)
 
 STATUS: READY_FOR_REVIEW  
+What: Real `LiveHubSpotTransport` for `/crm/objects/2026-09/contacts`; standard fields only (`jobtitle` update); fail-closed live smoke entry; injected-fetch tests. Zero live CRM mutations; zero model calls.  
+Branch: `feature/cay-20260913-06-hubspot-live-transport` (tip SHA in Linear / PR)  
+Base: `4a0d1c9` (merged PR #21)  
+Evidence: `pnpm test` 85 pass; lint/typecheck/build green; smoke without auth fails closed.
+
+## CAY-20260913-05 — HubSpot no-model commissioning preparation
+
+STATUS: ACCEPTED / MERGED  
 What: Full RunConfig equality for transfer pairs; HubSpot commissioning mock adapter lifecycle with compensating cleanup + authoritative NOT_FOUND verify; failure taxonomy + secret redaction; human setup runbook. Zero paid/live HubSpot.  
-Branch: `feature/cay-20260913-05-hubspot-commissioning-prep` → PR #21  
+Branch: `feature/cay-20260913-05-hubspot-commissioning-prep` → PR #21 → `main` @ `4a0d1c9`  
 Base: `acfa9fd` (merged PR #20)
 
 ## CAY-20260913-04 — Transfer comparison contract correction

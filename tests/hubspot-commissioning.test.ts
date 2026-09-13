@@ -230,8 +230,9 @@ describe("HubSpot no-model commissioning (mock)", () => {
   it("wires EnvironmentManifest adapter versions without fabricating live portal values", () => {
     const env = hubspotCommissioningEnvironmentManifest();
     expect(env.environmentId).toBe("hubspot-dev-test-v1");
-    expect(env.adapterImplementationVersion).toBe("hubspot-commissioning-mock-v1");
+    expect(env.adapterImplementationVersion).toBe("hubspot-commissioning-live-v1");
     expect(env.apiVersion).toBe("2026-09");
     expect(env.envHeadSha).toBe("hubspot-env-head-unresolved");
+    expect(env.environmentPermissionMechanicsVersion).toBe("hubspot-envelope-a-contacts-rw-v1");
   });
 });

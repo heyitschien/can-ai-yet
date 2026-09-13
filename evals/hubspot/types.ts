@@ -23,15 +23,18 @@ export type HubSpotCommissioningConfig = {
   credentialConfigured: boolean;
 };
 
+/**
+ * Domain contact shape for commissioning.
+ * Maps to HubSpot standard properties only (no custom properties / schema-write).
+ */
 export type HubSpotSyntheticContact = {
   id: string;
   email: string;
   firstName: string;
   lastName: string;
   company: string;
-  /** Harmless synthetic field used for update proof. */
-  cayCommissioningNote: string | null;
-  cayFixtureId: string;
+  /** Standard HubSpot property `jobtitle` — harmless update proof field. */
+  jobTitle: string | null;
   archived: boolean;
 };
 
@@ -94,12 +97,11 @@ export type HubSpotTransport = {
     firstName: string;
     lastName: string;
     company: string;
-    cayFixtureId: string;
   }): Promise<HubSpotTransportResult<HubSpotSyntheticContact>>;
   getContact(id: string): Promise<HubSpotTransportResult<HubSpotSyntheticContact>>;
   updateContact(
     id: string,
-    patch: { cayCommissioningNote: string },
+    patch: { jobTitle: string },
   ): Promise<HubSpotTransportResult<HubSpotSyntheticContact>>;
   archiveContact(id: string): Promise<HubSpotTransportResult<{ id: string; archived: boolean }>>;
 };
