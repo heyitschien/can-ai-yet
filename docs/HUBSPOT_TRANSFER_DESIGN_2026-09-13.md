@@ -199,7 +199,8 @@ This prevents “Claude failed Scenario 5” when the real fault was wrong scope
 
 Preserve at minimum:
 
-- LabManifest fingerprint + accepted lab head SHA (racetrack)
+- CapabilityContract fingerprint (invariant business exam)
+- EnvironmentManifest fingerprint + accepted env head SHA (synthetic vs HubSpot mechanics)
 - RunConfig: model/provider/route/permission envelope/limits (car)
 - RunReceipt: served model, generation IDs, tokens, cost, traces, HubSpot API request IDs, anomalies
 - HubSpot portal ID + Service Key / app identity (non-secret)
@@ -208,7 +209,12 @@ Preserve at minimum:
 - preflight + final snapshots
 - classification labels above
 
-Comparable Claude-vs-GPT (or synthetic-vs-HubSpot) experiments require the **same LabManifest**; model and environment belong in RunConfig / environment adapters, not the lab fingerprint.
+**Do not confuse the two comparison gates:**
+
+- **Claude-vs-GPT (within synthetic):** same CapabilityContract + same EnvironmentManifest/head; model may differ.
+- **Synthetic-vs-HubSpot transfer:** same CapabilityContract + intentionally different EnvironmentManifest; hold the same model/config so environment is the primary changed variable.
+
+Calling synthetic and HubSpot the “same LabManifest” is incorrect — they share the capability/transfer contract, not the environment-specific lab fingerprint.
 
 ---
 

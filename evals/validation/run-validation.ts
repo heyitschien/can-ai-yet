@@ -20,15 +20,17 @@ export type RunLimits = {
 
 /**
  * Per-run validation input.
- * `labFingerprint` must match the LabManifest (racetrack).
- * Model/provider belong in run config / served fields, not the lab fingerprint.
+ * Capability + environment fingerprints must match the intended comparison gate.
+ * Model/provider belong in run config / served fields, not environment fingerprints.
  */
 export type RunReceiptInput = {
   benchmarkVersion: string;
-  labFingerprint: string;
-  expectedLabFingerprint?: string;
-  labHeadSha: string;
-  expectedLabHeadSha?: string;
+  capabilityFingerprint: string;
+  expectedCapabilityFingerprint?: string;
+  environmentFingerprint: string;
+  expectedEnvironmentFingerprint?: string;
+  envHeadSha: string;
+  expectedEnvHeadSha?: string;
   requestedModel: string;
   servedModel: string;
   provider: string;
@@ -36,6 +38,14 @@ export type RunReceiptInput = {
   scenarioResults: ScenarioRunReceipt[];
   limits?: RunLimits;
   anomalies?: string[];
+  /** @deprecated Prefer environmentFingerprint. */
+  labFingerprint?: string;
+  /** @deprecated Prefer expectedEnvironmentFingerprint. */
+  expectedLabFingerprint?: string;
+  /** @deprecated Prefer envHeadSha. */
+  labHeadSha?: string;
+  /** @deprecated Prefer expectedEnvHeadSha. */
+  expectedLabHeadSha?: string;
 };
 
 export type RunValidationResult = {
@@ -55,13 +65,28 @@ function allScenarioIdsPresent(scenarioResults: ScenarioRunReceipt[]): boolean {
 }
 
 export function validateRunReceipt(input: RunReceiptInput): RunValidationResult {
+  const environmentFingerprint = input.environmentFingerprint || input.labFingerprint || "";
+  const expectedEnvironmentFingerprint = input.expectedEnvironmentFingerprint ?? input.expectedLabFingerprint;
+  const envHeadSha = input.envHeadSha || input.labHeadSha || "";
+  const expectedEnvHeadSha = input.expectedEnvHeadSha ?? input.expectedLabHeadSha;
+
   const checks: Record<string, boolean> = {
     benchmarkVersion: input.benchmarkVersion === "cap-001-v1",
-    labFingerprint: Boolean(input.labFingerprint),
+    capabilityFingerprint: Boolean(input.capabilityFingerprint),
+    capabilityComparable:
+      !input.expectedCapabilityFingerprint ||
+      input.capabilityFingerprint === input.expectedCapabilityFingerprint,
+    environmentFingerprint: Boolean(environmentFingerprint),
+    environmentComparable:
+      (!expectedEnvironmentFingerprint || environmentFingerprint === expectedEnvironmentFingerprint) &&
+      (!expectedEnvHeadSha || envHeadSha === expectedEnvHeadSha),
+    /** Alias for prior tests / callers. */
+    labFingerprint: Boolean(environmentFingerprint),
     labComparable:
-      (!input.expectedLabFingerprint || input.labFingerprint === input.expectedLabFingerprint) &&
-      (!input.expectedLabHeadSha || input.labHeadSha === input.expectedLabHeadSha),
-    labHeadSha: Boolean(input.labHeadSha && input.labHeadSha !== "uncommitted"),
+      (!expectedEnvironmentFingerprint || environmentFingerprint === expectedEnvironmentFingerprint) &&
+      (!expectedEnvHeadSha || envHeadSha === expectedEnvHeadSha),
+    envHeadSha: Boolean(envHeadSha && envHeadSha !== "uncommitted"),
+    labHeadSha: Boolean(envHeadSha && envHeadSha !== "uncommitted"),
     requestedModel: Boolean(input.requestedModel),
     servedModel: Boolean(input.servedModel),
     provider: Boolean(input.provider),
@@ -84,9 +109,13 @@ export function validateRunReceipt(input: RunReceiptInput): RunValidationResult 
 
   const reasons: string[] = [];
   if (!checks.benchmarkVersion) reasons.push("benchmarkVersion must be cap-001-v1");
-  if (!checks.labFingerprint) reasons.push("labFingerprint missing");
-  if (!checks.labComparable) reasons.push("labFingerprint/labHeadSha do not match expected LabManifest");
-  if (!checks.labHeadSha) reasons.push("labHeadSha missing or uncommitted");
+  if (!checks.capabilityFingerprint) reasons.push("capabilityFingerprint missing");
+  if (!checks.capabilityComparable) reasons.push("capabilityFingerprint does not match expected CapabilityContract");
+  if (!checks.environmentFingerprint) reasons.push("environmentFingerprint missing");
+  if (!checks.environmentComparable) {
+    reasons.push("environmentFingerprint/envHeadSha do not match expected EnvironmentManifest");
+  }
+  if (!checks.envHeadSha) reasons.push("envHeadSha missing or uncommitted");
   if (!checks.requestedModel) reasons.push("requestedModel missing");
   if (!checks.servedModel) reasons.push("servedModel missing");
   if (!checks.provider) reasons.push("provider missing");
@@ -102,7 +131,7 @@ export function validateRunReceipt(input: RunReceiptInput): RunValidationResult 
   if (!checks.anomaliesAbsent) reasons.push(`anomalies recorded: ${(input.anomalies ?? []).join(", ")}`);
 
   let status: RunValidationStatus = "VALID";
-  if (!checks.labComparable) {
+  if (!checks.capabilityComparable || !checks.environmentComparable) {
     status = "INCOMPARABLE";
   } else if (reasons.length > 0) {
     status = "INVALID";

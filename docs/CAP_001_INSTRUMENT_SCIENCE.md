@@ -53,15 +53,25 @@ Full analysis: [CAY-20260912-01](reviews/CAY-20260912-01-independent-strategy-co
 
 ---
 
-## Same-head / LabManifest discipline
+## Same-head / two-layer comparison discipline
 
-Comparable runs must share a **LabManifest** / `labFingerprint` (scenarios, fixture/world, policies, system/tool contract, judge, runner, limits/scoring, accepted lab head) — see `evals/manifest/experiment-manifest.ts`.
+Comparable experiments use two fingerprints — see `evals/manifest/experiment-manifest.ts`:
 
-**Model and provider are RunConfig**, not part of the lab fingerprint. Same racetrack + different car (Claude vs GPT) is comparable. Different accepted lab heads are not comparable by default.
+1. **CapabilityContractManifest** / `capabilityFingerprint` — invariant business exam across environments (portable CAP-001 semantics, scenario IDs, agent-facing tool meanings, policy contract, deterministic predicates/scoring, authority/safety invariants).
+2. **EnvironmentManifest** (LabManifest) / `environmentFingerprint` + accepted `envHeadSha` — environment-specific mechanics (synthetic World vs HubSpot adapter, fixture/seed/reset, API version, snapshot projection).
 
-Per-run validation (`evals/validation/run-validation.ts`) checks receipt completeness against that LabManifest: lab fingerprint + head, requested vs served model, fallback disabled, 12-scenario completeness, tool trace, final state, judge completion, token/cost accounting, limits, and absence of anomalies.
+**RunConfig** holds model/provider/route/limits. **RunReceipt** holds served model, traces, snapshots, cost/tokens, anomalies.
 
-**Version certification** (instrument pack at an accepted lab head + LabManifest) is distinct from **per-run validation** (one RunReceipt against that lab). A valid receipt on a defective construct still requires construct classification before model attribution.
+Gates (do not confuse them):
+
+- **Cross-model (synthetic):** same CapabilityContract + same EnvironmentManifest/head; different model allowed → `COMPARABLE_MODEL_RUNS`.
+- **Synthetic ↔ HubSpot transfer:** same CapabilityContract + intentionally different EnvironmentManifest; same model/config held fixed → `COMPARABLE_TRANSFER_PAIR`.
+
+Different accepted environment heads are not model-comparable. Different capability-contract fingerprints make transfer pairs incomparable.
+
+Per-run validation (`evals/validation/run-validation.ts`) checks receipt completeness against both fingerprints + head: requested vs served model, fallback disabled, 12-scenario completeness, tool trace, final state, judge completion, token/cost accounting, limits, and absence of anomalies.
+
+**Version certification** (instrument pack at an accepted env head + manifests) is distinct from **per-run validation** (one RunReceipt). A valid receipt on a defective construct still requires construct classification before model attribution.
 
 ---
 

@@ -34,11 +34,16 @@ Evidence: `APPROVED RUN → DETERMINISTIC JUDGE → INDEPENDENT REVIEW → ACCEP
 
 Science split for comparable experiments:
 
-- **LabManifest** — scenarios, fixtures, policies, tool/judge/runner contract, accepted lab head (the racetrack)
+- **CapabilityContractManifest** — invariant business exam (portable semantics, tools meanings, policy, predicates) that must match across synthetic and HubSpot
+- **EnvironmentManifest / LabManifest** — environment mechanics (synthetic World vs HubSpot adapter, seed/reset, API version, accepted env head)
 - **RunConfig** — model, provider, route, permissions (the car)
 - **RunReceipt** — served model, IDs, tokens, cost, traces, results
 
-Same racetrack + different car = comparable. Different racetrack + same car ≠ comparable by default.
+Gates:
+
+- Same capability + same environment + different car = **model-comparable**
+- Same capability + different environment + same car = **transfer-comparable**
+- Different capability contract = **incomparable** for transfer
 
 ---
 
@@ -85,7 +90,7 @@ If yes: portable packs may climb `synthetic → HubSpot → other CRM → custom
 
 ## 8. Target sequence (compressed)
 
-1. Certify CAP-001 instrument + LabManifest discipline  
+1. Certify CAP-001 instrument + CapabilityContract / EnvironmentManifest discipline  
 2. Preserve v1 history; freeze portable contract v2  
 3. Commission HubSpot (no model) → seed/reset/snapshot  
 4. Same model/config: synthetic vs HubSpot  
