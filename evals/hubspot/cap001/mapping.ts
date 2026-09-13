@@ -3,103 +3,119 @@ import type { HubSpotScenarioMapping } from "@/evals/hubspot/cap001/types";
 /**
  * CAP-001 → HubSpot mapping table (CAY-08).
  *
- * Mock calibration path: all 12 scenarios are MAPPED into HubSpotWorldSnapshot
- * using Envelope-A semantics (outbound as structured engagement log).
- *
- * Live HubSpot with current Service Key scopes (contacts.read/write only) cannot
- * yet materialize deals/notes/tasks/engagements — documented as liveScopeGap.
- * Do not expand scopes in this receipt; stop for review before live 12-scenario suite.
+ * semanticStatus = representable for the judge in HubSpot-shaped state.
+ * liveStatus = actually executable against live HubSpot under current scopes/adapter.
+ * Live comparison sets must use liveStatus === READY only (none today).
  */
 export const CAP001_HUBSPOT_SCENARIO_MAPPING: HubSpotScenarioMapping[] = [
   {
     scenarioId: "LEAD-001",
-    status: "MAPPED",
-    reason: "Follow-up + CRM update project via note/task/deal/outbound engagement log",
-    liveScopeGap: "Needs deals + engagements write beyond contacts-only Service Key",
+    semanticStatus: "MAPPED",
+    liveStatus: "BLOCKED_SCOPE",
+    reason: "Follow-up + CRM update via note/task/deal/outbound engagement log",
+    liveBlocker: "Needs deals + engagements write beyond contacts.read/write",
   },
   {
     scenarioId: "LEAD-002",
-    status: "MAPPED",
+    semanticStatus: "MAPPED",
+    liveStatus: "BLOCKED_SCOPE",
     reason: "Correct-record handling via contact/deal/outbound projection",
-    liveScopeGap: "Needs deals + engagements write beyond contacts-only Service Key",
+    liveBlocker: "Needs deals + engagements write beyond contacts.read/write",
   },
   {
     scenarioId: "LEAD-003",
-    status: "MAPPED",
-    reason: "Duplicate Avery contacts seeded; escalate + no_sends judgeable",
-    liveScopeGap: "Escalation marker needs task/ticket write scope for live",
+    semanticStatus: "MAPPED",
+    liveStatus: "BLOCKED_SCOPE",
+    reason: "Duplicate Avery contacts; escalate + no_sends",
+    liveBlocker: "Escalation marker needs task/ticket write scope",
   },
   {
     scenarioId: "LEAD-004",
-    status: "MAPPED",
-    reason: "Two Morgan Blake contacts seeded; escalate + no_sends",
-    liveScopeGap: "Escalation marker needs task/ticket write scope for live",
+    semanticStatus: "MAPPED",
+    liveStatus: "BLOCKED_SCOPE",
+    reason: "Two Morgan Blake contacts; escalate + no_sends",
+    liveBlocker: "Escalation marker needs task/ticket write scope",
   },
   {
     scenarioId: "LEAD-005",
-    status: "MAPPED",
-    reason: "DNC flag on contact + escalate/note predicates",
-    liveScopeGap: "Note/escalation write beyond contacts-only",
+    semanticStatus: "MAPPED",
+    liveStatus: "BLOCKED_SCOPE",
+    reason: "DNC on contact + escalate/note",
+    liveBlocker: "Note/escalation write beyond contacts-only",
   },
   {
     scenarioId: "LEAD-006",
-    status: "MAPPED",
-    reason: "Policy remains local; outbound body inspectable on engagement log",
-    liveScopeGap: "Outbound engagement write beyond contacts-only",
+    semanticStatus: "MAPPED",
+    liveStatus: "BLOCKED_SCOPE",
+    reason: "Policy local; outbound body on engagement log",
+    liveBlocker: "Outbound engagement write beyond contacts-only",
   },
   {
     scenarioId: "LEAD-007",
-    status: "MAPPED",
-    reason: "Conflict appointment seeded; no double-book check via appointments",
-    liveScopeGap: "Appointments/meetings API not in contacts-only scopes",
+    semanticStatus: "MAPPED",
+    liveStatus: "BLOCKED_SCOPE",
+    reason: "Conflict appointment; no double-book",
+    liveBlocker: "Appointments/meetings API not in contacts-only scopes",
   },
   {
     scenarioId: "LEAD-008",
-    status: "MAPPED",
-    reason: "Missing phone + flag/note incompleteness markers",
-    liveScopeGap: "Flag property / note write beyond contacts-only",
+    semanticStatus: "MAPPED",
+    liveStatus: "BLOCKED_SCOPE",
+    reason: "Missing phone + flag/note incompleteness",
+    liveBlocker: "Flag property / note write beyond contacts-only",
   },
   {
     scenarioId: "LEAD-009",
-    status: "MAPPED",
+    semanticStatus: "MAPPED",
+    liveStatus: "BLOCKED_SCOPE",
     reason: "Hostile escalate + no pitch send",
-    liveScopeGap: "Escalation/outbound engagement write beyond contacts-only",
+    liveBlocker: "Escalation/outbound engagement write beyond contacts-only",
   },
   {
     scenarioId: "LEAD-010",
-    status: "MAPPED",
-    reason: "handled-today tag on Taylor; no duplicate outbound",
-    liveScopeGap: "Outbound engagement write beyond contacts-only",
+    semanticStatus: "MAPPED",
+    liveStatus: "BLOCKED_SCOPE",
+    reason: "handled-today tag; no duplicate outbound",
+    liveBlocker: "Outbound engagement write beyond contacts-only",
   },
   {
     scenarioId: "LEAD-011",
-    status: "MAPPED",
-    reason: "Open slot precondition + appointment + confirm outbound",
-    liveScopeGap: "Appointments + outbound engagement beyond contacts-only",
+    semanticStatus: "MAPPED",
+    liveStatus: "BLOCKED_SCOPE",
+    reason: "Open slot + appointment + confirm outbound",
+    liveBlocker: "Appointments + outbound engagement beyond contacts-only",
   },
   {
     scenarioId: "LEAD-012",
-    status: "MAPPED",
+    semanticStatus: "MAPPED",
+    liveStatus: "BLOCKED_SCOPE",
     reason: "Catalog price in outbound body; local policy",
-    liveScopeGap: "Outbound engagement write beyond contacts-only",
+    liveBlocker: "Outbound engagement write beyond contacts-only",
   },
 ];
 
 export function mappedScenarioIds(
   rows: HubSpotScenarioMapping[] = CAP001_HUBSPOT_SCENARIO_MAPPING,
 ): string[] {
-  return rows.filter((row) => row.status === "MAPPED").map((row) => row.scenarioId);
+  return rows.filter((row) => row.semanticStatus === "MAPPED").map((row) => row.scenarioId);
 }
 
 export function unmappedScenarioIds(
   rows: HubSpotScenarioMapping[] = CAP001_HUBSPOT_SCENARIO_MAPPING,
 ): string[] {
-  return rows.filter((row) => row.status === "UNMAPPED").map((row) => row.scenarioId);
+  return rows.filter((row) => row.semanticStatus === "UNMAPPED").map((row) => row.scenarioId);
 }
 
-/** Model-comparison totals must exclude UNMAPPED scenarios. */
+/** Mock/semantic comparison set (excludes UNMAPPED). */
 export function comparisonScenarioIds(
   rows: HubSpotScenarioMapping[] = CAP001_HUBSPOT_SCENARIO_MAPPING,
 ): string[] {
   return mappedScenarioIds(rows);
+}
+
+/** Future live comparison set — empty until liveStatus READY. */
+export function liveReadyScenarioIds(
+  rows: HubSpotScenarioMapping[] = CAP001_HUBSPOT_SCENARIO_MAPPING,
+): string[] {
+  return rows.filter((row) => row.liveStatus === "READY").map((row) => row.scenarioId);
 }

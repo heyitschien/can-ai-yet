@@ -4,6 +4,11 @@ import {
   CAP001_SEED_DEALS,
 } from "@/evals/hubspot/cap001/seed-graph";
 import type {
+  Cap001ObjectFamily,
+  HubSpotCap001EnvironmentPort,
+  HubSpotCap001EnvResult,
+} from "@/evals/hubspot/cap001/port";
+import type {
   HubSpotCap001Appointment,
   HubSpotCap001Contact,
   HubSpotCap001Deal,
@@ -15,11 +20,16 @@ import type {
   HubSpotCap001Task,
 } from "@/evals/hubspot/cap001/types";
 
+const BASELINE_CONTACT_IDS = new Set(CAP001_SEED_CONTACTS.map((row) => row.cayFixtureId));
+const BASELINE_DEAL_IDS = new Set(CAP001_SEED_DEALS.map((row) => row.cayFixtureId));
+const BASELINE_APPT_IDS = new Set(CAP001_SEED_APPOINTMENTS.map((row) => row.cayFixtureId));
+
 /**
- * In-memory HubSpot CAP-001 environment store.
- * Models HubSpot object graphs for no-model calibration without live CRM writes.
+ * In-memory mock HubSpot CAP-001 environment (calibration harness).
+ * Not a live HubSpot adapter — see LiveHubSpotCap001Adapter for the live port.
  */
-export class HubSpotCap001Store {
+export class HubSpotCap001Store implements HubSpotCap001EnvironmentPort {
+  readonly kind = "mock" as const;
   private runId = "unseeded";
   private contacts: HubSpotCap001Contact[] = [];
   private deals: HubSpotCap001Deal[] = [];
@@ -29,17 +39,36 @@ export class HubSpotCap001Store {
   private escalations: HubSpotCap001Escalation[] = [];
   private flags: HubSpotCap001Flag[] = [];
   private appointments: HubSpotCap001Appointment[] = [];
-  /** Simulates eventual-consistency lag for bounded retry tests. */
   private snapshotLagReadsRemaining = 0;
+  private omitFamiliesOnRead: Set<Cap001ObjectFamily> = new Set();
 
   get currentRunId(): string {
     return this.runId;
   }
 
-  /** Seed/reset shared baseline keyed by cay_fixture_id (idempotent upsert). */
-  seedBaseline(runId: string): void {
+  supportedFamilies(): ReadonlySet<Cap001ObjectFamily> {
+    return new Set([
+      "contacts",
+      "deals",
+      "notes",
+      "tasks",
+      "outbounds",
+      "escalations",
+      "flags",
+      "appointments",
+    ]);
+  }
+
+  /**
+   * Seed/reset shared baseline.
+   * Idempotent for the SAME runId: removes all scenario-owned mutable state
+   * (including scenario appointments) and restores exact baseline fixtures.
+   */
+  seedBaseline(runId: string): HubSpotCap001EnvResult<{ runId: string }> {
     this.runId = runId;
-    this.archiveByRunIdExcept(runId);
+    this.clearScenarioOwnedState();
+    this.retainOnlyBaselineFixtures();
+
     for (const spec of CAP001_SEED_CONTACTS) {
       this.upsertContact({
         cayFixtureId: spec.cayFixtureId,
@@ -82,16 +111,15 @@ export class HubSpotCap001Store {
         archived: false,
       });
     }
-    // Clear scenario-owned activity for a clean baseline.
-    this.notes = this.notes.filter((row) => !row.archived && row.cayRunId === runId && row.cayScenarioId === null);
-    this.tasks = this.tasks.filter((row) => !row.archived && row.cayRunId === runId && row.cayScenarioId === null);
-    this.outbounds = [];
-    this.escalations = [];
-    this.flags = [];
+    return { ok: true, data: { runId } };
   }
 
-  reset(runId: string): void {
-    this.seedBaseline(runId);
+  reset(runId: string): HubSpotCap001EnvResult<{ runId: string }> {
+    return this.seedBaseline(runId);
+  }
+
+  readAuthoritativeState(): HubSpotCap001EnvResult<HubSpotCap001State> {
+    return { ok: true, data: this.snapshotState() };
   }
 
   activeCounts(): {
@@ -116,9 +144,13 @@ export class HubSpotCap001Store {
     };
   }
 
-  /** Inject N inconsistent snapshot reads before returning authoritative state. */
   setSnapshotLag(reads: number): void {
     this.snapshotLagReadsRemaining = Math.max(0, reads);
+  }
+
+  /** Force next reads to omit families (partial consistency / fail-closed readiness tests). */
+  setOmitFamiliesOnRead(families: Cap001ObjectFamily[]): void {
+    this.omitFamiliesOnRead = new Set(families);
   }
 
   snapshotState(): HubSpotCap001State {
@@ -136,17 +168,46 @@ export class HubSpotCap001Store {
         appointments: [],
       };
     }
+
+    const omit = this.omitFamiliesOnRead;
     return {
       runId: this.runId,
-      contacts: this.contacts.filter((row) => !row.archived).map((row) => structuredClone(row)),
-      deals: this.deals.filter((row) => !row.archived).map((row) => structuredClone(row)),
-      notes: this.notes.filter((row) => !row.archived).map((row) => structuredClone(row)),
-      tasks: this.tasks.filter((row) => !row.archived).map((row) => structuredClone(row)),
-      outbounds: this.outbounds.filter((row) => !row.archived).map((row) => structuredClone(row)),
-      escalations: this.escalations.filter((row) => !row.archived).map((row) => structuredClone(row)),
-      flags: this.flags.filter((row) => !row.archived).map((row) => structuredClone(row)),
-      appointments: this.appointments.filter((row) => !row.archived).map((row) => structuredClone(row)),
+      contacts: omit.has("contacts")
+        ? []
+        : this.contacts.filter((row) => !row.archived).map((row) => structuredClone(row)),
+      deals: omit.has("deals")
+        ? []
+        : this.deals.filter((row) => !row.archived).map((row) => structuredClone(row)),
+      notes: omit.has("notes")
+        ? []
+        : this.notes.filter((row) => !row.archived).map((row) => structuredClone(row)),
+      tasks: omit.has("tasks")
+        ? []
+        : this.tasks.filter((row) => !row.archived).map((row) => structuredClone(row)),
+      outbounds: omit.has("outbounds")
+        ? []
+        : this.outbounds.filter((row) => !row.archived).map((row) => structuredClone(row)),
+      escalations: omit.has("escalations")
+        ? []
+        : this.escalations.filter((row) => !row.archived).map((row) => structuredClone(row)),
+      flags: omit.has("flags")
+        ? []
+        : this.flags.filter((row) => !row.archived).map((row) => structuredClone(row)),
+      appointments: omit.has("appointments")
+        ? []
+        : this.appointments.filter((row) => !row.archived).map((row) => structuredClone(row)),
     };
+  }
+
+  /** Test seam: remove a seeded contact from authoritative state. */
+  removeContactByFixtureId(cayFixtureId: string): void {
+    const row = this.contacts.find((item) => item.cayFixtureId === cayFixtureId);
+    if (row) row.archived = true;
+  }
+
+  removeAppointmentByFixtureId(cayFixtureId: string): void {
+    const row = this.appointments.find((item) => item.cayFixtureId === cayFixtureId);
+    if (row) row.archived = true;
   }
 
   addNote(input: Omit<HubSpotCap001Note, "archived">): void {
@@ -187,20 +248,26 @@ export class HubSpotCap001Store {
     this.appointments.push({ ...input, archived: false });
   }
 
-  private archiveByRunIdExcept(keepRunId: string): void {
-    const archive = <T extends { cayRunId: string; archived: boolean }>(rows: T[]) => {
-      for (const row of rows) {
-        if (row.cayRunId !== keepRunId) row.archived = true;
-      }
-    };
-    archive(this.contacts);
-    archive(this.deals);
-    archive(this.notes);
-    archive(this.tasks);
-    archive(this.outbounds);
-    archive(this.escalations);
-    archive(this.flags);
-    archive(this.appointments);
+  private clearScenarioOwnedState(): void {
+    this.notes = [];
+    this.tasks = [];
+    this.outbounds = [];
+    this.escalations = [];
+    this.flags = [];
+    // Scenario appointments (non-baseline fixture IDs or cayScenarioId set) must die on reset.
+    this.appointments = this.appointments.filter(
+      (row) => BASELINE_APPT_IDS.has(row.cayFixtureId) && row.cayScenarioId === null,
+    );
+    for (const row of this.appointments) row.archived = false;
+  }
+
+  private retainOnlyBaselineFixtures(): void {
+    this.contacts = this.contacts.filter((row) => BASELINE_CONTACT_IDS.has(row.cayFixtureId));
+    this.deals = this.deals.filter((row) => BASELINE_DEAL_IDS.has(row.cayFixtureId));
+    this.appointments = this.appointments.filter((row) => BASELINE_APPT_IDS.has(row.cayFixtureId));
+    for (const row of this.contacts) row.archived = false;
+    for (const row of this.deals) row.archived = false;
+    for (const row of this.appointments) row.archived = false;
   }
 
   private upsertContact(row: HubSpotCap001Contact): void {

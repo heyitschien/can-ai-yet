@@ -43,7 +43,8 @@ These explain the product and operating method. They do not outrank the authorit
 11. `HUBSPOT_TRANSFER_DESIGN_2026-09-13.md` — design-only HubSpot transfer spec (Issue #14); consolidated Service Key + portable-v2 direction; not build authority until independently accepted.
 12. `HUBSPOT_COMMISSIONING_SETUP.md` — concise human setup runbook for no-model commissioning (Service Key; no secrets in chat); live smoke still separately authorized.
 13. `HUBSPOT_CAP001_ENV.md` — CAY-08 CAP-001 HubSpot seed/reset/snapshot/mapping versions (no-model calibration; not live suite auth).
-14. `CANAIYET_HUBSPOT_EXPLAINER.md` — plain durable explainer (what/why/how for synthetic→HubSpot); mirrors the Linear document; not build authority.
+14. `HUBSPOT_CAP001_SCOPE_PLAN.md` — minimum Envelope A API/scope plan for later human review (no key expansion).
+15. `CANAIYET_HUBSPOT_EXPLAINER.md` — plain durable explainer (what/why/how for synthetic→HubSpot); mirrors the Linear document; not build authority.
 14. `CAP_001_INSTRUMENT_SCIENCE.md` — execution vs construct validity, v1 certification matrix pointers, CapabilityContract + EnvironmentManifest discipline (CAY-20260913-03/04; not build authority).
 15. `FALSIFICATION_AND_PHASE_THRESHOLDS.md` — CanAIYet-specific stage gates and stop/narrow/pivot logic.
 16. `CAPABILITY_CONTROL_PLANE_HORIZON.md` — long-horizon hypothesis: capability graph, longitudinal evidence, and possible `measure → qualify → recommend → route → monitor → govern` progression; not a roadmap.

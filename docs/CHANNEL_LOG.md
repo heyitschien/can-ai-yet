@@ -4,8 +4,8 @@ Short scan log. Newest first.
 
 ## CAY-20260913-08 — CAP-001 HubSpot environment machinery
 
-STATUS: READY_FOR_REVIEW  
-What: Mock-calibrated HubSpot CAP-001 seed/reset/preflight/snapshot/judge wiring; 12/12 MAPPED with live scope gaps recorded; EnvironmentManifest versions frozen; explainer reachability vs capability sync. Zero model calls; no live 12-scenario suite.  
+STATUS: READY_FOR_REVIEW (post CHANGES_REQUESTED: authoritative snapshot + mock/live port)  
+What: HubSpot-only CRM projection; mock vs live port; semantic vs live readiness; fixture-graph settle; same-runId reset clears scenario appointments; scope plan doc (no expansion). Zero models; no live suite.  
 Branch: `feature/cay-20260913-08-hubspot-cap001-env`  
 Base: `bdab3c1` (merged PR #23)
 

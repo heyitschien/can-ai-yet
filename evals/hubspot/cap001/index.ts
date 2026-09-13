@@ -10,20 +10,30 @@ export {
   captureAuthoritativeSnapshot,
   runTripleDryReset,
 } from "@/evals/hubspot/cap001/calibration";
+export { LiveHubSpotCap001Adapter } from "@/evals/hubspot/cap001/live-adapter";
 export {
   CAP001_HUBSPOT_SCENARIO_MAPPING,
   comparisonScenarioIds,
+  liveReadyScenarioIds,
   mappedScenarioIds,
   unmappedScenarioIds,
 } from "@/evals/hubspot/cap001/mapping";
 export { preflightCap001HubSpotEnv, resetAndPreflight, seedAndPreflight } from "@/evals/hubspot/cap001/preflight";
+export type { Cap001ObjectFamily, HubSpotCap001EnvironmentPort } from "@/evals/hubspot/cap001/port";
 export {
+  normalizeStateFingerprint,
   projectHubSpotWorldSnapshot,
+  requiredBaselineFixtureIds,
   snapshotWithBoundedRetry,
+  stateHasRequiredBaselineFixtures,
   type HubSpotWorldSnapshot,
 } from "@/evals/hubspot/cap001/snapshot";
 export { HubSpotCap001Store } from "@/evals/hubspot/cap001/store";
-export type { HubSpotScenarioMapping } from "@/evals/hubspot/cap001/types";
+export type {
+  HubSpotLiveStatus,
+  HubSpotScenarioMapping,
+  HubSpotSemanticStatus,
+} from "@/evals/hubspot/cap001/types";
 export {
   HUBSPOT_CAP001_ADAPTER_VERSION,
   HUBSPOT_CAP001_ENVIRONMENT_ID,

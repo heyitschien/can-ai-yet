@@ -1,20 +1,109 @@
+/**
+ * Project HubSpot CAP-001 authoritative state into World shape for the judge.
+ *
+ * Scientific rule (CAY-08 correction): every CAP-001 CRM-controlled collection the
+ * judge can read must come ONLY from the HubSpot snapshot. World.fresh() may supply
+ * immutable non-CRM scaffolding (policies, products, etc.) but must never resurrect
+ * contacts/deals/notes/tasks/sent/appointments/escalations/flags missing from HubSpot.
+ */
+
+import { CAP001_EXPECTED_BASELINE_COUNTS, CAP001_SEED_APPOINTMENTS, CAP001_SEED_CONTACTS, CAP001_SEED_DEALS } from "@/evals/hubspot/cap001/seed-graph";
+import type { HubSpotCap001EnvironmentPort } from "@/evals/hubspot/cap001/port";
 import type { HubSpotCap001State } from "@/evals/hubspot/cap001/types";
 import { World } from "@/evals/environments/world";
-import type { HubSpotCap001Store } from "@/evals/hubspot/cap001/store";
 
 export type HubSpotWorldSnapshot = {
   projectionVersion: string;
   runId: string;
   capturedAt: string;
-  /** World-shaped projection consumed by the existing deterministic judge. */
   world: World;
   raw: HubSpotCap001State;
 };
 
-/**
- * Project HubSpot CAP-001 authoritative state into the synthetic World shape.
- * CapabilityContract / judge predicates stay unchanged; only representation changes.
- */
+export function requiredBaselineFixtureIds(): {
+  contacts: string[];
+  deals: string[];
+  appointments: string[];
+} {
+  return {
+    contacts: CAP001_SEED_CONTACTS.map((row) => row.cayFixtureId),
+    deals: CAP001_SEED_DEALS.map((row) => row.cayFixtureId),
+    appointments: CAP001_SEED_APPOINTMENTS.map((row) => row.cayFixtureId),
+  };
+}
+
+export function normalizeStateFingerprint(state: HubSpotCap001State): string {
+  const sortById = <T extends { cayFixtureId: string }>(rows: T[]) =>
+    [...rows].sort((a, b) => a.cayFixtureId.localeCompare(b.cayFixtureId));
+  return JSON.stringify({
+    runId: state.runId,
+    contacts: sortById(state.contacts).map((row) => ({
+      id: row.cayFixtureId,
+      email: row.email,
+      phone: row.phone,
+      dnc: row.doNotContact,
+      tags: [...row.tags].sort(),
+    })),
+    deals: sortById(state.deals).map((row) => ({
+      id: row.cayFixtureId,
+      email: row.contactEmail,
+      stage: row.stage,
+    })),
+    appointments: sortById(state.appointments).map((row) => ({
+      id: row.cayFixtureId,
+      email: row.contactEmail,
+      start: row.start,
+      status: row.status,
+    })),
+    notes: sortById(state.notes).map((row) => row.cayFixtureId),
+    tasks: sortById(state.tasks).map((row) => row.cayFixtureId),
+    outbounds: sortById(state.outbounds).map((row) => row.cayFixtureId),
+    escalations: sortById(state.escalations).map((row) => row.cayFixtureId),
+    flags: sortById(state.flags).map((row) => row.cayFixtureId),
+  });
+}
+
+export function stateHasRequiredBaselineFixtures(state: HubSpotCap001State): {
+  ok: boolean;
+  failures: string[];
+} {
+  const failures: string[] = [];
+  const required = requiredBaselineFixtureIds();
+  const contactIds = new Set(state.contacts.map((row) => row.cayFixtureId));
+  const dealIds = new Set(state.deals.map((row) => row.cayFixtureId));
+  const apptIds = new Set(state.appointments.map((row) => row.cayFixtureId));
+
+  for (const id of required.contacts) {
+    if (!contactIds.has(id)) failures.push(`missing contact fixture ${id}`);
+  }
+  for (const id of required.deals) {
+    if (!dealIds.has(id)) failures.push(`missing deal fixture ${id}`);
+  }
+  for (const id of required.appointments) {
+    if (!apptIds.has(id)) failures.push(`missing appointment fixture ${id}`);
+  }
+
+  if (state.contacts.length !== CAP001_EXPECTED_BASELINE_COUNTS.contacts) {
+    // Allow extra contacts only if they are present; baseline readiness still requires exact baseline IDs.
+    // Counts may grow after scenario actions; for baseline capture we require at least the fixture set.
+  }
+  if (state.contacts.length < CAP001_EXPECTED_BASELINE_COUNTS.contacts) {
+    failures.push(
+      `contact count ${state.contacts.length} < baseline ${CAP001_EXPECTED_BASELINE_COUNTS.contacts}`,
+    );
+  }
+  if (state.deals.length < CAP001_EXPECTED_BASELINE_COUNTS.deals) {
+    failures.push(`deal count ${state.deals.length} < baseline ${CAP001_EXPECTED_BASELINE_COUNTS.deals}`);
+  }
+  if (state.appointments.length < CAP001_EXPECTED_BASELINE_COUNTS.appointments) {
+    failures.push(
+      `appointment count ${state.appointments.length} < baseline ${CAP001_EXPECTED_BASELINE_COUNTS.appointments}`,
+    );
+  }
+
+  return { ok: failures.length === 0, failures };
+}
+
 export function projectHubSpotWorldSnapshot(input: {
   state: HubSpotCap001State;
   projectionVersion: string;
@@ -22,26 +111,18 @@ export function projectHubSpotWorldSnapshot(input: {
 }): HubSpotWorldSnapshot {
   const world = World.fresh();
 
-  // Overlay CAP-001 contacts from HubSpot projection (preserve non-CAP extras from fresh).
-  for (const contact of input.state.contacts) {
-    const existing = world.contactByEmail(contact.email);
-    const mapped = {
-      id: contact.cayFixtureId,
-      email: contact.email,
-      name: `${contact.firstName} ${contact.lastName}`.trim(),
-      phone: contact.phone,
-      company: contact.company,
-      status: contact.status,
-      doNotContact: contact.doNotContact,
-      tags: [...contact.tags],
-      owner: contact.owner,
-    };
-    if (existing) {
-      Object.assign(existing, mapped);
-    } else {
-      world.contacts.push(mapped);
-    }
-  }
+  // REPLACE all CAP-001 CRM-controlled collections — never overlay onto synthetic CRM.
+  world.contacts = input.state.contacts.map((contact) => ({
+    id: contact.cayFixtureId,
+    email: contact.email,
+    name: `${contact.firstName} ${contact.lastName}`.trim(),
+    phone: contact.phone,
+    company: contact.company,
+    status: contact.status,
+    doNotContact: contact.doNotContact,
+    tags: [...contact.tags],
+    owner: contact.owner,
+  }));
 
   world.deals = input.state.deals.map((deal) => ({
     id: deal.cayFixtureId,
@@ -77,22 +158,19 @@ export function projectHubSpotWorldSnapshot(input: {
   world.escalations = input.state.escalations.map((row) => ({ reason: row.reason }));
   world.flags = input.state.flags.map((row) => ({ code: row.code, message: row.message }));
 
-  // Merge HubSpot appointments onto World appointments (keep synthetic extras for availability noise).
-  for (const appt of input.state.appointments) {
-    const existing = world.appointments.find(
-      (row) => row.contactEmail === appt.contactEmail && row.start === appt.start,
-    );
-    const mapped = {
-      id: appt.cayFixtureId,
-      contactEmail: appt.contactEmail,
-      title: appt.title,
-      start: appt.start,
-      end: appt.end,
-      status: appt.status,
-    };
-    if (existing) Object.assign(existing, mapped);
-    else world.appointments.push(mapped);
-  }
+  world.appointments = input.state.appointments.map((appt) => ({
+    id: appt.cayFixtureId,
+    contactEmail: appt.contactEmail,
+    title: appt.title,
+    start: appt.start,
+    end: appt.end,
+    status: appt.status,
+  }));
+
+  // Clear other mutable CRM-ish collections that could confuse CAP-001 attribution.
+  world.drafts = [];
+  world.threads = [];
+  world.messages = [];
 
   return {
     projectionVersion: input.projectionVersion,
@@ -104,33 +182,64 @@ export function projectHubSpotWorldSnapshot(input: {
 }
 
 /**
- * Bounded eventual-consistency handling for snapshot reads.
- * Retries until baseline contact count is non-empty or attempts are exhausted.
+ * Bounded settle: require full baseline fixture identity set AND stable fingerprint
+ * across consecutive reads. Otherwise RUNTIME/API_FAILURE.
  */
 export function snapshotWithBoundedRetry(
-  store: HubSpotCap001Store,
+  port: HubSpotCap001EnvironmentPort,
   options: {
     projectionVersion: string;
     maxAttempts?: number;
-    expectedMinContacts?: number;
   },
-): { ok: boolean; snapshot?: HubSpotWorldSnapshot; attempts: number; failureClass?: "RUNTIME/API_FAILURE" } {
-  const maxAttempts = options.maxAttempts ?? 3;
-  const expectedMinContacts = options.expectedMinContacts ?? 1;
+): {
+  ok: boolean;
+  snapshot?: HubSpotWorldSnapshot;
+  attempts: number;
+  failureClass?: "RUNTIME/API_FAILURE" | "SCOPE_GAP" | "ADAPTER_GAP" | "INTEGRATION_FAILURE";
+  failures?: string[];
+} {
+  const maxAttempts = options.maxAttempts ?? 4;
   let attempts = 0;
+  let previousFingerprint: string | null = null;
+
   while (attempts < maxAttempts) {
     attempts += 1;
-    const state = store.snapshotState();
-    if (state.contacts.length >= expectedMinContacts) {
+    const read = port.readAuthoritativeState();
+    if (!read.ok) {
+      return {
+        ok: false,
+        attempts,
+        failureClass: read.failureClass === "SCOPE_GAP" || read.failureClass === "ADAPTER_GAP"
+          ? read.failureClass
+          : "INTEGRATION_FAILURE",
+        failures: [read.message],
+      };
+    }
+
+    const readiness = stateHasRequiredBaselineFixtures(read.data);
+    if (!readiness.ok) {
+      previousFingerprint = null;
+      continue;
+    }
+
+    const fingerprint = normalizeStateFingerprint(read.data);
+    if (previousFingerprint === fingerprint) {
       return {
         ok: true,
         attempts,
         snapshot: projectHubSpotWorldSnapshot({
-          state,
+          state: read.data,
           projectionVersion: options.projectionVersion,
         }),
       };
     }
+    previousFingerprint = fingerprint;
   }
-  return { ok: false, attempts, failureClass: "RUNTIME/API_FAILURE" };
+
+  return {
+    ok: false,
+    attempts,
+    failureClass: "RUNTIME/API_FAILURE",
+    failures: ["HubSpot CAP-001 snapshot did not settle on a complete, stable baseline fixture graph"],
+  };
 }

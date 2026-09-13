@@ -3,7 +3,21 @@
  * Lives in an in-memory store for CAY-08 calibration (no live 12-scenario suite).
  */
 
-export type HubSpotMappingStatus = "MAPPED" | "UNMAPPED";
+export type HubSpotSemanticStatus = "MAPPED" | "UNMAPPED";
+export type HubSpotLiveStatus = "READY" | "BLOCKED_SCOPE" | "BLOCKED_ADAPTER";
+
+export type HubSpotScenarioMapping = {
+  scenarioId: string;
+  /** Can the business question be represented in HubSpot-shaped state for the judge? */
+  semanticStatus: HubSpotSemanticStatus;
+  /** Can we execute this scenario against live HubSpot under current scopes/adapter? */
+  liveStatus: HubSpotLiveStatus;
+  reason: string;
+  liveBlocker?: string;
+};
+
+/** @deprecated Prefer semanticStatus. */
+export type HubSpotMappingStatus = HubSpotSemanticStatus;
 
 export type HubSpotCap001Contact = {
   cayFixtureId: string;
@@ -98,11 +112,4 @@ export type HubSpotCap001State = {
   escalations: HubSpotCap001Escalation[];
   flags: HubSpotCap001Flag[];
   appointments: HubSpotCap001Appointment[];
-};
-
-export type HubSpotScenarioMapping = {
-  scenarioId: string;
-  status: HubSpotMappingStatus;
-  reason: string;
-  liveScopeGap?: string;
 };

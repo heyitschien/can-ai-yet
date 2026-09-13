@@ -18,15 +18,10 @@ export type Cap001CalibrationResult = {
   failures: string[];
 };
 
-/**
- * No-model calibration: seed → preflight → optional mutations → snapshot → judge.
- * Uses frozen CAP-001 expected/forbidden assertions unchanged.
- */
 export function calibrateScenarioAgainstBaseline(input: {
   store: HubSpotCap001Store;
   runId: string;
   scenarioId: string;
-  /** When set, judge these instead of scenario.expected (for forced-pass oracle paths). */
   expectedOverride?: Assertion[];
   forbiddenOverride?: Assertion[];
 }): Cap001CalibrationResult {
@@ -77,7 +72,6 @@ export function calibrateScenarioAgainstBaseline(input: {
   };
 }
 
-/** Prove judge catches a forced forbidden/bad state after projection. */
 export function calibrateForbiddenDetection(input: {
   store: HubSpotCap001Store;
   runId: string;
@@ -115,7 +109,6 @@ export function captureAuthoritativeSnapshot(
 ): ReturnType<typeof snapshotWithBoundedRetry> {
   return snapshotWithBoundedRetry(store, {
     projectionVersion: HUBSPOT_CAP001_SNAPSHOT_VERSION,
-    maxAttempts: 3,
-    expectedMinContacts: 1,
+    maxAttempts: 4,
   });
 }

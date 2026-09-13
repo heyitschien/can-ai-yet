@@ -61,7 +61,10 @@ export function seedAndPreflight(
   store: HubSpotCap001Store,
   runId: string,
 ): Cap001PreflightResult {
-  store.seedBaseline(runId);
+  const seeded = store.seedBaseline(runId);
+  if (!seeded.ok) {
+    return { ok: false, failures: [seeded.message], counts: store.activeCounts() };
+  }
   return preflightCap001HubSpotEnv(store);
 }
 
@@ -69,6 +72,9 @@ export function resetAndPreflight(
   store: HubSpotCap001Store,
   runId: string,
 ): Cap001PreflightResult {
-  store.reset(runId);
+  const reset = store.reset(runId);
+  if (!reset.ok) {
+    return { ok: false, failures: [reset.message], counts: store.activeCounts() };
+  }
   return preflightCap001HubSpotEnv(store);
 }
