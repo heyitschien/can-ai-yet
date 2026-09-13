@@ -5,11 +5,10 @@ Short scan log. Newest first.
 ## CAY-20260913-03 — PR #20 CHANGES_REQUESTED fixes
 
 STATUS: READY_FOR_REVIEW  
-Exact head: `28e0450fb4a17a39c018b1bad538e6e732e736d1`  
+Exact head: PR #20 tip on `feature/cay-20260913-03-instrument-cert` (verify with `git rev-parse origin/feature/cay-20260913-03-instrument-cert`)  
 What: Split LabManifest (racetrack) vs RunConfig (car) vs RunReceipt; same lab + different models COMPARABLE; different lab heads INCOMPARABLE. Real mutation calibration (prove forbidden state exists, including LEAD-008 phone + LEAD-007 force-appointment seams). Consolidated HubSpot design (Service Key first, portable v2). Added `CANAIYET_HUBSPOT_EXPLAINER.md` + index link. Zero paid/live HubSpot.  
 Branch: `feature/cay-20260913-03-instrument-cert` → PR #20  
-Evidence: `pnpm test` 51 pass; lint/typecheck/build green.
-## CAY-20260913-03 — CAP-001 instrument certification (in progress)
+Evidence: `pnpm test` 51 pass; lint/typecheck/build green.## CAY-20260913-03 — CAP-001 instrument certification (in progress)
 
 STATUS: IN_PROGRESS → READY_FOR_REVIEW when tests green  
 What: Construct-validity certification layer for frozen CAP-001 v1 — matrix (`evals/certification/cap-001-v1-matrix.ts`), public oracle, manifest fingerprint + run validation, portable contract v2, tests. Docs: `CAP_001_INSTRUMENT_SCIENCE.md`, HubSpot design §20. No frozen scenario edits. No paid models. Demand Scout remains **PARKED_UNCOMMISSIONED**.  
