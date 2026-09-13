@@ -42,7 +42,9 @@ These explain the product and operating method. They do not outrank the authorit
 10. `HUBSPOT_TRANSFER_PREDICTION_2026-09-11.md` — pre-registered expectations for the CAP-001 HubSpot transfer; compare the eventual result against this record rather than rewriting the story afterward.
 11. `HUBSPOT_TRANSFER_DESIGN_2026-09-13.md` — design-only HubSpot transfer spec (Issue #14); consolidated Service Key + portable-v2 direction; not build authority until independently accepted.
 12. `HUBSPOT_COMMISSIONING_SETUP.md` — concise human setup runbook for no-model commissioning (Service Key; no secrets in chat); live smoke still separately authorized.
-13. `CANAIYET_HUBSPOT_EXPLAINER.md` — plain durable explainer (what/why/how for synthetic→HubSpot); mirrors the Linear document; not build authority.
+13. `HUBSPOT_CAP001_ENV.md` — CAY-08 CAP-001 HubSpot seed/reset/snapshot/mapping versions (no-model calibration; not live suite auth).
+14. `HUBSPOT_CAP001_SCOPE_PLAN.md` — exact least-authority tool→endpoint→scope matrix (deals new; activities under contacts scopes; no key expansion).
+15. `CANAIYET_HUBSPOT_EXPLAINER.md` — plain durable explainer (what/why/how for synthetic→HubSpot); mirrors the Linear document; not build authority.
 14. `CAP_001_INSTRUMENT_SCIENCE.md` — execution vs construct validity, v1 certification matrix pointers, CapabilityContract + EnvironmentManifest discipline (CAY-20260913-03/04; not build authority).
 15. `FALSIFICATION_AND_PHASE_THRESHOLDS.md` — CanAIYet-specific stage gates and stop/narrow/pivot logic.
 16. `CAPABILITY_CONTROL_PLANE_HORIZON.md` — long-horizon hypothesis: capability graph, longitudinal evidence, and possible `measure → qualify → recommend → route → monitor → govern` progression; not a roadmap.

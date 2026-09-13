@@ -109,6 +109,30 @@ CAY-06 Stage B illustrated this: HubSpot rejected a synthetic-lab `.invalid` ema
 
 ---
 
+## 7E. Reachability vs capability assurance
+
+**MCP/APIs/browser tools prove reachability. CanAIYet proves job capability.**
+
+Vendor tool layers answer: can an agent reach the software and perform actions? CanAIYet asks: once it can act, can this configured intelligence perform the business job correctly, safely, and repeatably under tested conditions?
+
+HubSpot, Salesforce, Zendesk, ServiceNow, MCP servers, and browsers are **execution environments**, not the core product thesis. The core asset is:
+
+`business capability → CapabilityContractManifest → stable tool/policy semantics → environment adapter → deterministic evidence → failure attribution`
+
+CanAIYet is closer to an **independent proving ground** than an automation product.
+
+Primary beneficiaries are people accountable for deciding whether work can be delegated—AI/platform leaders, operations owners, governance/assurance teams, solutions architects/integrators—not only developers who can wire an agent.
+
+Core deployment question:
+
+> **Can I safely delegate this job yet, under exactly these conditions, and what breaks if I do?**
+
+Mental model:
+
+> **The vendor provides the car and road access. CanAIYet provides the independent proving ground and the exam.**
+
+---
+
 ## 7B. Portable capability architecture
 
 Preserve the business capability contract; change only environment adapters:
