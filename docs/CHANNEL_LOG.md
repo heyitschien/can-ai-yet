@@ -2,6 +2,8 @@
 
 Short scan log. Newest first.
 
+## CAY-20260912-03 — Independent review ACCEPTED (review/cay-20260912-03); PR #10 awaits human merge gate. See docs/reviews/CAY-20260912-03.md.
+
 ## CAY-20260912-03 — Demand Scout sync with main
 
 STATUS: READY_FOR_REVIEW  
