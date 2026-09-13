@@ -128,7 +128,7 @@ export function defaultCap001ScenarioIds(): string[] {
 
 export function defaultLabManifest(overrides: Partial<LabManifestInput> = {}): LabManifest {
   return buildLabManifest({
-    labHeadSha: overrides.labHeadSha ?? "100c9511ea1c6349d871f44dd87a396b91c0fec7",
+    labHeadSha: overrides.labHeadSha ?? "f0b44179633d06759312195a03b575e1044c098d",
     fixtureVersion: overrides.fixtureVersion ?? FIXTURE_VERSION,
     environmentVersion: overrides.environmentVersion ?? ENVIRONMENT_VERSION,
     scenarioIds: overrides.scenarioIds ?? defaultCap001ScenarioIds(),
