@@ -2,6 +2,13 @@
 
 Short scan log. Newest first.
 
+## CAY-20260913-01 — capability intelligence horizon preserved
+
+STATUS: DOCS_ONLY / STRATEGY PRESERVED  
+What: Added `CAPABILITY_CONTROL_PLANE_HORIZON.md` to preserve the long-horizon hypothesis without expanding current build authority. It records the three-year capability-graph idea, value of longitudinal evidence, real-enterprise fidelity, cross-organization failure learning, asymmetric career/technical value, and the possible progression `measure → qualify → recommend → route → monitor → govern`.  
+Rule: this is a horizon document, not a roadmap. Continue falsification-first work; do not build a control plane because it is imaginable.  
+Cursor follow-up: consolidate this document into the main strategic reading/index structure when next working docs, while preserving its non-authoritative status and avoiding duplication.
+
 ## CAY-20260912-03 — Demand Scout sync with main
 
 STATUS: READY_FOR_REVIEW  
