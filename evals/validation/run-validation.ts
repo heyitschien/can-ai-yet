@@ -18,11 +18,17 @@ export type RunLimits = {
   maxSteps?: number;
 };
 
+/**
+ * Per-run validation input.
+ * `labFingerprint` must match the LabManifest (racetrack).
+ * Model/provider belong in run config / served fields, not the lab fingerprint.
+ */
 export type RunReceiptInput = {
   benchmarkVersion: string;
-  manifestFingerprint: string;
-  expectedManifestFingerprint?: string;
+  labFingerprint: string;
+  expectedLabFingerprint?: string;
   labHeadSha: string;
+  expectedLabHeadSha?: string;
   requestedModel: string;
   servedModel: string;
   provider: string;
@@ -51,9 +57,10 @@ function allScenarioIdsPresent(scenarioResults: ScenarioRunReceipt[]): boolean {
 export function validateRunReceipt(input: RunReceiptInput): RunValidationResult {
   const checks: Record<string, boolean> = {
     benchmarkVersion: input.benchmarkVersion === "cap-001-v1",
-    manifestFingerprint: Boolean(input.manifestFingerprint),
-    manifestComparable:
-      !input.expectedManifestFingerprint || input.manifestFingerprint === input.expectedManifestFingerprint,
+    labFingerprint: Boolean(input.labFingerprint),
+    labComparable:
+      (!input.expectedLabFingerprint || input.labFingerprint === input.expectedLabFingerprint) &&
+      (!input.expectedLabHeadSha || input.labHeadSha === input.expectedLabHeadSha),
     labHeadSha: Boolean(input.labHeadSha && input.labHeadSha !== "uncommitted"),
     requestedModel: Boolean(input.requestedModel),
     servedModel: Boolean(input.servedModel),
@@ -68,7 +75,8 @@ export function validateRunReceipt(input: RunReceiptInput): RunValidationResult 
       (row) => row.generationIds === undefined || row.generationIds.length > 0,
     ),
     costTokensPresent: input.scenarioResults.every(
-      (row) => typeof row.costUsd === "number" && typeof row.inputTokens === "number" && typeof row.outputTokens === "number",
+      (row) =>
+        typeof row.costUsd === "number" && typeof row.inputTokens === "number" && typeof row.outputTokens === "number",
     ),
     limitsPresent: Boolean(input.limits && (input.limits.maxCostUsd !== undefined || input.limits.maxSteps !== undefined)),
     anomaliesAbsent: !input.anomalies || input.anomalies.length === 0,
@@ -76,8 +84,8 @@ export function validateRunReceipt(input: RunReceiptInput): RunValidationResult 
 
   const reasons: string[] = [];
   if (!checks.benchmarkVersion) reasons.push("benchmarkVersion must be cap-001-v1");
-  if (!checks.manifestFingerprint) reasons.push("manifestFingerprint missing");
-  if (!checks.manifestComparable) reasons.push("manifestFingerprint does not match expected experiment manifest");
+  if (!checks.labFingerprint) reasons.push("labFingerprint missing");
+  if (!checks.labComparable) reasons.push("labFingerprint/labHeadSha do not match expected LabManifest");
   if (!checks.labHeadSha) reasons.push("labHeadSha missing or uncommitted");
   if (!checks.requestedModel) reasons.push("requestedModel missing");
   if (!checks.servedModel) reasons.push("servedModel missing");
@@ -94,7 +102,7 @@ export function validateRunReceipt(input: RunReceiptInput): RunValidationResult 
   if (!checks.anomaliesAbsent) reasons.push(`anomalies recorded: ${(input.anomalies ?? []).join(", ")}`);
 
   let status: RunValidationStatus = "VALID";
-  if (!checks.manifestComparable) {
+  if (!checks.labComparable) {
     status = "INCOMPARABLE";
   } else if (reasons.length > 0) {
     status = "INVALID";

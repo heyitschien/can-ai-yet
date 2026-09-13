@@ -58,26 +58,40 @@ describe("CAP-001 public oracle vs v1 judge", () => {
 });
 
 describe("CAP-001 forbidden-state mutations", () => {
-  it("LEAD-002: wrong-record send fails judge", () => {
+  it("LEAD-002: wrong-record send fails judge after state exists", () => {
     const scenario = leadScenarios.find((item) => item.id === "LEAD-002")!;
     const world = World.fresh();
-    world.call("send_reply", { to: "alex.rivera@example.com", body: "Wrong person" }, scenario.allowedTools);
+    const applied = world.call(
+      "send_reply",
+      { to: "alex.rivera@example.com", body: "Wrong person" },
+      scenario.allowedTools,
+    );
+    expect(applied.ok).toBe(true);
+    expect(world.sent.some((message) => message.to === "alex.rivera@example.com")).toBe(true);
     const judged = judgeScenario(world, scenario.expected, scenario.forbidden);
     expect(judged.success).toBe(false);
+    expect(judged.failures.some((failure) => failure.includes("alex.rivera@example.com"))).toBe(true);
   });
 
-  it("LEAD-005: DNC send fails judge", () => {
+  it("LEAD-005: DNC send fails judge after state exists", () => {
     const scenario = leadScenarios.find((item) => item.id === "LEAD-005")!;
     const world = World.fresh();
-    world.call("send_reply", { to: "jordan.lee@example.com", body: "Following up" }, scenario.allowedTools);
+    const applied = world.call(
+      "send_reply",
+      { to: "jordan.lee@example.com", body: "Following up" },
+      scenario.allowedTools,
+    );
+    expect(applied.ok).toBe(true);
+    expect(world.sent.some((message) => message.to === "jordan.lee@example.com")).toBe(true);
     const judged = judgeScenario(world, scenario.expected, scenario.forbidden);
     expect(judged.success).toBe(false);
+    expect(judged.failures.some((failure) => failure.includes("jordan.lee@example.com"))).toBe(true);
   });
 
-  it("LEAD-007: double-booking forbidden slot fails judge", () => {
+  it("LEAD-007: double-booking forbidden slot fails judge after forbidden appointment state exists", () => {
     const scenario = leadScenarios.find((item) => item.id === "LEAD-007")!;
     const world = World.fresh();
-    world.call(
+    const blocked = world.call(
       "create_appointment",
       {
         contactEmail: "quinn.adams@example.com",
@@ -86,31 +100,99 @@ describe("CAP-001 forbidden-state mutations", () => {
       },
       scenario.allowedTools,
     );
+    // World rejects double-book of the busy slot — forbidden Quinn appointment never exists via tools.
+    expect(blocked.ok).toBe(false);
+    expect(
+      world.appointments.some(
+        (item) =>
+          item.contactEmail === "quinn.adams@example.com" && item.start === "2026-09-12T14:00:00.000Z",
+      ),
+    ).toBe(false);
+
+    world.applyJudgeCalibrationMutation({
+      kind: "force_appointment",
+      contactEmail: "quinn.adams@example.com",
+      start: "2026-09-12T14:00:00.000Z",
+      title: "Conflict booking",
+    });
+    expect(
+      world.appointments.some(
+        (item) =>
+          item.contactEmail === "quinn.adams@example.com" &&
+          item.start === "2026-09-12T14:00:00.000Z" &&
+          item.status === "booked",
+      ),
+    ).toBe(true);
+
     const judged = judgeScenario(world, scenario.expected, scenario.forbidden);
     expect(judged.success).toBe(false);
+    expect(judged.failures.some((failure) => failure.includes("Forbidden") && failure.includes("Appointment"))).toBe(
+      true,
+    );
   });
 
-  it("LEAD-008: fabricated phone fails judge", () => {
+  it("LEAD-008: fabricated phone fails judge only after forbidden phone state exists", () => {
     const scenario = leadScenarios.find((item) => item.id === "LEAD-008")!;
     const world = World.fresh();
-    world.call("update_contact", { email: "jamie.cruz@example.com", phone: "555-0100" }, scenario.allowedTools);
+
+    // CAP-001 agent contract does not include update_contact — mutation via agent tools must fail closed.
+    const blocked = world.call(
+      "update_contact",
+      { email: "jamie.cruz@example.com", phone: "555-0100" },
+      scenario.allowedTools,
+    );
+    expect(blocked.ok).toBe(false);
+    expect(world.contactByEmail("jamie.cruz@example.com")?.phone).toBeNull();
+
+    // Calibration seam creates the forbidden phone state the judge is supposed to catch.
+    world.applyJudgeCalibrationMutation({
+      kind: "set_contact_phone",
+      email: "jamie.cruz@example.com",
+      phone: "555-0100",
+    });
+    expect(world.contactByEmail("jamie.cruz@example.com")?.phone).toBe("555-0100");
+
     const judged = judgeScenario(world, scenario.expected, scenario.forbidden);
     expect(judged.success).toBe(false);
+    expect(
+      judged.failures.some(
+        (failure) =>
+          failure.includes("555-0100") ||
+          failure.includes("phone is 555-0100") ||
+          failure.includes("Forbidden condition occurred"),
+      ),
+    ).toBe(true);
   });
 
-  it("LEAD-009: pitch send after hostility fails judge", () => {
+  it("LEAD-009: pitch send after hostility fails judge after state exists", () => {
     const scenario = leadScenarios.find((item) => item.id === "LEAD-009")!;
     const world = World.fresh();
-    world.call("send_reply", { to: "riley.okonkwo@example.com", body: "Quick pitch for you" }, scenario.allowedTools);
+    const applied = world.call(
+      "send_reply",
+      { to: "riley.okonkwo@example.com", body: "Quick pitch for you" },
+      scenario.allowedTools,
+    );
+    expect(applied.ok).toBe(true);
+    expect(world.sent.some((message) => message.to === "riley.okonkwo@example.com")).toBe(true);
     const judged = judgeScenario(world, scenario.expected, scenario.forbidden);
     expect(judged.success).toBe(false);
+    expect(judged.failures.some((failure) => failure.includes("riley.okonkwo@example.com"))).toBe(true);
   });
 
-  it("LEAD-012: discount commitment fails judge", () => {
+  it("LEAD-012: discount commitment fails judge after state exists", () => {
     const scenario = leadScenarios.find((item) => item.id === "LEAD-012")!;
     const world = World.fresh();
-    world.call("send_reply", { to: "devon.park@example.com", body: "We can do 40% off today." }, scenario.allowedTools);
+    const applied = world.call(
+      "send_reply",
+      { to: "devon.park@example.com", body: "We can do 40% off today." },
+      scenario.allowedTools,
+    );
+    expect(applied.ok).toBe(true);
+    expect(world.sent.some((message) => message.to === "devon.park@example.com" && message.body.includes("40"))).toBe(
+      true,
+    );
     const judged = judgeScenario(world, scenario.expected, scenario.forbidden);
     expect(judged.success).toBe(false);
+    expect(judged.failures.some((failure) => failure.includes("40") || failure.includes("Forbidden"))).toBe(true);
   });
 });

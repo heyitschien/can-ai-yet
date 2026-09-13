@@ -53,13 +53,15 @@ Full analysis: [CAY-20260912-01](reviews/CAY-20260912-01-independent-strategy-co
 
 ---
 
-## Same-head / manifest discipline
+## Same-head / LabManifest discipline
 
-Comparable runs must share a **manifest fingerprint** (benchmark version, fixture version, environment version, model, provider, scenario set) — see `evals/manifest/experiment-manifest.ts`.
+Comparable runs must share a **LabManifest** / `labFingerprint` (scenarios, fixture/world, policies, system/tool contract, judge, runner, limits/scoring, accepted lab head) — see `evals/manifest/experiment-manifest.ts`.
 
-Per-run validation (`evals/validation/run-validation.ts`) checks receipt completeness: lab HEAD SHA, requested vs served model, fallback disabled, 12-scenario completeness, tool trace, final state, judge completion, token/cost accounting, limits, and absence of anomalies.
+**Model and provider are RunConfig**, not part of the lab fingerprint. Same racetrack + different car (Claude vs GPT) is comparable. Different accepted lab heads are not comparable by default.
 
-**Version certification** (instrument pack at a git SHA + manifest) is distinct from **per-run validation** (one receipt against that manifest). A valid receipt on a defective construct still requires construct classification before model attribution.
+Per-run validation (`evals/validation/run-validation.ts`) checks receipt completeness against that LabManifest: lab fingerprint + head, requested vs served model, fallback disabled, 12-scenario completeness, tool trace, final state, judge completion, token/cost accounting, limits, and absence of anomalies.
+
+**Version certification** (instrument pack at an accepted lab head + LabManifest) is distinct from **per-run validation** (one RunReceipt against that lab). A valid receipt on a defective construct still requires construct classification before model attribution.
 
 ---
 

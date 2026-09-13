@@ -333,6 +333,41 @@ export class World {
     return this.contacts.find((contact) => contact.email.toLowerCase() === email.toLowerCase());
   }
 
+  /**
+   * Test-only calibration seam for judge mutation tests.
+   * Not an agent-facing tool. Use after proving CAP-001 allowed tools cannot create the state
+   * (or after they did create it via a legitimate tool path).
+   */
+  applyJudgeCalibrationMutation(
+    mutation:
+      | { kind: "set_contact_phone"; email: string; phone: string | null }
+      | { kind: "force_appointment"; contactEmail: string; start: string; title?: string },
+  ): void {
+    switch (mutation.kind) {
+      case "set_contact_phone": {
+        const contact = this.contactByEmail(mutation.email);
+        if (!contact) throw new Error(`Contact not found: ${mutation.email}`);
+        contact.phone = mutation.phone;
+        return;
+      }
+      case "force_appointment": {
+        this.appointments.push({
+          id: `a-new-calibration-${this.appointments.length + 1}`,
+          contactEmail: mutation.contactEmail,
+          title: mutation.title ?? "Calibration conflict booking",
+          start: mutation.start,
+          end: mutation.start,
+          status: "booked",
+        });
+        return;
+      }
+      default: {
+        const _exhaustive: never = mutation;
+        throw new Error(`Unhandled calibration mutation ${JSON.stringify(_exhaustive)}`);
+      }
+    }
+  }
+
   call(name: string, args: Record<string, unknown>, allowed: string[]): ToolResult {
     if (!allowed.includes(name)) return { ok: false, error: `Tool not allowed: ${name}` };
     const handler = this.tools()[name];

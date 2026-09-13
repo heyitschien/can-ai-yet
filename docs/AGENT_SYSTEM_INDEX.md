@@ -15,7 +15,7 @@ Two lists. Do not treat them as the same thing.
 
 `FALSIFICATION_OPERATING_METHOD.md` is the default learning/decision method for material hypotheses, but it does not independently authorize implementation, spend, deployment, or public claims.
 
-`ORIGIN_AND_DECISION_TRAIL.md`, `EXPLAINED_LIKE_IM_FIVE.md`, `DECISION_RECORD_2026-09-11.md`, `EOD_2026-09-11.md`, `CAPABILITY_INTELLIGENCE_THESIS.md`, `FALSIFICATION_AND_PHASE_THRESHOLDS.md`, `ENTERPRISE_ENVIRONMENT_VALIDATION.md`, `HUBSPOT_TRANSFER_PREDICTION_2026-09-11.md`, and `CAPABILITY_CONTROL_PLANE_HORIZON.md` are explanation/strategy, not build authority. `FOUR_AGENT_SYSTEM_SUMMARY.md` is a refresher, not a second architecture. `can-ai-yet-status.pdf` is a dated human snapshot, not a work order.
+`ORIGIN_AND_DECISION_TRAIL.md`, `EXPLAINED_LIKE_IM_FIVE.md`, `CANAIYET_HUBSPOT_EXPLAINER.md`, `DECISION_RECORD_2026-09-11.md`, `EOD_2026-09-11.md`, `CAPABILITY_INTELLIGENCE_THESIS.md`, `FALSIFICATION_AND_PHASE_THRESHOLDS.md`, `ENTERPRISE_ENVIRONMENT_VALIDATION.md`, `HUBSPOT_TRANSFER_PREDICTION_2026-09-11.md`, and `CAPABILITY_CONTROL_PLANE_HORIZON.md` are explanation/strategy, not build authority. `FOUR_AGENT_SYSTEM_SUMMARY.md` is a refresher, not a second architecture. `can-ai-yet-status.pdf` is a dated human snapshot, not a work order.
 
 ## First public CAP-001 finding (live)
 
@@ -40,12 +40,13 @@ These explain the product and operating method. They do not outrank the authorit
 8. `CAPABILITY_INTELLIGENCE_THESIS.md` — strategic thesis: economics, moat hypotheses, demand loop, falsification.
 9. `ENTERPRISE_ENVIRONMENT_VALIDATION.md` — why the synthetic lab is a wind tunnel, how capability packs could progress into real vendor sandboxes/customer staging, and the HubSpot transfer experiment hypothesis.
 10. `HUBSPOT_TRANSFER_PREDICTION_2026-09-11.md` — pre-registered expectations for the CAP-001 HubSpot transfer; compare the eventual result against this record rather than rewriting the story afterward.
-11. `HUBSPOT_TRANSFER_DESIGN_2026-09-13.md` — design-only HubSpot transfer spec (Issue #14); not build authority until independently accepted.
-12. `CAP_001_INSTRUMENT_SCIENCE.md` — execution vs construct validity, v1 certification matrix pointers, manifest discipline (CAY-20260913-03; not build authority).
-12. `FALSIFICATION_AND_PHASE_THRESHOLDS.md` — CanAIYet-specific stage gates and stop/narrow/pivot logic.
-13. `CAPABILITY_CONTROL_PLANE_HORIZON.md` — long-horizon hypothesis: capability graph, longitudinal evidence, and possible `measure → qualify → recommend → route → monitor → govern` progression; not a roadmap.
-14. `FOUR_AGENT_SYSTEM.md` — who scouts, runs, judges, and publishes.
-15. `NEXT_MISSIONS.md` — what should happen next.
+11. `HUBSPOT_TRANSFER_DESIGN_2026-09-13.md` — design-only HubSpot transfer spec (Issue #14); consolidated Service Key + portable-v2 direction; not build authority until independently accepted.
+12. `CANAIYET_HUBSPOT_EXPLAINER.md` — plain durable explainer (what/why/how for synthetic→HubSpot); mirrors the Linear document; not build authority.
+13. `CAP_001_INSTRUMENT_SCIENCE.md` — execution vs construct validity, v1 certification matrix pointers, LabManifest discipline (CAY-20260913-03; not build authority).
+14. `FALSIFICATION_AND_PHASE_THRESHOLDS.md` — CanAIYet-specific stage gates and stop/narrow/pivot logic.
+15. `CAPABILITY_CONTROL_PLANE_HORIZON.md` — long-horizon hypothesis: capability graph, longitudinal evidence, and possible `measure → qualify → recommend → route → monitor → govern` progression; not a roadmap.
+16. `FOUR_AGENT_SYSTEM.md` — who scouts, runs, judges, and publishes.
+17. `NEXT_MISSIONS.md` — what should happen next.
 
 Demand Scout docs (sensor, not benchmark authority):
 
@@ -65,7 +66,7 @@ Demand Scout docs (sensor, not benchmark authority):
 8. `CAPABILITY_INTELLIGENCE_THESIS.md`, `ENTERPRISE_ENVIRONMENT_VALIDATION.md`, `HUBSPOT_TRANSFER_PREDICTION_2026-09-11.md`, `FALSIFICATION_AND_PHASE_THRESHOLDS.md`, and `CAPABILITY_CONTROL_PLANE_HORIZON.md` when strategic/economic/enterprise-validation direction is needed.
 9. `DEMAND_SCOUT_ARCHITECTURE.md` / `DEMAND_SCOUT_OPERATIONS.md` when working Issue #6 (currently PARKED_UNCOMMISSIONED — no live Google calls without a fresh work order).
 10. `HUBSPOT_TRANSFER_DESIGN_2026-09-13.md` when reviewing Issue #14 design (design only until accepted).
-11. `ORIGIN_AND_DECISION_TRAIL.md` and `EXPLAINED_LIKE_IM_FIVE.md` when the why or the plain explanation is needed.
+11. `ORIGIN_AND_DECISION_TRAIL.md`, `EXPLAINED_LIKE_IM_FIVE.md`, and `CANAIYET_HUBSPOT_EXPLAINER.md` when the why or the plain HubSpot-transfer explanation is needed.
 
 ## Name map
 
@@ -96,6 +97,7 @@ Official sequence is in `NEXT_MISSIONS.md`. Human override: Demand Scout live co
 - `reviews/CAY-20260913-01-gpt-cap001-comparator.md` — unpublished GPT-5.5 vs Sonnet 4.6 CAP-001 comparator (N=1; not public evidence).
 - `CAP_001_INSTRUMENT_SCIENCE.md` / `CAP_001_RACETRACK.md` — instrument certification science + how to read traces.
 - `HUBSPOT_TRANSFER_DESIGN_2026-09-13.md` — Issue #14 design-only transfer spec; compare to pre-registration without editing it.
+- `CANAIYET_HUBSPOT_EXPLAINER.md` — durable plain explainer for CanAIYet + HubSpot reality transfer.
 
 ## Stable rule
 
