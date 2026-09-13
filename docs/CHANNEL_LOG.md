@@ -2,6 +2,43 @@
 
 Short scan log. Newest first.
 
+## CAY-20260913-04 — Transfer comparison contract correction
+
+STATUS: READY_FOR_REVIEW  
+What: Split CapabilityContractManifest (invariant) from EnvironmentManifest (env-specific); encode COMPARABLE_MODEL_RUNS vs COMPARABLE_TRANSFER_PAIR; docs aligned. Preserve v1/GPT UI/Service Key. Zero paid/live.  
+Branch: `feature/cay-20260913-03-instrument-cert` → PR #20  
+Evidence: `pnpm test` 55 pass; lint/typecheck/build green.
+
+## CAY-20260913-03 — PR #20 CHANGES_REQUESTED fixes
+
+STATUS: READY_FOR_REVIEW  
+Exact head: PR #20 tip on `feature/cay-20260913-03-instrument-cert` (verify with `git rev-parse origin/feature/cay-20260913-03-instrument-cert`)  
+What: Split LabManifest (racetrack) vs RunConfig (car) vs RunReceipt; same lab + different models COMPARABLE; different lab heads INCOMPARABLE. Real mutation calibration (prove forbidden state exists, including LEAD-008 phone + LEAD-007 force-appointment seams). Consolidated HubSpot design (Service Key first, portable v2). Added `CANAIYET_HUBSPOT_EXPLAINER.md` + index link. Zero paid/live HubSpot.  
+Branch: `feature/cay-20260913-03-instrument-cert` → PR #20  
+Evidence: `pnpm test` 51 pass; lint/typecheck/build green.
+
+## CAY-20260913-03 — CAP-001 instrument certification (in progress)
+
+STATUS: IN_PROGRESS → READY_FOR_REVIEW when tests green  
+What: Construct-validity certification layer for frozen CAP-001 v1 — matrix (`evals/certification/cap-001-v1-matrix.ts`), public oracle, manifest fingerprint + run validation, portable contract v2, tests. Docs: `CAP_001_INSTRUMENT_SCIENCE.md`, HubSpot design §20. No frozen scenario edits. No paid models. Demand Scout remains **PARKED_UNCOMMISSIONED**.  
+Branch: `feature/cay-20260913-03-instrument-cert` (base `533ac5f`)  
+Next: `pnpm test` green → handoff for independent review.
+
+## CAY-20260913-03 — instrument certification → GPT report → HubSpot prep
+
+STATUS: READY_FOR_REVIEW  
+What: Certified CAP-001 v1 instrument (matrix + public oracles + mutations), automatic run-validation + manifest fingerprints, portable contract v2 data, GPT-5.5 compare UI inside existing CAP-001 report (unpublished companion), HubSpot design updated from cert findings. Zero paid/live calls. v1 artifacts unchanged.  
+Linear: CanAIYet project discussion  
+Branch: `feature/cay-20260913-03-instrument-cert`
+
+## CAY-20260913-01 — park Demand Scout / GPT comparator / HubSpot prep
+
+STATUS: READY_FOR_REVIEW  
+What: Demand Scout live commissioning **PARKED_UNCOMMISSIONED**. One GPT-5.5 CAP-001 synthetic comparator completed under $1 (`benchmarkValid`, ~$0.404, 2/12 pass, 5 critical labels; 10/12 same pass/fail vs Sonnet). HubSpot transfer **design only** written. No Google live calls. No Demand Scout code changes. No HubSpot build. Public Sonnet finding unchanged.  
+Evidence: `docs/reviews/CAY-20260913-01-gpt-cap001-comparator.md`, `docs/reviews/runs/CAP-001-openrouter-2026-09-13T18-47-08-436Z.json`, `docs/HUBSPOT_TRANSFER_DESIGN_2026-09-13.md`  
+Base main: `21ea109`  
+Next: independent review of GPT evidence + HubSpot design.
+
 ## CAY-20260913-01 — capability intelligence horizon preserved
 
 STATUS: DOCS_ONLY / STRATEGY PRESERVED  

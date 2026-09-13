@@ -5,10 +5,8 @@ import { Cap001FirstFindingView } from "@/components/capability/cap-001-first-fi
 import { StatusMark } from "@/components/capability/status-mark";
 import { getPublishedBySlug, localRecord } from "@/lib/data/public-data";
 import { EVIDENCE_LABEL, STATUS_HINT, SUPERVISION_LABEL } from "@/lib/domain";
-import {
-  isCap001FirstFindingSlug,
-  loadCap001FirstFinding,
-} from "@/lib/evidence/first-finding";
+import { cap001SocialDescription, loadCap001ReportBundle } from "@/lib/evidence/cap-001-report";
+import { isCap001FirstFindingSlug } from "@/lib/evidence/first-finding";
 import { formatCost, formatRuntime, formatTestedDate } from "@/lib/format";
 
 export const dynamic = "force-dynamic";
@@ -17,9 +15,9 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   const capability = await getPublishedBySlug(slug);
   if (!capability) return { title: "Capability" };
-  const finding = isCap001FirstFindingSlug(slug) ? loadCap001FirstFinding() : null;
+  const bundle = isCap001FirstFindingSlug(slug) ? loadCap001ReportBundle() : null;
   const title = `Can AI ${capability.title}? Current Capability Test`;
-  const description = finding?.publicWording.summary ?? capability.shortDescription;
+  const description = bundle ? cap001SocialDescription(bundle) : capability.shortDescription;
   return {
     title,
     description,
@@ -34,9 +32,9 @@ export default async function CapabilityPage({ params }: { params: Promise<{ slu
   if (!capability) notFound();
 
   if (isCap001FirstFindingSlug(slug)) {
-    const finding = loadCap001FirstFinding();
-    if (finding) {
-      return <Cap001FirstFindingView capability={capability} finding={finding} />;
+    const bundle = loadCap001ReportBundle();
+    if (bundle) {
+      return <Cap001FirstFindingView capability={capability} bundle={bundle} />;
     }
   }
 
