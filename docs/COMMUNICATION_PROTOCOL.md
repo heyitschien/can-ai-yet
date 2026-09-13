@@ -23,6 +23,8 @@ The canonical lab roles are **Scout, Test Runner, Judge, and Publisher**. This p
 
 Do not silently reinterpret the canonical product thesis. Surface conflicts in Issue #1 and STOP.
 
+`docs/FALSIFICATION_OPERATING_METHOD.md` is the default learning/decision method for material strategic, product, market, capability, and architecture hypotheses. It does **not** independently authorize implementation, spend, deployment, or public claims.
+
 ## 2. Roles
 
 ### Human owner
@@ -175,3 +177,32 @@ canonical docs
 ```
 
 This makes the operating system portable across model changes, new agent sessions, devices, and future vendors.
+
+## 12. Falsification operating discipline
+
+For work whose purpose is to answer an uncertain strategic, product, market, capability, or architecture question, follow `docs/FALSIFICATION_OPERATING_METHOD.md`.
+
+Before material execution, make the experiment capable of changing our mind. When useful, include this block in the work order or a linked pre-registration document:
+
+```text
+HYPOTHESIS:
+HUMAN / BUSINESS PROBLEM:
+CURRENT EVIDENCE:
+KEY UNCERTAINTY:
+FALSIFIER:
+CHEAPEST SERIOUS TEST:
+FROZEN CONDITIONS:
+MAX TIME / SPEND:
+SUCCESS SIGNAL:
+FAILURE SIGNAL:
+AMBIGUOUS RESULT HANDLING:
+DECISION IF SUCCESS:
+DECISION IF FAILURE:
+EVIDENCE DESTINATION:
+```
+
+Do not use implementation output to retroactively redefine the hypothesis. Preserve negative results. End serious experiments with an explicit `CONTINUE`, `NARROW`, `PIVOT`, or `STOP` decision.
+
+The short form is:
+
+> **Imagine boldly. State the claim precisely. Design the cheapest serious test. Let reality answer. Preserve the evidence. Continue, narrow, pivot, or stop without ego.**
