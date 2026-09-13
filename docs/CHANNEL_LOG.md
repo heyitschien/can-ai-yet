@@ -2,6 +2,14 @@
 
 Short scan log. Newest first.
 
+## CAY-20260913-01 — park Demand Scout / GPT comparator / HubSpot prep
+
+STATUS: READY_FOR_REVIEW  
+What: Demand Scout live commissioning **PARKED_UNCOMMISSIONED**. One GPT-5.5 CAP-001 synthetic comparator completed under $1 (`benchmarkValid`, ~$0.404, 2/12 pass, 5 critical labels; 10/12 same pass/fail vs Sonnet). HubSpot transfer **design only** written. No Google live calls. No Demand Scout code changes. No HubSpot build. Public Sonnet finding unchanged.  
+Evidence: `docs/reviews/CAY-20260913-01-gpt-cap001-comparator.md`, `docs/reviews/runs/CAP-001-openrouter-2026-09-13T18-47-08-436Z.json`, `docs/HUBSPOT_TRANSFER_DESIGN_2026-09-13.md`  
+Base main: `21ea109`  
+Next: independent review of GPT evidence + HubSpot design.
+
 ## CAY-20260913-01 — capability intelligence horizon preserved
 
 STATUS: DOCS_ONLY / STRATEGY PRESERVED  

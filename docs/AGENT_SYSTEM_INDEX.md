@@ -40,10 +40,11 @@ These explain the product and operating method. They do not outrank the authorit
 8. `CAPABILITY_INTELLIGENCE_THESIS.md` — strategic thesis: economics, moat hypotheses, demand loop, falsification.
 9. `ENTERPRISE_ENVIRONMENT_VALIDATION.md` — why the synthetic lab is a wind tunnel, how capability packs could progress into real vendor sandboxes/customer staging, and the HubSpot transfer experiment hypothesis.
 10. `HUBSPOT_TRANSFER_PREDICTION_2026-09-11.md` — pre-registered expectations for the CAP-001 HubSpot transfer; compare the eventual result against this record rather than rewriting the story afterward.
-11. `FALSIFICATION_AND_PHASE_THRESHOLDS.md` — CanAIYet-specific stage gates and stop/narrow/pivot logic.
-12. `CAPABILITY_CONTROL_PLANE_HORIZON.md` — long-horizon hypothesis: capability graph, longitudinal evidence, and possible `measure → qualify → recommend → route → monitor → govern` progression; not a roadmap.
-13. `FOUR_AGENT_SYSTEM.md` — who scouts, runs, judges, and publishes.
-14. `NEXT_MISSIONS.md` — what should happen next.
+11. `HUBSPOT_TRANSFER_DESIGN_2026-09-13.md` — design-only HubSpot transfer spec (Issue #14); not build authority until independently accepted.
+12. `FALSIFICATION_AND_PHASE_THRESHOLDS.md` — CanAIYet-specific stage gates and stop/narrow/pivot logic.
+13. `CAPABILITY_CONTROL_PLANE_HORIZON.md` — long-horizon hypothesis: capability graph, longitudinal evidence, and possible `measure → qualify → recommend → route → monitor → govern` progression; not a roadmap.
+14. `FOUR_AGENT_SYSTEM.md` — who scouts, runs, judges, and publishes.
+15. `NEXT_MISSIONS.md` — what should happen next.
 
 Demand Scout docs (sensor, not benchmark authority):
 
@@ -61,8 +62,9 @@ Demand Scout docs (sensor, not benchmark authority):
 6. `NEXT_MISSIONS.md`.
 7. Issue #1, including the latest receipt.
 8. `CAPABILITY_INTELLIGENCE_THESIS.md`, `ENTERPRISE_ENVIRONMENT_VALIDATION.md`, `HUBSPOT_TRANSFER_PREDICTION_2026-09-11.md`, `FALSIFICATION_AND_PHASE_THRESHOLDS.md`, and `CAPABILITY_CONTROL_PLANE_HORIZON.md` when strategic/economic/enterprise-validation direction is needed.
-9. `DEMAND_SCOUT_ARCHITECTURE.md` / `DEMAND_SCOUT_OPERATIONS.md` when working Issue #6 / PR #10.
-10. `ORIGIN_AND_DECISION_TRAIL.md` and `EXPLAINED_LIKE_IM_FIVE.md` when the why or the plain explanation is needed.
+9. `DEMAND_SCOUT_ARCHITECTURE.md` / `DEMAND_SCOUT_OPERATIONS.md` when working Issue #6 (currently PARKED_UNCOMMISSIONED — no live Google calls without a fresh work order).
+10. `HUBSPOT_TRANSFER_DESIGN_2026-09-13.md` when reviewing Issue #14 design (design only until accepted).
+11. `ORIGIN_AND_DECISION_TRAIL.md` and `EXPLAINED_LIKE_IM_FIVE.md` when the why or the plain explanation is needed.
 
 ## Name map
 
@@ -74,9 +76,9 @@ GitHub Issue #1 — **Agent Communication Channel — CanAIYet Mission Control**
 
 `CHANNEL_LOG.md` is the short scan log. Newest entry first. It does not replace Issue #1.
 
-### Locked restart (CAY-20260911-11)
+### Locked restart (CAY-20260913-01)
 
-Official sequence is in `NEXT_MISSIONS.md` and `EOD_2026-09-11.md`. Tomorrow’s first job: independent re-review of Demand Scout PR #10, then one Google smoke, then freeze. After that: Issue **#14** HubSpot transfer design (design-only, review before build) and Issue **#15** practitioner decision-utility validation in parallel. Stay deep in Sales / Revenue Operations. HubSpot implementation is not authorized until the transfer design is reviewed.
+Official sequence is in `NEXT_MISSIONS.md`. Human override: Demand Scout live commissioning is **PARKED_UNCOMMISSIONED** (V1 merged/accepted; mock/CI valid; first Google smoke blocked on customer-not-enabled; not a code failure; no Google live calls until a fresh work order). Next: one GPT-family CAP-001 synthetic comparator → Issue **#14** HubSpot transfer **design only** → independent review → HubSpot implementation only after acceptance. Issue **#15** practitioner validation may run in parallel. Stay deep in Sales / Revenue Operations.
 
 ### Key review / strategy trail on `main` (not build authority)
 
@@ -90,8 +92,8 @@ Official sequence is in `NEXT_MISSIONS.md` and `EOD_2026-09-11.md`. Tomorrow’s
 - `DECISION_RECORD_2026-09-11.md` / `EOD_2026-09-11.md` — Sep 11 strategy + stop point.
 - `FALSIFICATION_OPERATING_METHOD.md` — Sep 13 operating method for falsifiable hypothesis work across research/product/market/architecture decisions.
 - `ENTERPRISE_ENVIRONMENT_VALIDATION.md` — Sep 11 insight record for synthetic→real-stack→customer-staging validation and portable capability packs.
-- `HUBSPOT_TRANSFER_PREDICTION_2026-09-11.md` — pre-experiment prediction record; preserve unchanged and compare against eventual Issue #14 results to reduce hindsight bias.
-- `CAPABILITY_CONTROL_PLANE_HORIZON.md` — Sep 13 long-horizon hypothesis; preserve as strategy, not build authority.
+- `reviews/CAY-20260913-01-gpt-cap001-comparator.md` — unpublished GPT-5.5 vs Sonnet 4.6 CAP-001 comparator (N=1; not public evidence).
+- `HUBSPOT_TRANSFER_DESIGN_2026-09-13.md` — Issue #14 design-only transfer spec; compare to pre-registration without editing it.
 
 ## Stable rule
 
