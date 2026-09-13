@@ -9,6 +9,7 @@
  */
 import { HUBSPOT_API_VERSION, HUBSPOT_LAB_PORTAL_ID, HUBSPOT_LIVE_ADAPTER_VERSION } from "../evals/hubspot/api-version";
 import { runHubSpotCommissioningLifecycle } from "../evals/hubspot/commissioning";
+import { createHubSpotFixtureRunId } from "../evals/hubspot/fixture";
 import { assertHubSpotLiveSmokeAuthorized } from "../evals/hubspot/live-gate";
 import { LiveHubSpotTransport } from "../evals/hubspot/live-transport";
 import {
@@ -30,6 +31,7 @@ async function main(): Promise<void> {
   }
 
   const token = process.env[HUBSPOT_SERVICE_KEY_ENV]!;
+  const runId = process.env.CAY_HUBSPOT_FIXTURE_RUN_ID?.trim() || createHubSpotFixtureRunId();
   const transport = new LiveHubSpotTransport({ accessToken: token });
   const result = await runHubSpotCommissioningLifecycle({
     transport,
@@ -40,6 +42,7 @@ async function main(): Promise<void> {
       authMechanism: "service_key",
       portalId: HUBSPOT_LAB_PORTAL_ID,
       syntheticNamespace: "cay-comm",
+      runId,
       credentialConfigured: true,
     },
     gitHead: process.env.CAY_GIT_HEAD ?? "uncommitted",
@@ -54,6 +57,8 @@ async function main(): Promise<void> {
         apiVersion: HUBSPOT_API_VERSION,
         envFileLoaded: loaded.fileLoaded,
         serviceKeyConfigured: true,
+        runId: result.receipt.runId,
+        syntheticEmail: result.receipt.syntheticEmail,
         failureClass: result.failureClass,
         cleanupVerified: result.receipt.cleanupVerified,
         createdObjectIds: result.receipt.createdObjectIds,

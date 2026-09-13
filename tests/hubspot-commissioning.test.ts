@@ -43,6 +43,20 @@ describe("HubSpot no-model commissioning (mock)", () => {
     expect(result.receipt.failureClass).toBeUndefined();
   });
 
+  it("uses cay-comm-<run-id>@example.com and records run provenance", async () => {
+    const transport = new MockHubSpotTransport({ mode: "happy" });
+    const result = await runHubSpotCommissioningLifecycle({
+      transport,
+      config: { ...baseConfig, runId: "20260913-fixture-a" },
+      gitHead: "test-head",
+    });
+    expect(result.ok).toBe(true);
+    expect(result.receipt.runId).toBe("20260913-fixture-a");
+    expect(result.receipt.syntheticEmail).toBe("cay-comm-20260913-fixture-a@example.com");
+    expect(result.receipt.syntheticEmail).toContain("@example.com");
+    expect(result.receipt.syntheticEmail).not.toContain(".invalid");
+  });
+
   it("classifies missing/insufficient authorization as PERMISSION_FAILURE", async () => {
     const result = await runHubSpotCommissioningLifecycle({
       transport: new MockHubSpotTransport({ mode: "permission_denied" }),

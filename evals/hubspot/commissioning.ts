@@ -1,3 +1,8 @@
+import {
+  buildHubSpotCommissioningEmail,
+  createHubSpotFixtureRunId,
+  normalizeHubSpotFixtureRunId,
+} from "@/evals/hubspot/fixture";
 import { assertNoSecrets, scrubForReceipt } from "@/evals/hubspot/redact";
 import type {
   HubSpotCommissioningConfig,
@@ -16,6 +21,8 @@ export type CommissioningLifecycleResult = {
 function buildReceipt(input: {
   gitHead: string;
   config: HubSpotCommissioningConfig;
+  runId: string;
+  syntheticEmail: string;
   operations: HubSpotOperationRecord[];
   createdObjectIds: string[];
   cleanupVerified: boolean;
@@ -31,6 +38,8 @@ function buildReceipt(input: {
     apiVersion: input.config.apiVersion,
     authMechanism: input.config.authMechanism,
     portalId: input.config.portalId,
+    runId: input.runId,
+    syntheticEmail: input.syntheticEmail,
     operationSequence: input.operations,
     createdObjectIds: input.createdObjectIds,
     cleanupVerified: input.cleanupVerified,
@@ -62,11 +71,17 @@ export async function runHubSpotCommissioningLifecycle(input: {
   const anomalies: string[] = [];
   let failureClass: HubSpotFailureClass | undefined;
   let cleanupVerified = false;
+  const runId = input.config.runId
+    ? normalizeHubSpotFixtureRunId(input.config.runId)
+    : createHubSpotFixtureRunId();
+  const syntheticEmail = buildHubSpotCommissioningEmail(runId);
 
   const finish = (ok: boolean): CommissioningLifecycleResult => {
     const receipt = buildReceipt({
       gitHead: input.gitHead,
       config: input.config,
+      runId,
+      syntheticEmail,
       operations,
       createdObjectIds,
       cleanupVerified,
@@ -183,9 +198,8 @@ export async function runHubSpotCommissioningLifecycle(input: {
     requestId: preflight.requestId,
   });
 
-  const email = `${input.config.syntheticNamespace}.acme.contact@example.invalid`;
   const created = await input.transport.createContact({
-    email,
+    email: syntheticEmail,
     firstName: "Acme",
     lastName: "Commissioning",
     company: "Acme Services (synthetic)",

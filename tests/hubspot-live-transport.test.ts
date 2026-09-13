@@ -60,7 +60,7 @@ describe("LiveHubSpotTransport (injected fetch)", () => {
       expect(init?.method).toBe("POST");
       const body = JSON.parse(String(init?.body));
       expect(body.properties).toEqual({
-        email: "cay-comm.acme.contact@example.invalid",
+        email: "cay-comm-20260913-fixture@example.com",
         firstname: "Acme",
         lastname: "Commissioning",
         company: "Acme Services (synthetic)",
@@ -71,7 +71,7 @@ describe("LiveHubSpotTransport (injected fetch)", () => {
         id: "99",
         archived: false,
         properties: {
-          email: "cay-comm.acme.contact@example.invalid",
+          email: "cay-comm-20260913-fixture@example.com",
           firstname: "Acme",
           lastname: "Commissioning",
           company: "Acme Services (synthetic)",
@@ -85,7 +85,7 @@ describe("LiveHubSpotTransport (injected fetch)", () => {
       fetchImpl: fetchImpl as unknown as typeof fetch,
     });
     const created = await transport.createContact({
-      email: "cay-comm.acme.contact@example.invalid",
+      email: "cay-comm-20260913-fixture@example.com",
       firstName: "Acme",
       lastName: "Commissioning",
       company: "Acme Services (synthetic)",
@@ -105,7 +105,7 @@ describe("LiveHubSpotTransport (injected fetch)", () => {
         return jsonResponse(200, {
           id: "99",
           properties: {
-            email: "a@b.invalid",
+            email: "a@example.com",
             firstname: "A",
             lastname: "B",
             company: "C",
@@ -117,7 +117,7 @@ describe("LiveHubSpotTransport (injected fetch)", () => {
         id: "99",
         archived: false,
         properties: {
-          email: "a@b.invalid",
+          email: "a@example.com",
           firstname: "A",
           lastname: "B",
           company: "C",

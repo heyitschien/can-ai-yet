@@ -16,9 +16,9 @@
 
 - Official Contacts path pinned: `POST/GET/PATCH/DELETE https://api.hubapi.com/crm/objects/2026-03/contacts`
   - Source: HubSpot Contacts OpenAPI/reference (`/crm/objects/2026-03/{objectType}`); intentionally the documented version, not a guessed newer date
-- Standard properties only: `email`, `firstname`, `lastname`, `company`, `jobtitle`
+- Synthetic email fixture (CAY-07): `cay-comm-<run-id>@example.com` (IANA-reserved `example.com`; unique per recorded run id)
+  - CAY-06 Stage B finding: HubSpot rejected `@example.invalid` as `INVALID_EMAIL` — fixture portability, not auth/model failure
 - Harmless update field: standard `jobtitle` = `cay-commissioning-ok`
-- Synthetic namespace convention: `{namespace}.acme.contact@example.invalid`
 - Live smoke script is **fail-closed** unless `CAY_HUBSPOT_LIVE_SMOKE=AUTHORIZED`
 - `pnpm hubspot:commissioning-smoke` loads repo-local `.env.local` for `HUBSPOT_SERVICE_KEY` (never prints the key)
 
@@ -44,6 +44,8 @@ Exactly one authorized command shape:
 ```bash
 CAY_HUBSPOT_LIVE_SMOKE=AUTHORIZED CAY_GIT_HEAD=$(git rev-parse HEAD) pnpm hubspot:commissioning-smoke
 ```
+
+Optional non-secret run-id override: `CAY_HUBSPOT_FIXTURE_RUN_ID=20260913-a1b2` (email becomes `cay-comm-20260913-a1b2@example.com`).
 
 The script loads `.env.local` from the repo root before reading `HUBSPOT_SERVICE_KEY`. Shell-exported env still wins over the file. The key is never printed.
 

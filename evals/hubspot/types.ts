@@ -19,6 +19,11 @@ export type HubSpotCommissioningConfig = {
   portalId?: string;
   /** Namespace prefix for synthetic objects (never production). */
   syntheticNamespace: string;
+  /**
+   * Unique run identifier recorded on the receipt.
+   * Drives live email `cay-comm-<runId>@example.com`.
+   */
+  runId?: string;
   /** Credential present in process env — never logged. */
   credentialConfigured: boolean;
 };
@@ -66,6 +71,10 @@ export type HubSpotCommissioningReceipt = {
   apiVersion: string;
   authMechanism: HubSpotAuthMechanism;
   portalId?: string;
+  /** Non-secret fixture run id used to reconstruct syntheticEmail. */
+  runId: string;
+  /** Synthetic contact email for this run (`cay-comm-<runId>@example.com`). */
+  syntheticEmail: string;
   operationSequence: HubSpotOperationRecord[];
   createdObjectIds: string[];
   cleanupVerified: boolean;
