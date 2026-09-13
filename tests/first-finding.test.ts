@@ -2,6 +2,7 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { getPublishedBySlug, listPublished } from "@/lib/data/public-data";
+import { cap001SocialDescription, loadCap001ReportBundle } from "@/lib/evidence/cap-001-report";
 import {
   CAP_001_FIRST_FINDING_PATH,
   loadCap001FirstFinding,
@@ -50,7 +51,6 @@ describe("CAP-001 first Sonnet finding publication", () => {
     expect(card?.currentSuccesses).toBe(4);
     expect(card?.currentCriticalFailures).toBe(4);
 
-    // Harness baseline remains reference and must not become the CAP-001 public headline source.
     const accepted = loadEvidence();
     const referenceCap001 = accepted?.suites.find((suite) => suite.capabilityCode === "CAP-001");
     expect(referenceCap001?.model).toBe("reference-agent-v1");
@@ -66,7 +66,15 @@ describe("CAP-001 first Sonnet finding publication", () => {
         join(process.cwd(), "docs/reviews/runs/CAP-001-openrouter-2026-09-11T06-51-59-982Z.json"),
         "utf8",
       ),
-    ) as { suite: { successCount: number; failureCount: number; criticalFailureCount: number; totalCostUsd: number; results: unknown[] } };
+    ) as {
+      suite: {
+        successCount: number;
+        failureCount: number;
+        criticalFailureCount: number;
+        totalCostUsd: number;
+        results: unknown[];
+      };
+    };
 
     expect(published?.suite.successCount).toBe(raw.suite.successCount);
     expect(published?.suite.failureCount).toBe(raw.suite.failureCount);
@@ -79,5 +87,19 @@ describe("CAP-001 first Sonnet finding publication", () => {
     expect(blob).not.toMatch(/\b67% failure rate\b/i);
     expect(blob).toContain("Single frozen run — not a reliability estimate");
     expect(published?.publicWording.summary).toMatch(/not a claim that Sonnet is/i);
+  });
+
+  it("loads GPT companion for compare view without ranking language in social framing", () => {
+    resetCap001FirstFindingCache();
+    const bundle = loadCap001ReportBundle();
+    expect(bundle).toBeTruthy();
+    expect(bundle!.gpt?.suite.model).toBe("openai/gpt-5.5");
+    expect(bundle!.gpt?.suite.successCount).toBe(2);
+    expect(bundle!.compareRows).toHaveLength(12);
+    expect(bundle!.compareRows.filter((row) => row.samePassFail)).toHaveLength(10);
+    const social = cap001SocialDescription(bundle!);
+    expect(social.toLowerCase()).toContain("not a model ranking");
+    expect(social).not.toMatch(/claude beats/i);
+    expect(social).not.toMatch(/\b2\/12 vs\b/i);
   });
 });

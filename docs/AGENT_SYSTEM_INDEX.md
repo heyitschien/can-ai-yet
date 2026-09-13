@@ -41,6 +41,7 @@ These explain the product and operating method. They do not outrank the authorit
 9. `ENTERPRISE_ENVIRONMENT_VALIDATION.md` — why the synthetic lab is a wind tunnel, how capability packs could progress into real vendor sandboxes/customer staging, and the HubSpot transfer experiment hypothesis.
 10. `HUBSPOT_TRANSFER_PREDICTION_2026-09-11.md` — pre-registered expectations for the CAP-001 HubSpot transfer; compare the eventual result against this record rather than rewriting the story afterward.
 11. `HUBSPOT_TRANSFER_DESIGN_2026-09-13.md` — design-only HubSpot transfer spec (Issue #14); not build authority until independently accepted.
+12. `CAP_001_INSTRUMENT_SCIENCE.md` — execution vs construct validity, v1 certification matrix pointers, manifest discipline (CAY-20260913-03; not build authority).
 12. `FALSIFICATION_AND_PHASE_THRESHOLDS.md` — CanAIYet-specific stage gates and stop/narrow/pivot logic.
 13. `CAPABILITY_CONTROL_PLANE_HORIZON.md` — long-horizon hypothesis: capability graph, longitudinal evidence, and possible `measure → qualify → recommend → route → monitor → govern` progression; not a roadmap.
 14. `FOUR_AGENT_SYSTEM.md` — who scouts, runs, judges, and publishes.
@@ -76,9 +77,9 @@ GitHub Issue #1 — **Agent Communication Channel — CanAIYet Mission Control**
 
 `CHANNEL_LOG.md` is the short scan log. Newest entry first. It does not replace Issue #1.
 
-### Locked restart (CAY-20260913-01)
+### Locked restart (CAY-20260913-01 / CAY-20260913-03)
 
-Official sequence is in `NEXT_MISSIONS.md`. Human override: Demand Scout live commissioning is **PARKED_UNCOMMISSIONED** (V1 merged/accepted; mock/CI valid; first Google smoke blocked on customer-not-enabled; not a code failure; no Google live calls until a fresh work order). Next: one GPT-family CAP-001 synthetic comparator → Issue **#14** HubSpot transfer **design only** → independent review → HubSpot implementation only after acceptance. Issue **#15** practitioner validation may run in parallel. Stay deep in Sales / Revenue Operations.
+Official sequence is in `NEXT_MISSIONS.md`. Human override: Demand Scout live commissioning is **PARKED_UNCOMMISSIONED** (V1 merged/accepted; mock/CI valid; first Google smoke blocked on customer-not-enabled; not a code failure; no Google live calls until a fresh work order). **CAY-20260913-03** (instrument certification) is **in progress** on branch `feature/cay-20260913-03-instrument-cert` — certification matrix, public oracle, manifest/validation, portable contract v2; will reach `READY_FOR_REVIEW` when tests pass. HubSpot transfer remains **design only** until independent acceptance. Issue **#15** practitioner validation may run in parallel. Stay deep in Sales / Revenue Operations.
 
 ### Key review / strategy trail on `main` (not build authority)
 
@@ -93,6 +94,7 @@ Official sequence is in `NEXT_MISSIONS.md`. Human override: Demand Scout live co
 - `FALSIFICATION_OPERATING_METHOD.md` — Sep 13 operating method for falsifiable hypothesis work across research/product/market/architecture decisions.
 - `ENTERPRISE_ENVIRONMENT_VALIDATION.md` — Sep 11 insight record for synthetic→real-stack→customer-staging validation and portable capability packs.
 - `reviews/CAY-20260913-01-gpt-cap001-comparator.md` — unpublished GPT-5.5 vs Sonnet 4.6 CAP-001 comparator (N=1; not public evidence).
+- `CAP_001_INSTRUMENT_SCIENCE.md` / `CAP_001_RACETRACK.md` — instrument certification science + how to read traces.
 - `HUBSPOT_TRANSFER_DESIGN_2026-09-13.md` — Issue #14 design-only transfer spec; compare to pre-registration without editing it.
 
 ## Stable rule

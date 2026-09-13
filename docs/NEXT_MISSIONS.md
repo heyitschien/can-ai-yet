@@ -70,6 +70,18 @@ Hard rules:
 
 If a valid complete GPT run cannot fit under $1.00, or requires material new harness engineering beyond the existing OpenRouter path, STOP and report.
 
+## Mission 1b — CAP-001 instrument certification (CAY-20260913-03)
+
+**Status:** IN_PROGRESS on `feature/cay-20260913-03-instrument-cert`.
+
+Deliver construct-validity certification without editing frozen v1 scenarios:
+
+- certification matrix + public oracle + manifest/run validation
+- portable business contract v2 (data only)
+- `docs/CAP_001_INSTRUMENT_SCIENCE.md`
+
+STOP at `READY_FOR_REVIEW` after tests pass. No paid model runs.
+
 ## Mission 2 — HubSpot Reality Transfer DESIGN (Issue #14)
 
 After preserving the GPT comparison, produce **design only** for Issue #14.

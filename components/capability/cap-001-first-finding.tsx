@@ -1,32 +1,35 @@
+"use client";
+
 import Link from "next/link";
+import { useState } from "react";
 import { StatusMark } from "@/components/capability/status-mark";
 import type { PublicCapability } from "@/lib/domain";
 import { EVIDENCE_LABEL } from "@/lib/domain";
-import type { Cap001FirstFinding, FirstFindingScenario } from "@/lib/evidence/first-finding";
+import type {
+  Cap001ConfigObservation,
+  Cap001ReportBundle,
+  Cap001ReportView,
+  Cap001ScenarioCompareRow,
+} from "@/lib/evidence/cap-001-report";
+import type { FirstFindingScenario } from "@/lib/evidence/first-finding";
 import { formatTestedDate } from "@/lib/format";
+import type { ConstructClass } from "@/evals/certification/cap-001-v1-matrix";
 
 function formatExactCost(value: number): string {
   return `$${value.toFixed(6).replace(/0+$/, "").replace(/\.$/, "")}`;
 }
 
-/** Rows that deserve emphasis inside the single canonical scenario list. */
-const EMPHASIZED = new Set(["LEAD-003", "LEAD-006", "LEAD-007", "LEAD-009"]);
+const EMPHASIZED = new Set(["LEAD-003", "LEAD-005", "LEAD-006", "LEAD-007", "LEAD-009"]);
 
 export function Cap001FirstFindingView({
   capability,
-  finding,
+  bundle,
 }: {
   capability: PublicCapability;
-  finding: Cap001FirstFinding;
+  bundle: Cap001ReportBundle;
 }) {
-  const suite = finding.suite;
-  const passed = suite.results.filter((row) => row.success);
-  const humanNeeded = [
-    "Identity was ambiguous or matched more than one CRM record (LEAD-003 / LEAD-004 contrast).",
-    "A person asked not to be contacted or said not to be pitched (LEAD-005 pass · LEAD-009 fail).",
-    "Policy exceptions or unavailable appointments still required escalation, not just a polite reply (LEAD-006 · LEAD-007).",
-    "A lead already handled today should not restart outreach (LEAD-010).",
-  ];
+  const [view, setView] = useState<Cap001ReportView>("overview");
+  const suite = bundle.sonnet.suite;
 
   return (
     <article className="site-wrap py-14">
@@ -42,95 +45,133 @@ export function Cap001FirstFindingView({
         <StatusMark status={capability.status} />
       </div>
 
-      <p className="mt-4 text-sm text-[var(--muted)]">Latest accepted observation · Claude Sonnet 4.6</p>
-
-      <p className="mt-6 max-w-2xl text-lg leading-8">
-        In one frozen run, Claude Sonnet 4.6 completed {suite.successCount} of {suite.totalCount} scenarios correctly.
+      <p className="mt-4 text-sm text-[var(--muted)]">
+        Capability report · CAP-001 v1 synthetic lab · configurations are single-run observations
       </p>
-      <p className="mt-2 text-sm text-[var(--muted)]">Single frozen run · not a reliability estimate</p>
 
+      <p className="mt-6 max-w-2xl text-lg leading-8">{bundle.framing}</p>
+      <p className="mt-2 text-sm text-[var(--muted)]">Not a reliability estimate · not a model ranking</p>
+
+      <div className="mt-8 flex flex-wrap gap-2">
+        <ViewTab active={view === "overview"} onClick={() => setView("overview")} label="Overview" />
+        <ViewTab active={view === "compare"} onClick={() => setView("compare")} label="Compare configurations" />
+      </div>
+
+      {view === "overview" ? (
+        <OverviewBody capability={capability} bundle={bundle} suite={suite} />
+      ) : (
+        <CompareBody bundle={bundle} />
+      )}
+    </article>
+  );
+}
+
+function OverviewBody({
+  capability,
+  bundle,
+  suite,
+}: {
+  capability: PublicCapability;
+  bundle: Cap001ReportBundle;
+  suite: Cap001ConfigObservation["suite"];
+}) {
+  const validCritical = bundle.compareRows.filter(
+    (row) =>
+      row.constructClass === "VALID" &&
+      ((row.sonnet && !row.sonnet.success && row.sonnet.critical) ||
+        (row.gpt && !row.gpt.success && row.gpt.critical)),
+  );
+
+  return (
+    <>
       <dl className="mt-8 grid max-w-3xl gap-4 sm:grid-cols-4">
-        <SummaryCard label="Observed result" value={`${suite.successCount} / ${suite.totalCount} passed`} />
-        <SummaryCard label="Frozen-critical failures" value={`${suite.criticalFailureCount} observed`} />
+        <SummaryCard label="Primary config" value="Sonnet 4.6" />
+        <SummaryCard label="Historical raw result" value={`${suite.successCount} / ${suite.totalCount} passed`} />
         <SummaryCard label="Last tested" value={formatTestedDate(suite.completedAt)} />
         <SummaryCard label="Evidence" value={EVIDENCE_LABEL[capability.evidenceLevel]} />
       </dl>
       <p className="mt-4 max-w-3xl text-sm text-[var(--muted)]">
-        Model {suite.model} · measured API cost {formatExactCost(suite.totalCostUsd)} · wall time ~3.3 minutes
+        Model {suite.model} · measured API cost {formatExactCost(suite.totalCostUsd)} · CAP-001 v1 historical suite
+        labels retained
       </p>
 
-      <Section title="What worked in this run">
+      <Section title="Observed configurations">
+        <div className="grid gap-4 sm:grid-cols-2">
+          <ConfigCard config={bundle.sonnet} />
+          {bundle.gpt ? <ConfigCard config={bundle.gpt} /> : null}
+        </div>
+      </Section>
+
+      <Section title="What this run shows about trust boundaries">
         <ul className="list-disc space-y-2 pl-5 leading-7">
-          {passed.map((row) => (
+          {validCritical.map((row) => (
             <li key={row.scenarioId}>
-              <span className="font-medium">{row.title}</span>
-              <span className="text-[var(--muted)]"> — {row.fairnessNote}</span>
+              <span className="font-medium">
+                {row.scenarioId} · {row.title}
+              </span>
+              <span className="text-[var(--muted)]"> — {row.businessQuestion}</span>
             </li>
           ))}
         </ul>
         <p className="mt-3 text-sm text-[var(--muted)]">
-          These are behaviors observed in this single frozen run. They are not a claim about every business or every
-          future trial.
+          Emphasizing VALID construct scenarios. House-convention and construct-defect fails are not treated as clean
+          model verdicts here.
         </p>
       </Section>
 
-      <Section title="Where this run showed a human was needed">
+      <Section title="Shared observations">
         <ul className="list-disc space-y-2 pl-5 leading-7">
-          {humanNeeded.map((item) => (
+          {bundle.sharedSafetyNotes.map((item) => (
             <li key={item}>{item}</li>
           ))}
         </ul>
-        <p className="mt-3 text-sm text-[var(--muted)]">
-          Failures are not equally severe. Safety and escalation misses differ from CRM-hygiene misses.
-        </p>
       </Section>
 
-      <Section title="What we tested">
+      <Section title="Differences observed">
+        <ul className="list-disc space-y-2 pl-5 leading-7">
+          {bundle.differenceNotes.map((item) => (
+            <li key={item}>{item}</li>
+          ))}
+        </ul>
+        <p className="mt-3 text-sm text-[var(--muted)]">Differences are inspectable; they are not a winner declaration.</p>
+      </Section>
+
+      <Section title="Known benchmark limitations">
+        <ul className="list-disc space-y-2 pl-5 leading-7 text-[var(--muted)]">
+          {bundle.limitationNotes.map((item) => (
+            <li key={item}>{item}</li>
+          ))}
+        </ul>
+      </Section>
+
+      <Section title="What we tested (Sonnet historical list)">
         <p className="leading-7">
           Each scenario starts from the Acme Services fixture ({suite.fixtureVersion}). The agent gets only the tools
           for that task. Software then checks what actually changed. A confident message is not a pass.
         </p>
         <ul className="mt-4 divide-y divide-[var(--line)] border-y border-[var(--line)]">
           {suite.results.map((row) => (
-            <ScenarioRow key={row.scenarioId} row={row} emphasized={EMPHASIZED.has(row.scenarioId)} />
+            <ScenarioRow
+              key={row.scenarioId}
+              row={row}
+              constructClass={bundle.compareRows.find((c) => c.scenarioId === row.scenarioId)?.constructClass}
+              emphasized={EMPHASIZED.has(row.scenarioId)}
+            />
           ))}
         </ul>
       </Section>
 
-      <Section title="Results">
-        <div className="grid gap-3 sm:grid-cols-3">
-          <SummaryCard label="Passed" value={String(suite.successCount)} />
-          <SummaryCard label="Failed" value={String(suite.failureCount)} />
-          <SummaryCard label="Frozen-critical" value={String(suite.criticalFailureCount)} />
-        </div>
-        <p className="mt-4 text-sm leading-7 text-[var(--muted)]">
-          Measured model/API cost {formatExactCost(suite.totalCostUsd)} · wall time ~3.3 minutes · {suite.provenance.requestCount}{" "}
-          provider requests. We do not convert 4/12 into a reliability or failure percentage.
-        </p>
-        <details className="mt-4 rounded-xl border border-[var(--line)] bg-[var(--paper-2)] p-4 text-sm text-[var(--muted)]">
-          <summary className="cursor-pointer text-[var(--ink)]">View technical details</summary>
-          <div className="mt-3 space-y-1 leading-6">
-            <p>
-              Tokens in/out: {suite.inputTokens.toLocaleString()} / {suite.outputTokens.toLocaleString()}
-            </p>
-            <p>
-              Run head: <span className="num">{suite.gitSha}</span>
-            </p>
-            <p>
-              Environment: {suite.fixtureVersion} / {suite.environmentVersion}
-            </p>
-            <p>
-              Provider path: {suite.provider} · served {suite.provenance.servedProviderUnique.join(", ")}
-            </p>
-            <p>
-              Receipts: {finding.receipts.run} · {finding.receipts.wrap} · fairness {finding.receipts.fairnessGate} ·
-              publication {finding.receipts.publication}
-            </p>
-            <p>
-              Source artifact: <span className="num">{finding.sourceArtifact}</span>
-            </p>
-          </div>
+      <Section title="Technical receipts">
+        <details className="rounded-xl border border-[var(--line)] bg-[var(--paper-2)] p-4 text-sm text-[var(--muted)]">
+          <summary className="cursor-pointer text-[var(--ink)]">Sonnet 4.6 receipt</summary>
+          <ReceiptDetails config={bundle.sonnet} />
         </details>
+        {bundle.gpt ? (
+          <details className="mt-3 rounded-xl border border-[var(--line)] bg-[var(--paper-2)] p-4 text-sm text-[var(--muted)]">
+            <summary className="cursor-pointer text-[var(--ink)]">GPT-5.5 receipt (unpublished)</summary>
+            <ReceiptDetails config={bundle.gpt} />
+          </details>
+        ) : null}
       </Section>
 
       <Section title="Evidence strength">
@@ -138,60 +179,22 @@ export function Cap001FirstFindingView({
           <div>
             <h3 className="font-medium">What we observed</h3>
             <p className="mt-2 text-[var(--muted)]">
-              In this frozen simulated run, the model completed some ordinary booking and pricing cases, respected some
-              do-not-contact and ambiguity paths, and also produced wrong-person, opt-out, and missed-escalation
-              failures under the suite’s critical criteria.
-            </p>
-          </div>
-          <div>
-            <h3 className="font-medium">What it suggests</h3>
-            <p className="mt-2 text-[var(--muted)]">
-              The useful signal is the failure-mode map: identity ambiguity, opt-out handling, and escalation
-              discipline are boundaries worth retesting and comparing across models and versions.
+              Under CAP-001 v1, identity ambiguity and do-not-pitch handling remain the clearest VALID trust-boundary
+              signals. Several other suite-labeled failures are known construct limitations.
             </p>
           </div>
           <div>
             <h3 className="font-medium">What it does not prove</h3>
             <ul className="mt-2 list-disc space-y-2 pl-5 text-[var(--muted)]">
-              <li>No real-world reliability estimate from one run.</li>
-              <li>No cross-model ranking yet.</li>
-              <li>No production guarantee for Salesforce, HubSpot, or other live CRMs.</li>
-              <li>No commercial-demand or willingness-to-pay proof.</li>
+              <li>No real-world reliability estimate from one run per configuration.</li>
+              <li>No claim that one model beats another.</li>
+              <li>No production guarantee for HubSpot or other live CRMs.</li>
             </ul>
           </div>
           <p>
             <Link href="/methodology" className="underline">
               How a scenario passes or fails
             </Link>
-            {" · "}
-            <span className="text-sm text-[var(--muted)]">docs/public/CAP-001-SONNET-4.6-FIRST-FINDING.md</span>
-          </p>
-        </div>
-      </Section>
-
-      <Section title="History">
-        <p className="leading-7">
-          One accepted frontier-model observation is on record for this capability. A comparison chart appears after a
-          later accepted run gives a real second point.
-        </p>
-        <div className="mt-4 rounded-xl border border-[var(--line)] bg-[var(--paper-2)] p-4 text-sm leading-6">
-          <p className="font-medium">2026-09-11 · Claude Sonnet 4.6</p>
-          <p className="mt-1 text-[var(--muted)]">
-            {suite.successCount}/{suite.totalCount} passed · {suite.criticalFailureCount} frozen-critical ·{" "}
-            {formatExactCost(suite.totalCostUsd)}
-          </p>
-        </div>
-      </Section>
-
-      <Section title="Tested configuration">
-        <div className="rounded-xl border border-[var(--line)] bg-[var(--paper-2)] p-5">
-          <p className="font-medium">Claude Sonnet 4.6</p>
-          <p className="mt-2 text-sm leading-6 text-[var(--muted)]">
-            OpenRouter path pinned to Anthropic · controlled Acme Services simulation · frozen CAP-001 suite · 12
-            scenarios · single run · fairness gate {finding.receipts.fairnessGate} accepted for evidence use.
-          </p>
-          <p className="mt-2 text-sm text-[var(--muted)]">
-            We do not publish provider rankings from a single configuration.
           </p>
         </div>
       </Section>
@@ -207,14 +210,6 @@ export function Cap001FirstFindingView({
         </ol>
       </Section>
 
-      <Section title="Methodology">
-        <p>
-          <Link href="/methodology" className="underline">
-            How a scenario passes or fails
-          </Link>
-        </p>
-      </Section>
-
       <div className="mt-12 flex flex-wrap gap-3">
         <Link href="/request" className="solid-control rounded-xl px-4 py-3 text-sm">
           Request another capability
@@ -226,7 +221,162 @@ export function Cap001FirstFindingView({
           I want to implement this
         </Link>
       </div>
-    </article>
+    </>
+  );
+}
+
+function CompareBody({ bundle }: { bundle: Cap001ReportBundle }) {
+  return (
+    <>
+      <Section title="Configuration cards">
+        <div className="grid gap-4 sm:grid-cols-2">
+          <ConfigCard config={bundle.sonnet} />
+          {bundle.gpt ? <ConfigCard config={bundle.gpt} /> : <p className="text-sm text-[var(--muted)]">GPT companion missing.</p>}
+        </div>
+      </Section>
+
+      <Section title="Scenario comparison">
+        <ul className="divide-y divide-[var(--line)] border-y border-[var(--line)]">
+          {bundle.compareRows.map((row) => (
+            <CompareRow key={row.scenarioId} row={row} />
+          ))}
+        </ul>
+      </Section>
+
+      <Section title="How to read this">
+        <p className="leading-7 text-[var(--muted)]">
+          Raw suite counts are historical CAP-001 v1 outputs. Construct badges mark whether the scenario is a fair
+          business question (`VALID`), a known rubric/policy conflict (`CONSTRUCT_DEFECT`), hidden vocabulary
+          (`HOUSE_CONVENTION`), or contested (`AMBIGUOUS`).
+        </p>
+      </Section>
+    </>
+  );
+}
+
+function ConfigCard({ config }: { config: Cap001ConfigObservation }) {
+  return (
+    <div className="rounded-xl border border-[var(--line)] bg-[var(--paper-2)] p-5">
+      <p className="font-medium">{config.label}</p>
+      <div className="mt-2 flex flex-wrap gap-2">
+        {config.badges.map((badge) => (
+          <span key={badge} className="rounded-md border border-[var(--line)] px-2 py-0.5 text-[10px] uppercase tracking-wide text-[var(--muted)]">
+            {badge}
+          </span>
+        ))}
+      </div>
+      <p className="num mt-3 text-sm">
+        Historical raw: {config.suite.successCount}/{config.suite.totalCount} passed · {config.suite.criticalFailureCount}{" "}
+        suite-critical
+      </p>
+      <p className="mt-2 text-sm text-[var(--muted)]">
+        {formatExactCost(config.suite.totalCostUsd)} · {config.modelDisplay}
+      </p>
+    </div>
+  );
+}
+
+function CompareRow({ row }: { row: Cap001ScenarioCompareRow }) {
+  return (
+    <li className={`py-4 text-sm ${EMPHASIZED.has(row.scenarioId) ? "bg-[var(--paper-2)]/70" : ""}`}>
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div className="max-w-xl">
+          <p className="font-medium">
+            {row.scenarioId} · {row.title}
+          </p>
+          <p className="mt-1 text-[var(--muted)]">{row.businessQuestion}</p>
+        </div>
+        <ConstructBadge constructClass={row.constructClass} />
+      </div>
+      <div className="mt-3 grid gap-3 sm:grid-cols-2">
+        <OutcomeBlock label="Sonnet 4.6" row={row.sonnet} />
+        <OutcomeBlock label="GPT-5.5" row={row.gpt} />
+      </div>
+      <p className="mt-3 leading-6 text-[var(--muted)]">{row.interpretation}</p>
+    </li>
+  );
+}
+
+function OutcomeBlock({ label, row }: { label: string; row: FirstFindingScenario | null }) {
+  if (!row) return <p className="text-[var(--muted)]">{label}: n/a</p>;
+  const tone = row.success ? "pass" : row.critical ? "critical" : "fail";
+  const text = row.success ? "Pass" : row.critical ? "Critical fail" : "Fail";
+  return (
+    <div>
+      <p className="text-xs text-[var(--muted)]">{label}</p>
+      <div className="mt-1 flex items-center gap-2">
+        <OutcomeBadge tone={tone} label={text} />
+        <span className="text-[var(--muted)]">{row.failureCode ?? "—"}</span>
+      </div>
+    </div>
+  );
+}
+
+function ScenarioRow({
+  row,
+  constructClass,
+  emphasized,
+}: {
+  row: FirstFindingScenario;
+  constructClass?: ConstructClass;
+  emphasized: boolean;
+}) {
+  const tone = row.success ? "pass" : row.critical ? "critical" : "fail";
+  const label = row.success ? "Pass" : row.critical ? "Critical fail" : "Fail";
+  return (
+    <li className={`py-3 text-sm ${emphasized ? "bg-[var(--paper-2)]/70" : ""}`}>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <p className="font-medium">
+            {row.scenarioId} · {row.title}
+          </p>
+          <p className="mt-1 text-[var(--muted)]">{row.setup}</p>
+        </div>
+        <div className="flex flex-col items-end gap-2">
+          <OutcomeBadge tone={tone} label={label} />
+          {constructClass ? <ConstructBadge constructClass={constructClass} /> : null}
+        </div>
+      </div>
+      <p className="mt-2 leading-6 text-[var(--muted)]">{row.fairnessNote}</p>
+    </li>
+  );
+}
+
+function ReceiptDetails({ config }: { config: Cap001ConfigObservation }) {
+  const suite = config.suite;
+  return (
+    <div className="mt-3 space-y-1 leading-6">
+      <p>Requested/served: {suite.provenance.requestedModel} / {suite.provenance.servedModelUnique.join(", ")}</p>
+      <p>Provider: {suite.provider} · {suite.provenance.servedProviderUnique.join(", ")}</p>
+      <p>
+        Benchmark/version: CAP-001 v1 · fixture {suite.fixtureVersion} · env {suite.environmentVersion}
+      </p>
+      <p>
+        Head: <span className="num">{suite.gitSha}</span>
+      </p>
+      <p>
+        Tokens in/out: {suite.inputTokens.toLocaleString()} / {suite.outputTokens.toLocaleString()} · cost{" "}
+        {formatExactCost(suite.totalCostUsd)}
+      </p>
+      <p>Execution valid flag: {String(suite.benchmarkValid)} · construct status: see certification matrix</p>
+      <p>
+        Source: <span className="num">{config.sourceArtifact}</span>
+      </p>
+    </div>
+  );
+}
+
+function ViewTab({ active, onClick, label }: { active: boolean; onClick: () => void; label: string }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`rounded-xl px-4 py-2 text-sm ${
+        active ? "solid-control" : "quiet-control border border-[var(--line)]"
+      }`}
+    >
+      {label}
+    </button>
   );
 }
 
@@ -248,25 +398,19 @@ function SummaryCard({ label, value }: { label: string; value: string }) {
   );
 }
 
-function ScenarioRow({ row, emphasized }: { row: FirstFindingScenario; emphasized: boolean }) {
-  const tone = row.success ? "pass" : row.critical ? "critical" : "fail";
-  const label = row.success ? "Pass" : row.critical ? "Critical fail" : "Fail";
+function ConstructBadge({ constructClass }: { constructClass: ConstructClass }) {
+  const label =
+    constructClass === "VALID"
+      ? "valid"
+      : constructClass === "CONSTRUCT_DEFECT"
+        ? "known defect"
+        : constructClass === "HOUSE_CONVENTION"
+          ? "house convention"
+          : "ambiguous";
   return (
-    <li className={`py-3 text-sm ${emphasized ? "bg-[var(--paper-2)]/70" : ""}`}>
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <p className="font-medium">
-            {row.scenarioId} · {row.title}
-          </p>
-          <p className="mt-1 text-[var(--muted)]">{row.setup}</p>
-        </div>
-        <OutcomeBadge tone={tone} label={label} />
-      </div>
-      <p className="mt-2 leading-6 text-[var(--muted)]">{row.fairnessNote}</p>
-      {!row.success && row.failureExplanation ? (
-        <p className="mt-1 leading-6 text-[var(--muted)]">Judge: {row.failureExplanation}</p>
-      ) : null}
-    </li>
+    <span className="shrink-0 rounded-md border border-[var(--line)] px-2 py-1 text-[10px] uppercase tracking-wide text-[var(--muted)]">
+      {label}
+    </span>
   );
 }
 

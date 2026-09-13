@@ -266,3 +266,23 @@ No paid HubSpot model run under this design receipt.
 
 STOP for independent review of this design together with the GPT comparator evidence.  
 HubSpot implementation requires a separate ACCEPTED design verdict + build work order.
+
+---
+
+## 20. Instrument certification implications (CAY-20260913-03)
+
+CAP-001 v1 construct certification (`evals/certification/cap-001-v1-matrix.ts`, `docs/CAP_001_INSTRUMENT_SCIENCE.md`) classifies scenarios for **transfer comparison**, not for rewriting frozen v1.
+
+**VALID for HubSpot model-attribution comparison** (business invariants map cleanly):
+
+- LEAD-003, LEAD-004, LEAD-005, LEAD-009, LEAD-010, LEAD-011, LEAD-012
+
+**Do not treat as model failures until portable contract v2 is used:**
+
+| Class | Scenarios | Transfer note |
+| --- | --- | --- |
+| `HOUSE_CONVENTION` | LEAD-001, LEAD-002, LEAD-008 | Undiscoverable stage/note/flag strings — compare using `portable-contract-v2.ts` semantics or exclude from model score totals. |
+| `CONSTRUCT_DEFECT` | LEAD-007 | Policy says offer next slot; v1 rubric requires escalation — attribute to rubric mismatch, not model incapability. |
+| `AMBIGUOUS` | LEAD-006 | Escalation/silence not fully specified in visible policy — classify separately in HubSpot failure taxonomy. |
+
+HubSpot judge projections should prefer **portable v2 invariants** for cross-environment totals; v1 frozen rubric remains historical Sonnet/GPT evidence only. No live HubSpot under CAY-20260913-03.

@@ -2,6 +2,20 @@
 
 Short scan log. Newest first.
 
+## CAY-20260913-03 — CAP-001 instrument certification (in progress)
+
+STATUS: IN_PROGRESS → READY_FOR_REVIEW when tests green  
+What: Construct-validity certification layer for frozen CAP-001 v1 — matrix (`evals/certification/cap-001-v1-matrix.ts`), public oracle, manifest fingerprint + run validation, portable contract v2, tests. Docs: `CAP_001_INSTRUMENT_SCIENCE.md`, HubSpot design §20. No frozen scenario edits. No paid models. Demand Scout remains **PARKED_UNCOMMISSIONED**.  
+Branch: `feature/cay-20260913-03-instrument-cert` (base `533ac5f`)  
+Next: `pnpm test` green → handoff for independent review.
+
+## CAY-20260913-03 — instrument certification → GPT report → HubSpot prep
+
+STATUS: READY_FOR_REVIEW  
+What: Certified CAP-001 v1 instrument (matrix + public oracles + mutations), automatic run-validation + manifest fingerprints, portable contract v2 data, GPT-5.5 compare UI inside existing CAP-001 report (unpublished companion), HubSpot design updated from cert findings. Zero paid/live calls. v1 artifacts unchanged.  
+Linear: CanAIYet project discussion  
+Branch: `feature/cay-20260913-03-instrument-cert`
+
 ## CAY-20260913-01 — park Demand Scout / GPT comparator / HubSpot prep
 
 STATUS: READY_FOR_REVIEW  
