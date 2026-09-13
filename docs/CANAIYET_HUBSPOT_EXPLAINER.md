@@ -61,7 +61,7 @@ Credentials stay server-side. The model never receives HubSpot secrets. First tr
 
 Prefer:
 
-`developer test account → least-authority Service Key → pinned date-based API version (e.g. 2026-09) → no-model CRUD/preflight → seed/reset/snapshot → then same-model synthetic vs HubSpot`
+`developer test account → least-authority Service Key → pinned date-based API version (documented Contacts `2026-03`) → no-model CRUD/preflight → seed/reset/snapshot → then same-model synthetic vs HubSpot`
 
 OAuth/project apps later for multi-account installs, webhooks, or Marketplace. Legacy private-app creation is being sunset — do not default to old private-app tutorials.
 
@@ -85,6 +85,70 @@ Higher-information question than a leaderboard:
 > Can a controlled capability test transfer into real enterprise software and still produce useful, inspectable evidence?
 
 If yes: portable packs may climb `synthetic → HubSpot → other CRM → customer staging`. If no: that falsifies or narrows the thesis — equally valuable.
+
+---
+
+## 7A. Real software + fake consequences
+
+Enterprise developer environments are AI laboratories because they give:
+
+> **real software + fake consequences**
+
+APIs, permissions, validation, auth, schemas, and rate limits are real — while data and business consequences can stay synthetic and resettable.
+
+Evidence ladder:
+
+`synthetic lab → vendor enterprise test account / sandbox → customer staging → carefully controlled production assurance`
+
+Operating principles:
+
+- **When mistakes are cheap, make the system boring. Then, when mistakes become expensive, you can trust what the system tells you.**
+- **When we finally say the AI failed, we should actually know it was the AI that failed.**
+
+CAY-06 Stage B illustrated this: HubSpot rejected a synthetic-lab `.invalid` email as `INVALID_EMAIL` — an `INTEGRATION_FAILURE / fixture portability` finding, not a model or auth failure. Live fixtures now use IANA-reserved `example.com` (`cay-comm-<run-id>@example.com`).
+
+---
+
+## 7B. Portable capability architecture
+
+Preserve the business capability contract; change only environment adapters:
+
+```text
+Capability
+  → CapabilityContractManifest (semantics, policy, predicates)
+  → stable CanAIYet tool contract + judge
+  → adapters: Synthetic Acme / HubSpot / later Salesforce sandbox / customer staging
+  → comparable evidence + failure classification
+```
+
+Separate `CapabilityContractManifest` from `EnvironmentManifest` from `RunConfig` from `RunReceipt`. If portability fails, that is useful falsification — not a reason to hide the evidence.
+
+Design detail stays in `HUBSPOT_TRANSFER_DESIGN_2026-09-13.md`. Canonical Linear explainer remains the long-form source.
+
+---
+
+## 7C. After every transfer: what changed?
+
+A pass-rate delta is not enough. Ask:
+
+- model decision?
+- adapter/integration state?
+- permission boundary?
+- runtime/API condition?
+- representation difference?
+- platform validation exposing a synthetic assumption?
+- tool-semantic drift?
+- capability not portable without qualification?
+
+---
+
+## 7D. Long-range vision
+
+`Capability → portable business contract → synthetic proof → vendor sandbox proof → customer staging → carefully bounded production assurance`
+
+The enterprise question is not only “how smart is this model?” but:
+
+> **Can this configured AI system safely perform this job, in this real software environment, under these permissions — and what changed when we moved it here?**
 
 ---
 

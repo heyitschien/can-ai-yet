@@ -2,6 +2,13 @@
 
 Short scan log. Newest first.
 
+## CAY-20260913-07 — HubSpot fixture portability (code-only)
+
+STATUS: READY_FOR_REVIEW  
+What: Live commissioning email → `cay-comm-<run-id>@example.com`; receipt records `runId` + `syntheticEmail`; explainer sync for real-software/fake-consequences architecture. No live HubSpot retry; no model calls.  
+Branch: `feature/cay-20260913-07-hubspot-fixture-portability`  
+Base: `4d891a1` (merged PR #22 / CAY-06 Stage A)
+
 ## CAY-20260913-06 — HubSpot Stage A live transport (no mutation)
 
 STATUS: READY_FOR_REVIEW (post CHANGES_REQUESTED: API `2026-03` + `.env.local` loader)  
