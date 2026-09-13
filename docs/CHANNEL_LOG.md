@@ -4,7 +4,14 @@ Short scan log. Newest first.
 
 ## CAY-20260913-08 — CAP-001 HubSpot environment machinery
 
-STATUS: READY_FOR_REVIEW (post CHANGES_REQUESTED: authoritative snapshot + mock/live port)  
+STATUS: READY_FOR_REVIEW (narrow provenance: exact scope/API matrix; BLOCKED_SCOPE vs BLOCKED_ADAPTER; per-family API versions; one-time metadata setup)  
+What: Least-authority HubSpot matrix from official Required Scopes docs — deals are the only genuinely new scopes; notes/tasks/meetings/emails use contacts scopes (adapter gaps). No Service Key change. Zero models; no live suite.  
+Branch: `feature/cay-20260913-08-hubspot-cap001-env`  
+Base: `bdab3c1` (merged PR #23)
+
+## CAY-20260913-08 — CAP-001 HubSpot environment machinery (prior tip)
+
+STATUS: READY_FOR_REVIEW (post CHANGES_REQUESTED: authoritative snapshot + mock/live port) — superseded by provenance tip above  
 What: HubSpot-only CRM projection; mock vs live port; semantic vs live readiness; fixture-graph settle; same-runId reset clears scenario appointments; scope plan doc (no expansion). Zero models; no live suite.  
 Branch: `feature/cay-20260913-08-hubspot-cap001-env`  
 Base: `bdab3c1` (merged PR #23)

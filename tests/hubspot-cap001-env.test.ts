@@ -1,13 +1,17 @@
 import { describe, expect, it } from "vitest";
 import {
   CAP001_EXPECTED_BASELINE_COUNTS,
+  CAP001_HUBSPOT_METADATA_PROVISIONING,
   CAP001_HUBSPOT_SCENARIO_MAPPING,
+  CAP001_HUBSPOT_SCOPE_MATRIX,
+  CAP001_LIVE_ENVIRONMENT_SCOPE_BLOCKER,
   HubSpotCap001Store,
   LiveHubSpotCap001Adapter,
   calibrateForbiddenDetection,
   calibrateScenarioAgainstBaseline,
   captureAuthoritativeSnapshot,
   comparisonScenarioIds,
+  genuinelyNewScopesFromMatrix,
   liveReadyScenarioIds,
   mappedScenarioIds,
   preflightCap001HubSpotEnv,
@@ -16,6 +20,8 @@ import {
   runTripleDryReset,
   seedAndPreflight,
   snapshotWithBoundedRetry,
+  toolRowsBlockedAdapter,
+  toolRowsBlockedScope,
   unmappedScenarioIds,
 } from "@/evals/hubspot/cap001";
 import {
@@ -190,12 +196,22 @@ describe("HubSpot CAP-001 environment machinery (CAY-08)", () => {
     expect(live.supportedFamilies().size).toBe(0);
     const seeded = live.seedBaseline("x");
     expect(seeded.ok).toBe(false);
-    if (!seeded.ok) expect(seeded.failureClass).toBe("ADAPTER_GAP");
+    if (!seeded.ok) {
+      expect(seeded.failureClass).toBe("SCOPE_GAP");
+      expect(seeded.family).toBe("deals");
+    }
     const read = live.readAuthoritativeState();
     expect(read.ok).toBe(false);
-    if (!read.ok) expect(["SCOPE_GAP", "ADAPTER_GAP"]).toContain(read.failureClass);
-    const required = live.requireFamily("deals");
-    expect(required.ok).toBe(false);
+    if (!read.ok) expect(read.failureClass).toBe("ADAPTER_GAP");
+    const deals = live.requireFamily("deals");
+    expect(deals.ok).toBe(false);
+    if (!deals.ok) expect(deals.failureClass).toBe("SCOPE_GAP");
+    const notes = live.requireFamily("notes");
+    expect(notes.ok).toBe(false);
+    if (!notes.ok) expect(notes.failureClass).toBe("ADAPTER_GAP");
+    const meetings = live.requireFamily("appointments");
+    expect(meetings.ok).toBe(false);
+    if (!meetings.ok) expect(meetings.failureClass).toBe("ADAPTER_GAP");
   });
 
   it("freezes EnvironmentManifest versions for CAP-001 HubSpot env", () => {
@@ -204,5 +220,48 @@ describe("HubSpot CAP-001 environment machinery (CAY-08)", () => {
     expect(env.seedResetVersion).toBe(HUBSPOT_CAP001_SEED_RESET_VERSION);
     expect(env.snapshotProjectionVersion).toBe(HUBSPOT_CAP001_SNAPSHOT_VERSION);
     expect(env.apiVersion).toBe("2026-03");
+    expect(env.apiVersionsByObjectFamily).toMatchObject({
+      contacts: "2026-03",
+      deals: "2026-09",
+      notes: "2026-09",
+      tasks: "2026-09",
+      meetings: "2026-09",
+      emails: "2026-09",
+    });
+    expect(env.environmentPermissionMechanicsVersion).toBe(
+      "hubspot-envelope-a-least-authority-v2",
+    );
+  });
+
+  it("exact scope matrix: only deals are genuinely new; activities are adapter gaps", () => {
+    expect(CAP001_HUBSPOT_SCOPE_MATRIX).toHaveLength(13);
+    expect(genuinelyNewScopesFromMatrix()).toEqual([
+      "crm.objects.deals.read",
+      "crm.objects.deals.write",
+    ]);
+    expect(toolRowsBlockedScope().map((row) => row.tool).sort()).toEqual(["get_deal", "update_deal"]);
+    const adapterTools = toolRowsBlockedAdapter().map((row) => row.tool);
+    expect(adapterTools).toEqual(
+      expect.arrayContaining([
+        "search_contact",
+        "get_contact",
+        "create_task",
+        "add_note",
+        "send_reply",
+        "get_availability",
+        "create_appointment",
+        "escalate",
+        "flag",
+      ]),
+    );
+    expect(CAP001_HUBSPOT_METADATA_PROVISIONING.strategy).toBe("one_time_human_or_setup_path");
+    expect(CAP001_HUBSPOT_METADATA_PROVISIONING.avoidRuntimeScopes).toContain(
+      "crm.schemas.contacts.write",
+    );
+    expect(
+      CAP001_HUBSPOT_SCENARIO_MAPPING.every(
+        (row) => row.liveStatus === "BLOCKED_SCOPE" && row.liveBlocker === CAP001_LIVE_ENVIRONMENT_SCOPE_BLOCKER,
+      ),
+    ).toBe(true);
   });
 });

@@ -7,8 +7,8 @@
 ## Scientific rules (post CHANGES_REQUESTED)
 
 1. **Authoritative snapshots:** CAP-001 CRM collections (contacts, deals, notes, tasks, sent, appointments, escalations, flags) come **only** from the HubSpot snapshot. `World.fresh()` may supply immutable non-CRM scaffolding (policies, etc.) but must never resurrect missing HubSpot records.
-2. **Mock vs live:** `HubSpotCap001Store` is a mock calibration harness; `LiveHubSpotCap001Adapter` is the live port and fails closed under contacts-only scopes.
-3. **Semantic vs live readiness:** `semanticStatus` ≠ `liveStatus`. Live comparison uses `liveStatus === READY` only.
+2. **Mock vs live:** `HubSpotCap001Store` is a mock calibration harness; `LiveHubSpotCap001Adapter` is the live port and fails closed. Deals are `SCOPE_GAP`; contact-scoped activity families are `ADAPTER_GAP`.
+3. **Semantic vs live readiness:** `semanticStatus` ≠ `liveStatus`. Live comparison uses `liveStatus === READY` only. Scenario `BLOCKED_SCOPE` is the environment-level deals gap; activity tools under contacts scopes are `BLOCKED_ADAPTER` in the tool matrix.
 4. **Snapshot readiness:** complete required baseline fixture IDs + stable consecutive fingerprints, else `RUNTIME/API_FAILURE`.
 5. **Reset:** same `runId` clears scenario-owned activity including scenario appointments.
 
@@ -16,11 +16,12 @@
 
 | Field | Value |
 | --- | --- |
-| adapterImplementationVersion | `hubspot-cap001-env-v1` |
+| adapterImplementationVersion | `hubspot-cap001-env-v1.1` |
 | seedResetVersion | `hubspot-seed-reset-v1` |
 | snapshotProjectionVersion | `hubspot-snapshot-v1` |
-| apiVersion | `2026-03` |
-| permissionMechanics | `hubspot-envelope-a-contacts-rw-v1` |
+| apiVersion (contacts pin) | `2026-03` |
+| apiVersionsByObjectFamily | contacts=`2026-03`; notes/tasks/meetings/emails/deals/properties=`2026-09` |
+| permissionMechanics | `hubspot-envelope-a-least-authority-v2` |
 
 ## Mapping summary
 
@@ -29,9 +30,11 @@
 | semanticStatus MAPPED | 12 |
 | semanticStatus UNMAPPED | 0 |
 | liveStatus READY | 0 |
-| liveStatus BLOCKED_SCOPE | 12 |
+| liveStatus BLOCKED_SCOPE | 12 (environment-level deals gap) |
+| tool-matrix BLOCKED_ADAPTER | notes/tasks/meetings/emails/contacts/escalate/flag (scopes already held) |
+| tool-matrix BLOCKED_SCOPE | `get_deal` / `update_deal` only |
 
-See also `docs/HUBSPOT_CAP001_SCOPE_PLAN.md` (plan only — no key expansion).
+See also `docs/HUBSPOT_CAP001_SCOPE_PLAN.md` (exact matrix — no key expansion).
 
 ## Calibration loop (no model)
 

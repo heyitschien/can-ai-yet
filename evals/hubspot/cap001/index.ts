@@ -18,6 +18,16 @@ export {
   mappedScenarioIds,
   unmappedScenarioIds,
 } from "@/evals/hubspot/cap001/mapping";
+export {
+  CAP001_HUBSPOT_METADATA_PROVISIONING,
+  CAP001_HUBSPOT_SCOPE_MATRIX,
+  CAP001_LIVE_ENVIRONMENT_SCOPE_BLOCKER,
+  HUBSPOT_CAP001_API_VERSIONS_BY_FAMILY,
+  HUBSPOT_GRANTED_SCOPES,
+  genuinelyNewScopesFromMatrix,
+  toolRowsBlockedAdapter,
+  toolRowsBlockedScope,
+} from "@/evals/hubspot/cap001/scope-matrix";
 export { preflightCap001HubSpotEnv, resetAndPreflight, seedAndPreflight } from "@/evals/hubspot/cap001/preflight";
 export type { Cap001ObjectFamily, HubSpotCap001EnvironmentPort } from "@/evals/hubspot/cap001/port";
 export {

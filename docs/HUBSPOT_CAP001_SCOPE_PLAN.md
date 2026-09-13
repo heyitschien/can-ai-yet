@@ -1,43 +1,79 @@
-# HubSpot CAP-001 minimum API / scope plan (CAY-08)
+# HubSpot CAP-001 exact scope / API provenance (CAY-08)
 
-**Status:** planning boundary for human review — **not** authorization to expand scopes or call live APIs.  
-**Current Service Key:** `crm.objects.contacts.read`, `crm.objects.contacts.write` only.  
-**Pinned Contacts version:** `2026-03` (`/crm/objects/2026-03/contacts`).
+**Status:** exact least-authority matrix for human review — **not** authorization to expand scopes, call live APIs, or change the Service Key.  
+**Current Service Key (unchanged):** `crm.objects.contacts.read`, `crm.objects.contacts.write`.  
+**Machine source of truth:** `evals/hubspot/cap001/scope-matrix.ts`.
 
-## Adapter boundary
+## How to read blockers
 
-| Implementation | Role |
+| Label | Meaning |
 | --- | --- |
-| `HubSpotCap001EnvironmentPort` | Port for seed/reset/authoritative read |
-| `HubSpotCap001Store` (`kind: mock`) | In-memory calibration harness |
-| `LiveHubSpotCap001Adapter` (`kind: live`) | Fail-closed live boundary; no invented CRM state |
+| `BLOCKED_SCOPE` | Chosen HubSpot endpoint’s Required Scopes accordion lists a scope we do **not** have. |
+| `BLOCKED_ADAPTER` | Required scope is already granted (or local-only), but CAP-001 live adapter code is missing. |
+| `LOCAL_ONLY` | No HubSpot call for this tool semantic. |
 
-Live adapter currently returns `ADAPTER_GAP` / `SCOPE_GAP` for full CAP-001 seed/snapshot. Commissioning Contacts transport remains separate and accepted.
+**Environment-level (all 12 live scenarios):** full CAP-001 live seed / preflight / authoritative snapshot needs baseline **deals**. Until `crm.objects.deals.read` + `crm.objects.deals.write` are granted, every scenario’s `liveStatus` stays `BLOCKED_SCOPE` for that environment reason — **not** because notes/tasks/meetings/emails need extra activity scopes.
 
-## Semantic vs live readiness
+## Per-object API version provenance
 
-- `semanticStatus: MAPPED|UNMAPPED` — can the exam be judged from HubSpot-shaped state?
-- `liveStatus: READY|BLOCKED_SCOPE|BLOCKED_ADAPTER` — can we execute live today?
-- Future live comparison totals use **`liveStatus === READY` only** (currently **0** scenarios).
+HubSpot’s dated paths are **not** uniform. We do **not** stamp the whole environment as one date.
 
-## Minimum Envelope A object/action plan (for later review)
+| Object family | Pinned path | Why |
+| --- | --- | --- |
+| Contacts | `2026-03` | Proven live in CAY-06; official dated docs still publish `/crm/objects/2026-03/contacts…` |
+| Notes | `2026-09` | Current Notes create/get Required Scopes pages |
+| Tasks | `2026-09` | Current Tasks create/get Required Scopes pages |
+| Meetings | `2026-09` | Current Meetings create/get Required Scopes pages |
+| Emails (engagement log) | `2026-09` | Current Emails create/get Required Scopes pages |
+| Deals | `2026-09` | Current Deals get/update/create Required Scopes pages |
+| Properties (setup-only) | `2026-09` | Create-property page; **not** a runtime Service Key grant |
 
-Derived from HubSpot CRM object model + CAP-001 mapping (design §3). Exact scope names must be re-checked against current HubSpot scope docs before any key change.
+`EnvironmentManifest.apiVersion` remains the contacts pin (`2026-03`). `apiVersionsByObjectFamily` records the full map.
 
-| Object / action | CAP-001 need | Likely scope family (review before grant) | Notes |
-| --- | --- | --- | --- |
-| Contacts CRUD + properties (DNC, tags, phone) | All LEADs | `crm.objects.contacts.read/write` | Already granted; custom props may need property create once |
-| Deals + pipeline stage | LEAD-001/002/… | `crm.objects.deals.read/write` | Dedicated test pipeline |
-| Notes / engagements | CRM notes | `crm.objects.contacts` + engagements/notes scopes as documented | Judge searches note body |
-| Tasks | Follow-up tasks / escalation markers | tasks scopes per current docs | Or ticket+`cay_escalated` |
-| Outbound engagement log (Envelope A) | “sent” without marketing send | engagements write; **not** marketing send | Structured log preferred |
-| Appointments / meetings | LEAD-007/011 | meetings or custom object | Preserve conflict/open-slot fixtures |
-| Custom properties (`cay_fixture_id`, `cay_run_id`, flags) | Seed provenance | property write once, then object write | Idempotent upsert key |
+## Exact tool matrix
 
-**Do not expand the Service Key in this correction.** After independent acceptance of the adapter boundary + this plan, human may authorize a separate scope-change receipt.
+Columns: **CanAIYet tool → HubSpot representation → action → endpoint/version → required scope → already granted vs new**.
 
-## Official references to re-check before scope change
+| Tool | HubSpot representation | Action | Endpoint / version | Required scope(s) | Grant | Live block |
+| --- | --- | --- | --- | --- | --- | --- |
+| `search_contact` | Contact search | search | `POST /crm/objects/2026-03/contacts/search` | `crm.objects.contacts.read` | already granted | `BLOCKED_ADAPTER` |
+| `get_contact` | Contact | read | `GET /crm/objects/2026-03/contacts/{contactId}` | `crm.objects.contacts.read` | already granted | `BLOCKED_ADAPTER` |
+| `create_task` | Task engagement | create | `POST /crm/objects/2026-09/tasks` | `crm.objects.contacts.write` | already granted | `BLOCKED_ADAPTER` |
+| `get_deal` | Deal | read | `GET /crm/objects/2026-09/deals/{dealId}` | `crm.objects.deals.read` | **genuinely new** | `BLOCKED_SCOPE` |
+| `update_deal` | Deal | update | `PATCH /crm/objects/2026-09/deals/{dealId}` | `crm.objects.deals.write` | **genuinely new** | `BLOCKED_SCOPE` |
+| `add_note` | Note engagement | create | `POST /crm/objects/2026-09/notes` | `crm.objects.contacts.write` | already granted | `BLOCKED_ADAPTER` |
+| `draft_reply` | Local draft | compose | `(local)` | none | not required | `LOCAL_ONLY` |
+| `send_reply` | Email engagement log (Envelope A) | create | `POST /crm/objects/2026-09/emails` | `crm.objects.contacts.write` **OR** `sales-email-read` | already granted (via contacts.write) | `BLOCKED_ADAPTER` |
+| `get_policy` | Local policy pack | read | `(local)` | none | not required | `LOCAL_ONLY` |
+| `get_availability` | Meeting engagement | read | `GET /crm/objects/2026-09/meetings/{meetingId}` | `crm.objects.contacts.read` | already granted | `BLOCKED_ADAPTER` |
+| `create_appointment` | Meeting engagement | create | `POST /crm/objects/2026-09/meetings` | `crm.objects.contacts.write` | already granted | `BLOCKED_ADAPTER` |
+| `escalate` | Task (and/or note) | create | `POST /crm/objects/2026-09/tasks` | `crm.objects.contacts.write` | already granted | `BLOCKED_ADAPTER` |
+| `flag` | Contact property / note | update | `PATCH /crm/objects/2026-03/contacts/{contactId}` | `crm.objects.contacts.write` | already granted | `BLOCKED_ADAPTER` |
 
-- Contacts guide / OpenAPI `2026-03`
-- HubSpot scopes catalog
-- Engagements / notes / tasks / deals / meetings API guides for the chosen date-based version
+### Smallest future Service Key delta (if human later accepts full CAP-001 live env)
+
+Only these are **genuinely new** relative to today:
+
+- `crm.objects.deals.read`
+- `crm.objects.deals.write`
+
+Do **not** add notes/tasks/meetings/emails object scopes solely because CAP-001 uses those tools — current Required Scopes pages authorize them under contact scopes we already hold.
+
+## Custom test metadata (least authority)
+
+| Need | Strategy |
+| --- | --- |
+| `cay_fixture_id`, `cay_run_id`, `cay_scenario_id`, DNC/tags/flag encodings | **Provision once** in the HubSpot test account (UI or short-lived setup credential) |
+| Runtime Service Key | Keep object write only (`contacts.*`, and deals only if accepted later) |
+| Avoid | Permanent `crm.schemas.contacts.write` on the runtime Service Key “for convenience” |
+
+Create-property docs require a schemas/object-write family (`crm.schemas.contacts.write` among OR alternatives on `POST /crm/properties/2026-09/{objectType}`). That is a **setup** authority, not a steady-state CAP-001 runtime authority.
+
+## Official sources checked (2026-09-13)
+
+- Contacts `2026-03` create / get / update / search Required Scopes
+- Notes / Tasks / Meetings / Emails `2026-09` create (and get) Required Scopes
+- Deals `2026-09` get / update Required Scopes (+ deals guide)
+- Properties create Required Scopes (setup-only)
+
+**Do not change the Service Key until this matrix is accepted and a separate human authorization receipt names the exact scopes.**
