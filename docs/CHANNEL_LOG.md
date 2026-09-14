@@ -2,6 +2,14 @@
 
 Short scan log. Newest first.
 
+## CAY-20260914-11 — Meeting/Email archive evidence sufficiency
+
+STATUS: READY_FOR_REVIEW  
+What: Evidence-only refresh after CHANGES_REQUESTED `5134df68`. Keep 2026-09 wiring/readiness. Record independently reproducible public `.md` curl evidence (HTTP 200 @ `2026-09-14T04:59:20Z`) for exact DELETE ops + named specs `crm-meetings/emails-v2026-09`; note exact `/api-reference/2026-09/...` HTML 404 and JSON Asset not found; `_llms/apis/2026-09/crm.md` lists the `.md` sources. No architecture change; no Service Key; no live HubSpot; no model; no probe.  
+Branch: `feature/cay-20260914-11-hubspot-archive-contract`  
+Tip: _(pending commit)_ · Draft PR: https://github.com/heyitschien/can-ai-yet/pull/28  
+Base: `1aa936f993c5eff770f4e8b1a46137ccdc9d8a79` (prior READY tip)
+
 ## CAY-20260914-11 — HubSpot Meeting/Email archive contract reconciliation
 
 STATUS: READY_FOR_REVIEW  

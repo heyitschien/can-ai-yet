@@ -50,11 +50,12 @@ export const HUBSPOT_ASSOC_DEAL_TO_CONTACT = 3;
  * docs. CAP-001 pins Meeting/Email archive to 2026-09 (newest Current GA, same as
  * create/list). 2026-03 remains documented as an older coexisting supported contract.
  *
- * Evidence: versioning contract + llms.txt listing both specs + OpenAPI embeds via
- * HubSpotDev fetch-doc for 2026-09 and 2026-03 delete pages. Direct HTTP GET of
- * llms.txt JSON asset URLs returned "Asset not found" — recorded, not DOC_CONFLICT.
- * Misleading `latest` HTML scrape can surface 2026-03-shaped path noise; authority is
- * the versioned OpenAPI embed named on the page (`specs/2026-09/...`).
+ * Independently reproducible evidence (no MCP): public curl of
+ * `/api-reference/latest/crm/activities/{meetings|emails}/delete-*.md` (HTTP 200)
+ * embeds `specs/2026-09/crm-*-v2026-09.json` + DELETE `/crm/objects/2026-09/...`.
+ * `_llms/apis/2026-09/crm.md` lists those `.md` URLs. Exact `/api-reference/2026-09/...`
+ * HTML 404; direct JSON specs "Asset not found". Rendered HTML without `.md` may look
+ * 2026-03-shaped — authority is the public `.md` OpenAPI embed. See provenance.ts.
  */
 export const RESOLVED_VERSION_COEXISTENCE_MEETINGS_EMAILS_ARCHIVE =
   "RESOLVED_VERSION_COEXISTENCE: meetings/emails.archive — CAP-001 pin 2026-09; 2026-03 coexists as older supported contract (retrieval 2026-09-14)";
