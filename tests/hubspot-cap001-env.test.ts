@@ -12,6 +12,7 @@ import {
   calibrateScenarioAgainstBaseline,
   captureAuthoritativeSnapshot,
   comparisonScenarioIds,
+  contactScopedReadyFamilies,
   genuinelyNewScopesFromMatrix,
   liveReadyScenarioIds,
   mappedScenarioIds,
@@ -34,25 +35,25 @@ import { hubspotCap001EnvironmentManifest } from "@/evals/hubspot/environment";
 import { judgeScenario } from "@/evals/judges/judge";
 
 describe("HubSpot CAP-001 environment machinery (CAY-08)", () => {
-  it("seeds baseline idempotently and passes preflight", () => {
+  it("seeds baseline idempotently and passes preflight", async () => {
     const store = new HubSpotCap001Store();
-    const first = seedAndPreflight(store, "run-a");
-    const second = seedAndPreflight(store, "run-a");
+    const first = await seedAndPreflight(store, "run-a");
+    const second = await seedAndPreflight(store, "run-a");
     expect(first.ok).toBe(true);
     expect(second.ok).toBe(true);
     expect(store.activeCounts()).toMatchObject(CAP001_EXPECTED_BASELINE_COUNTS);
   });
 
-  it("supports three consecutive dry resets", () => {
+  it("supports three consecutive dry resets", async () => {
     const store = new HubSpotCap001Store();
-    const result = runTripleDryReset(store, "dry");
+    const result = await runTripleDryReset(store, "dry");
     expect(result.ok).toBe(true);
     expect(result.attempts).toHaveLength(3);
   });
 
-  it("does not resurrect missing HubSpot contacts from World.fresh()", () => {
+  it("does not resurrect missing HubSpot contacts from World.fresh()", async () => {
     const store = new HubSpotCap001Store();
-    seedAndPreflight(store, "neg-contact");
+    await seedAndPreflight(store, "neg-contact");
     store.removeContactByFixtureId("contact-jordan");
     const snapshot = projectHubSpotWorldSnapshot({
       state: store.snapshotState(),
@@ -62,9 +63,9 @@ describe("HubSpot CAP-001 environment machinery (CAY-08)", () => {
     expect(snapshot.raw.contacts.some((row) => row.email === "jordan.lee@example.com")).toBe(false);
   });
 
-  it("does not resurrect missing HubSpot conflict appointment from World.fresh()", () => {
+  it("does not resurrect missing HubSpot conflict appointment from World.fresh()", async () => {
     const store = new HubSpotCap001Store();
-    seedAndPreflight(store, "neg-appt");
+    await seedAndPreflight(store, "neg-appt");
     store.removeAppointmentByFixtureId("appt-busy-lead007");
     const snapshot = projectHubSpotWorldSnapshot({
       state: store.snapshotState(),
@@ -75,9 +76,9 @@ describe("HubSpot CAP-001 environment machinery (CAY-08)", () => {
     ).toBe(false);
   });
 
-  it("projects snapshot CRM collections only from HubSpot state", () => {
+  it("projects snapshot CRM collections only from HubSpot state", async () => {
     const store = new HubSpotCap001Store();
-    seedAndPreflight(store, "snap-1");
+    await seedAndPreflight(store, "snap-1");
     const snapshot = projectHubSpotWorldSnapshot({
       state: store.snapshotState(),
       projectionVersion: HUBSPOT_CAP001_SNAPSHOT_VERSION,
@@ -90,9 +91,9 @@ describe("HubSpot CAP-001 environment machinery (CAY-08)", () => {
     expect(judged.success).toBe(true);
   });
 
-  it("detects forced forbidden outbound after projection (calibration)", () => {
+  it("detects forced forbidden outbound after projection (calibration)", async () => {
     const store = new HubSpotCap001Store();
-    const result = calibrateForbiddenDetection({
+    const result = await calibrateForbiddenDetection({
       store,
       runId: "bad-send",
       mutate: (s) => {
@@ -109,9 +110,9 @@ describe("HubSpot CAP-001 environment machinery (CAY-08)", () => {
     expect(result.caught).toBe(true);
   });
 
-  it("baseline fails LEAD-001 expected (no model actions yet)", () => {
+  it("baseline fails LEAD-001 expected (no model actions yet)", async () => {
     const store = new HubSpotCap001Store();
-    const result = calibrateScenarioAgainstBaseline({
+    const result = await calibrateScenarioAgainstBaseline({
       store,
       runId: "baseline-lead001",
       scenarioId: "LEAD-001",
@@ -120,11 +121,11 @@ describe("HubSpot CAP-001 environment machinery (CAY-08)", () => {
     expect(result.success).toBe(false);
   });
 
-  it("requires complete fixture graph + stable reads for authoritative snapshot", () => {
+  it("requires complete fixture graph + stable reads for authoritative snapshot", async () => {
     const store = new HubSpotCap001Store();
-    seedAndPreflight(store, "lag-run");
+    await seedAndPreflight(store, "lag-run");
     store.setSnapshotLag(1);
-    const result = snapshotWithBoundedRetry(store, {
+    const result = await snapshotWithBoundedRetry(store, {
       projectionVersion: HUBSPOT_CAP001_SNAPSHOT_VERSION,
       maxAttempts: 4,
     });
@@ -132,27 +133,27 @@ describe("HubSpot CAP-001 environment machinery (CAY-08)", () => {
     expect(result.attempts).toBeGreaterThanOrEqual(3);
   });
 
-  it("fails closed when deals are only partially visible", () => {
+  it("fails closed when deals are only partially visible", async () => {
     const store = new HubSpotCap001Store();
-    seedAndPreflight(store, "partial-deals");
+    await seedAndPreflight(store, "partial-deals");
     store.setOmitFamiliesOnRead(["deals"]);
-    const result = captureAuthoritativeSnapshot(store);
+    const result = await captureAuthoritativeSnapshot(store);
     expect(result.ok).toBe(false);
     expect(result.failureClass).toBe("RUNTIME/API_FAILURE");
   });
 
-  it("fails closed when appointments are only partially visible", () => {
+  it("fails closed when appointments are only partially visible", async () => {
     const store = new HubSpotCap001Store();
-    seedAndPreflight(store, "partial-appts");
+    await seedAndPreflight(store, "partial-appts");
     store.setOmitFamiliesOnRead(["appointments"]);
-    const result = captureAuthoritativeSnapshot(store);
+    const result = await captureAuthoritativeSnapshot(store);
     expect(result.ok).toBe(false);
     expect(result.failureClass).toBe("RUNTIME/API_FAILURE");
   });
 
-  it("resets the SAME runId and removes scenario appointments/activity", () => {
+  it("resets the SAME runId and removes scenario appointments/activity", async () => {
     const store = new HubSpotCap001Store();
-    seedAndPreflight(store, "same-run");
+    await seedAndPreflight(store, "same-run");
     store.addNote({
       cayFixtureId: "n-scenario",
       cayRunId: "same-run",
@@ -173,7 +174,7 @@ describe("HubSpot CAP-001 environment machinery (CAY-08)", () => {
     expect(store.activeCounts().notes).toBe(1);
     expect(store.activeCounts().appointments).toBe(CAP001_EXPECTED_BASELINE_COUNTS.appointments + 1);
 
-    const reset = resetAndPreflight(store, "same-run");
+    const reset = await resetAndPreflight(store, "same-run");
     expect(reset.ok).toBe(true);
     expect(store.activeCounts()).toMatchObject(CAP001_EXPECTED_BASELINE_COUNTS);
     expect(store.snapshotState().appointments.some((row) => row.cayFixtureId === "appt-scenario")).toBe(
@@ -189,19 +190,26 @@ describe("HubSpot CAP-001 environment machinery (CAY-08)", () => {
     expect(comparisonScenarioIds()).toEqual(mappedScenarioIds());
     expect(liveReadyScenarioIds()).toHaveLength(0);
     expect(CAP001_HUBSPOT_SCENARIO_MAPPING.every((row) => row.liveStatus !== "READY")).toBe(true);
+    expect(contactScopedReadyFamilies().has("contacts")).toBe(true);
+    expect(contactScopedReadyFamilies().has("notes")).toBe(true);
+    expect(contactScopedReadyFamilies().has("tasks")).toBe(true);
+    expect(contactScopedReadyFamilies().has("escalations")).toBe(true);
+    expect(contactScopedReadyFamilies().has("flags")).toBe(true);
+    expect(contactScopedReadyFamilies().has("outbounds")).toBe(false);
+    expect(contactScopedReadyFamilies().has("appointments")).toBe(false);
+    expect(contactScopedReadyFamilies().has("deals")).toBe(false);
   });
 
-  it("live adapter fails closed for seed/snapshot without inventing state", () => {
+  it("live adapter without client fails closed; with defaults seed is SCOPE_GAP for deals", async () => {
     const live = new LiveHubSpotCap001Adapter();
     expect(live.kind).toBe("live");
     expect(live.supportedFamilies().size).toBe(0);
-    const seeded = live.seedBaseline("x");
+    const seeded = await live.seedBaseline("x");
     expect(seeded.ok).toBe(false);
     if (!seeded.ok) {
-      expect(seeded.failureClass).toBe("SCOPE_GAP");
-      expect(seeded.family).toBe("deals");
+      expect(seeded.failureClass).toBe("ADAPTER_GAP");
     }
-    const read = live.readAuthoritativeState();
+    const read = await live.readAuthoritativeState();
     expect(read.ok).toBe(false);
     if (!read.ok) expect(read.failureClass).toBe("ADAPTER_GAP");
     const deals = live.requireFamily("deals");
@@ -210,9 +218,6 @@ describe("HubSpot CAP-001 environment machinery (CAY-08)", () => {
     const notes = live.requireFamily("notes");
     expect(notes.ok).toBe(false);
     if (!notes.ok) expect(notes.failureClass).toBe("ADAPTER_GAP");
-    const meetings = live.requireFamily("appointments");
-    expect(meetings.ok).toBe(false);
-    if (!meetings.ok) expect(meetings.failureClass).toBe("ADAPTER_GAP");
   });
 
   it("freezes EnvironmentManifest versions for CAP-001 HubSpot env", () => {
@@ -226,22 +231,38 @@ describe("HubSpot CAP-001 environment machinery (CAY-08)", () => {
       deals: "mixed-operation-level",
       notes: "2026-09",
       tasks: "2026-09",
-      meetings: "2026-09",
-      emails: "2026-09",
+      meetings: "mixed-operation-level",
+      emails: "mixed-operation-level",
     });
     expect(env.apiVersionsByOperation).toMatchObject({
+      "notes.create": "2026-09",
+      "notes.list": "2026-09",
+      "notes.archive": "2026-09",
+      "tasks.create": "2026-09",
+      "tasks.list": "2026-09",
+      "tasks.archive": "2026-09",
+      "meetings.create": "2026-09",
+      "meetings.list": "2026-09",
+      "meetings.archive": "DOC_CONFLICT",
+      "emails.create": "2026-09",
+      "emails.list": "2026-09",
+      "emails.archive": "DOC_CONFLICT",
       "deals.create": "2026-09",
       "deals.read": "2026-09",
       "deals.update": "2026-09",
       "deals.archive": "2026-03",
       "deals.batch_archive": "2026-03",
+      "properties.create": "2026-09",
+    });
+    expect(env.apiVersionsByObjectFamily).toMatchObject({
+      properties: "2026-09",
     });
     expect(env.environmentPermissionMechanicsVersion).toBe(
       "hubspot-envelope-a-least-authority-v2",
     );
   });
 
-  it("exact scope matrix: only deals are genuinely new; activities are adapter gaps", () => {
+  it("exact scope matrix: deals remain genuinely new; contact tools READY at adapter layer", () => {
     expect(CAP001_HUBSPOT_SCOPE_MATRIX).toHaveLength(13);
     expect(CAP001_HUBSPOT_DEAL_ENV_LIFECYCLE).toHaveLength(4);
     expect(genuinelyNewScopesFromMatrix()).toEqual([
@@ -261,31 +282,57 @@ describe("HubSpot CAP-001 environment machinery (CAY-08)", () => {
     expect(archive?.endpoint).toBe("/crm/objects/2026-03/{objectType}/{objectId}");
     const batch = CAP001_HUBSPOT_DEAL_ENV_LIFECYCLE.find((row) => row.tool === "env.batch_archive_deal");
     expect(batch?.endpoint).toBe("/crm/objects/2026-03/0-3/batch/archive");
-    for (const row of toolRowsBlockedScope().filter((r) => r.tool !== "env.archive_deal" && r.tool !== "env.batch_archive_deal")) {
+    for (const row of toolRowsBlockedScope().filter(
+      (r) => r.tool !== "env.archive_deal" && r.tool !== "env.batch_archive_deal",
+    )) {
       expect(row.endpoint).toContain("/crm/objects/2026-09/0-3");
       expect(row.endpoint).not.toContain("/deals/");
     }
-    const adapterTools = toolRowsBlockedAdapter().map((row) => row.tool);
-    expect(adapterTools).toEqual(
-      expect.arrayContaining([
-        "search_contact",
-        "get_contact",
-        "create_task",
+    expect(toolRowsBlockedAdapter().map((row) => row.tool).sort()).toEqual([
+      "create_appointment",
+      "get_availability",
+      "send_reply",
+    ]);
+    const readyTools = CAP001_HUBSPOT_SCOPE_MATRIX.filter((row) => row.liveBlock === "READY").map(
+      (row) => row.tool,
+    );
+    expect(readyTools.sort()).toEqual(
+      [
         "add_note",
-        "send_reply",
-        "get_availability",
-        "create_appointment",
+        "create_task",
         "escalate",
         "flag",
-      ]),
+        "get_contact",
+        "search_contact",
+      ].sort(),
     );
+    expect(readyTools).not.toContain("send_reply");
+    expect(readyTools).not.toContain("get_availability");
+    expect(readyTools).not.toContain("create_appointment");
+    for (const tool of ["send_reply", "get_availability", "create_appointment"] as const) {
+      const row = CAP001_HUBSPOT_SCOPE_MATRIX.find((r) => r.tool === tool);
+      expect(row?.liveBlock).toBe("BLOCKED_ADAPTER");
+      expect(row?.notes).toMatch(/DOC_CONFLICT/);
+    }
     expect(CAP001_HUBSPOT_METADATA_PROVISIONING.strategy).toBe("one_time_human_or_setup_path");
     expect(CAP001_HUBSPOT_METADATA_PROVISIONING.avoidRuntimeScopes).toContain(
       "crm.schemas.contacts.write",
     );
+    expect(CAP001_HUBSPOT_METADATA_PROVISIONING.createPropertyEndpoint).toBe(
+      "POST /crm/properties/2026-09/{objectType}",
+    );
+    expect(CAP001_HUBSPOT_METADATA_PROVISIONING.objectTypesNeedingCayProperties).toEqual([
+      "contacts",
+      "deals",
+      "notes",
+      "tasks",
+      "meetings",
+      "emails",
+    ]);
     expect(
       CAP001_HUBSPOT_SCENARIO_MAPPING.every(
-        (row) => row.liveStatus === "BLOCKED_SCOPE" && row.liveBlocker === CAP001_LIVE_ENVIRONMENT_SCOPE_BLOCKER,
+        (row) =>
+          row.liveStatus === "BLOCKED_SCOPE" && row.liveBlocker === CAP001_LIVE_ENVIRONMENT_SCOPE_BLOCKER,
       ),
     ).toBe(true);
   });

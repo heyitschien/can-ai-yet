@@ -12,12 +12,22 @@ export {
 } from "@/evals/hubspot/cap001/calibration";
 export { LiveHubSpotCap001Adapter } from "@/evals/hubspot/cap001/live-adapter";
 export {
+  Cap001HubSpotHttpClient,
+  isDocConflictMessage,
+  isScopeGapMessage,
+  mapClientFailureToEnv,
+} from "@/evals/hubspot/cap001/http-client";
+export { CAP001_METADATA_PLAN } from "@/evals/hubspot/cap001/metadata-plan";
+export {
   CAP001_HUBSPOT_SCENARIO_MAPPING,
   comparisonScenarioIds,
+  contactScopedReadyFamilies,
   liveReadyScenarioIds,
   mappedScenarioIds,
   unmappedScenarioIds,
 } from "@/evals/hubspot/cap001/mapping";
+export { CAP001_LIVE_ADAPTER_PROVENANCE } from "@/evals/hubspot/cap001/provenance";
+export type { VendorEvidenceRow } from "@/evals/hubspot/cap001/provenance";
 export {
   CAP001_HUBSPOT_DEAL_ENV_LIFECYCLE,
   CAP001_HUBSPOT_METADATA_PROVISIONING,
@@ -57,3 +67,19 @@ export {
   HUBSPOT_CAP001_SEED_RESET_VERSION,
   HUBSPOT_CAP001_SNAPSHOT_VERSION,
 } from "@/evals/hubspot/cap001/versions";
+export {
+  CAP001_CONTACTS_BASE_PATH,
+  CAP001_DEFAULT_GRANTED_SCOPES,
+  DOC_CONFLICT_EMAILS_ARCHIVE,
+  DOC_CONFLICT_MEETINGS_ARCHIVE,
+  HUBSPOT_API_BASE_URL,
+  HUBSPOT_ASSOC_DEAL_TO_CONTACT,
+  HUBSPOT_ASSOC_EMAIL_TO_CONTACT,
+  HUBSPOT_ASSOC_MEETING_TO_CONTACT,
+  HUBSPOT_ASSOC_NOTE_TO_CONTACT,
+  HUBSPOT_ASSOC_TASK_TO_CONTACT,
+  SCOPE_CONTACTS_READ,
+  SCOPE_CONTACTS_WRITE,
+  SCOPE_DEALS_READ,
+  SCOPE_DEALS_WRITE,
+} from "@/evals/hubspot/cap001/paths";

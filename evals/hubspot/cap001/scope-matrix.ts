@@ -41,6 +41,8 @@ export const HUBSPOT_GRANTED_SCOPES = [
 /**
  * Per-object-family API version *summary* (not authority for every operation).
  * Contacts stay on proven `2026-03` (CAY-06).
+ * Notes/tasks create/list/archive use settled `2026-09`.
+ * Meetings/emails create/list use `2026-09`; **archive is DOC_CONFLICT** (not live-ready).
  * Deals are **operation-level**: create/read/update use `2026-09`; archive uses `2026-03`.
  * Exact operation matrix is the authority — see `HUBSPOT_CAP001_API_VERSIONS_BY_OPERATION`.
  */
@@ -48,27 +50,44 @@ export const HUBSPOT_CAP001_API_VERSIONS_BY_FAMILY = {
   contacts: "2026-03",
   notes: "2026-09",
   tasks: "2026-09",
-  meetings: "2026-09",
-  emails: "2026-09",
+  /** Summary — meetings.archive is DOC_CONFLICT; do not treat as archive authority. */
+  meetings: "mixed-operation-level",
+  /** Summary — emails.archive is DOC_CONFLICT; do not treat as archive authority. */
+  emails: "mixed-operation-level",
   /** Summary only — Deal archive is 2026-03; do not treat this as archive authority. */
   deals: "mixed-operation-level",
-  /** Properties create is setup-only; runtime Service Key must not hold schema-write. */
+  /**
+   * Properties create is setup-only (latest OpenAPI 2026-09). Runtime Service Key must not
+   * hold schema-write.
+   */
   properties: "2026-09",
 } as const;
 
 /**
  * Operation-level HubSpot dated API pins for CAP-001.
  * Never infer a destructive/reset path version from create/read/update of the same object family.
+ * notes/tasks archive settled 2026-09; meetings/emails archive = DOC_CONFLICT (not live-ready);
+ * Deal archive stays operation-level 2026-03 (CAY-08).
  */
 export const HUBSPOT_CAP001_API_VERSIONS_BY_OPERATION = {
   "contacts.search": "2026-03",
   "contacts.read": "2026-03",
   "contacts.write": "2026-03",
   "notes.create": "2026-09",
+  "notes.list": "2026-09",
+  "notes.archive": "2026-09",
   "tasks.create": "2026-09",
+  "tasks.list": "2026-09",
+  "tasks.archive": "2026-09",
   "meetings.create": "2026-09",
   "meetings.read": "2026-09",
+  "meetings.list": "2026-09",
+  /** OpenAPI 2026-09 vs rendered/dated 2026-03 — not live-authorized. */
+  "meetings.archive": "DOC_CONFLICT",
   "emails.create": "2026-09",
+  "emails.list": "2026-09",
+  /** OpenAPI 2026-09 vs rendered/dated 2026-03 — not live-authorized. */
+  "emails.archive": "DOC_CONFLICT",
   "deals.create": "2026-09",
   "deals.read": "2026-09",
   "deals.update": "2026-09",
@@ -97,7 +116,7 @@ export const CAP001_HUBSPOT_SCOPE_MATRIX: readonly Cap001HubSpotScopeRow[] = [
     requiredScopes: ["crm.objects.contacts.read"],
     scopeLogic: "all",
     grant: "already_granted",
-    liveBlock: "BLOCKED_ADAPTER",
+    liveBlock: "READY",
     docSource:
       "https://developers.hubspot.com/docs/api-reference/2026-03/crm/objects/contacts/search/search-contacts",
   },
@@ -111,10 +130,10 @@ export const CAP001_HUBSPOT_SCOPE_MATRIX: readonly Cap001HubSpotScopeRow[] = [
     requiredScopes: ["crm.objects.contacts.read"],
     scopeLogic: "all",
     grant: "already_granted",
-    liveBlock: "BLOCKED_ADAPTER",
+    liveBlock: "READY",
     docSource:
       "https://developers.hubspot.com/docs/api-reference/2026-03/crm/objects/contacts/get-contact",
-    notes: "Commissioning LiveHubSpotTransport already exercises Contacts CRUD; CAP-001 graph adapter not wired.",
+    notes: "CAY-10 Cap001HubSpotHttpClient + LiveHubSpotCap001Adapter dry-certified (injected HTTP).",
   },
   {
     tool: "create_task",
@@ -126,7 +145,7 @@ export const CAP001_HUBSPOT_SCOPE_MATRIX: readonly Cap001HubSpotScopeRow[] = [
     requiredScopes: ["crm.objects.contacts.write"],
     scopeLogic: "all",
     grant: "already_granted",
-    liveBlock: "BLOCKED_ADAPTER",
+    liveBlock: "READY",
     docSource:
       "https://developers.hubspot.com/docs/api-reference/latest/crm/activities/tasks/create-task",
   },
@@ -168,7 +187,7 @@ export const CAP001_HUBSPOT_SCOPE_MATRIX: readonly Cap001HubSpotScopeRow[] = [
     requiredScopes: ["crm.objects.contacts.write"],
     scopeLogic: "all",
     grant: "already_granted",
-    liveBlock: "BLOCKED_ADAPTER",
+    liveBlock: "READY",
     docSource:
       "https://developers.hubspot.com/docs/api-reference/latest/crm/activities/notes/create-note",
   },
@@ -200,7 +219,7 @@ export const CAP001_HUBSPOT_SCOPE_MATRIX: readonly Cap001HubSpotScopeRow[] = [
     docSource:
       "https://developers.hubspot.com/docs/api-reference/latest/crm/activities/emails/create-email",
     notes:
-      "Required Scopes accordion lists contacts.write OR sales-email-read. contacts.write is already granted; no new scope for logging.",
+      "Required Scopes accordion lists contacts.write OR sales-email-read. contacts.write is already granted. Family not READY: emails.archive is DOC_CONFLICT (OpenAPI 2026-09 vs rendered/dated 2026-03) — no deterministic reset/cleanup path.",
   },
   {
     tool: "get_policy",
@@ -228,6 +247,8 @@ export const CAP001_HUBSPOT_SCOPE_MATRIX: readonly Cap001HubSpotScopeRow[] = [
     liveBlock: "BLOCKED_ADAPTER",
     docSource:
       "https://developers.hubspot.com/docs/api-reference/latest/crm/activities/meetings/get-meeting",
+    notes:
+      "Create/list OpenAPI settled 2026-09, but appointments family not READY: meetings.archive is DOC_CONFLICT — no deterministic reset/cleanup path.",
   },
   {
     tool: "create_appointment",
@@ -242,6 +263,8 @@ export const CAP001_HUBSPOT_SCOPE_MATRIX: readonly Cap001HubSpotScopeRow[] = [
     liveBlock: "BLOCKED_ADAPTER",
     docSource:
       "https://developers.hubspot.com/docs/api-reference/latest/crm/activities/meetings/create-meeting",
+    notes:
+      "Create path settled 2026-09; appointments family not READY while meetings.archive remains DOC_CONFLICT.",
   },
   {
     tool: "escalate",
@@ -253,7 +276,7 @@ export const CAP001_HUBSPOT_SCOPE_MATRIX: readonly Cap001HubSpotScopeRow[] = [
     requiredScopes: ["crm.objects.contacts.write"],
     scopeLogic: "all",
     grant: "already_granted",
-    liveBlock: "BLOCKED_ADAPTER",
+    liveBlock: "READY",
     docSource:
       "https://developers.hubspot.com/docs/api-reference/latest/crm/activities/tasks/create-task",
     notes: "Prefer task/note under contact scopes; do not invent a ticket scope for CAP-001 Envelope A.",
@@ -268,7 +291,7 @@ export const CAP001_HUBSPOT_SCOPE_MATRIX: readonly Cap001HubSpotScopeRow[] = [
     requiredScopes: ["crm.objects.contacts.write"],
     scopeLogic: "all",
     grant: "already_granted",
-    liveBlock: "BLOCKED_ADAPTER",
+    liveBlock: "READY",
     docSource:
       "https://developers.hubspot.com/docs/api-reference/2026-03/crm/objects/contacts/update-contact",
     notes:
@@ -362,17 +385,30 @@ export const CAP001_HUBSPOT_METADATA_PROVISIONING = {
     "tags / handled-today style markers",
     "flag codes (if not encoded as notes)",
   ] as const,
+  /**
+   * Setup-only: POST /crm/properties/2026-09/{objectType} from latest create-property OpenAPI
+   * (HubSpotDev fetch-doc 2026-09-14). Runtime schema-write remains 0.
+   */
   createPropertyEndpoint: "POST /crm/properties/2026-09/{objectType}",
   createPropertyDoc:
     "https://developers.hubspot.com/docs/api-reference/latest/crm/properties/create-property",
   createPropertyScopeFamily: "crm.schemas.contacts.write (among OR alternatives on the create-property page)",
+  engagementObjectTypes: ["notes", "tasks", "meetings", "emails"] as const,
+  objectTypesNeedingCayProperties: [
+    "contacts",
+    "deals",
+    "notes",
+    "tasks",
+    "meetings",
+    "emails",
+  ] as const,
   rationale:
-    "Prefer provisioning custom test metadata once in the HubSpot test portal (UI or a short-lived setup credential). Runtime Service Key keeps contacts.read/write (+ deals only if accepted later) without permanent schema-write authority.",
+    "Prefer provisioning custom test metadata once in the HubSpot test portal (UI or a short-lived setup credential). Runtime Service Key keeps contacts.read/write (+ deals only if accepted later) without permanent schema-write authority. Activity cay_* properties are required for this adapter (not optional).",
 };
 
 /** Environment-level truth: full CAP-001 live seed/snapshot needs deals even when a scenario never mutates them. */
 export const CAP001_LIVE_ENVIRONMENT_SCOPE_BLOCKER =
-  "Full CAP-001 live seed/preflight/authoritative snapshot requires baseline deals via crm.objects.deals.read/write (verified missing). Activity APIs (notes/tasks/meetings/emails) are contact-scoped per HubSpot Required Scopes — those are BLOCKED_ADAPTER until wired, not missing scopes.";
+  "Full CAP-001 live seed/preflight/authoritative snapshot requires baseline deals via crm.objects.deals.read/write (verified missing). Settled contact-scoped families (contacts/notes/tasks/escalations/flags) are READY at the CAY-10 adapter/tool layer under contacts scopes (dry-certified; no live suite). outbounds/appointments remain BLOCKED_ADAPTER while emails.archive/meetings.archive are DOC_CONFLICT.";
 
 export function genuinelyNewScopesFromMatrix(
   rows: readonly Cap001HubSpotScopeRow[] = CAP001_HUBSPOT_SCOPE_MATRIX_WITH_ENV,

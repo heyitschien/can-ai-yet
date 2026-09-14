@@ -2,6 +2,47 @@
 
 Short scan log. Newest first.
 
+## CAY-20260914-10 — HubSpot CAP-001 live adapter (readiness truth)
+
+STATUS: READY_FOR_REVIEW  
+What: Final readiness alignment — `outbounds`/`appointments` and `send_reply`/`get_availability`/`create_appointment` marked `BLOCKED_ADAPTER` (`DOC_CONFLICT` Meeting/Email archive); settled `contacts`/`notes`/`tasks`/`escalations`/`flags` stay READY; `contactScopedReadyFamilies`/`supportedFamilies`/scope matrix/docs consistent. No Service Key change; no live HubSpot; no model; no hs auth; no remote CRM MCP. All 12 scenarios remain environment `BLOCKED_SCOPE`.  
+Branch: `feature/cay-20260914-10-hubspot-cap001-live-adapter-dry`  
+Tip: `e605fb5` · Draft PR: https://github.com/heyitschien/can-ai-yet/pull/27  
+Base: `ff25f55`
+
+## CAY-20260914-10 — HubSpot CAP-001 live adapter (independent re-review blockers)
+
+STATUS: READY_FOR_REVIEW  
+What: Independent re-review fixes — (1) `meetings.archive` / `emails.archive` marked `DOC_CONFLICT` (OpenAPI 2026-09 vs rendered/dated 2026-03, both sides recorded); `archiveMeeting`/`archiveEmail` + cleanup fail closed (`ADAPTER_GAP` + DOC_CONFLICT); notes/tasks archive stay settled 2026-09; (2) contact association uniqueness — exactly one contact association required (multi-contact fail closed even if one matches `cay_contact_email`). No Service Key change; no live HubSpot; no model; no hs auth; no remote CRM MCP. All 12 scenarios remain environment `BLOCKED_SCOPE`.  
+Branch: `feature/cay-20260914-10-hubspot-cap001-live-adapter-dry`  
+Tip: `35a20276ff8ebf7cd249973f3b8e25e66c6826a8` · Draft PR: https://github.com/heyitschien/can-ai-yet/pull/27  
+Base: `6373b7f`
+
+## CAY-20260914-10 — HubSpot CAP-001 live adapter (re-review CHANGES_REQUESTED)
+
+STATUS: READY_FOR_REVIEW  
+What: Re-review fixes — (1) activity archive + create-property follow latest OpenAPI `2026-09` per-operation paths (CAY-09: official docs outrank prior 2026-03 pin; Deal archive stays `2026-03`); (2) Deal→Contact association type `3` on create/list/read (fail closed vs `cay_contact_email`); (3) cross-run scenario cleanup archives CanAIYet-tagged non-baseline leftovers across all `cay_run_id`s. No Service Key change; no live HubSpot; no model; no hs auth; no remote CRM MCP.  
+Branch: `feature/cay-20260914-10-hubspot-cap001-live-adapter-dry`  
+Tip: `6f15901` · Draft PR: https://github.com/heyitschien/can-ai-yet/pull/27  
+Base: `dbbeabd`
+
+## CAY-20260914-10 — HubSpot CAP-001 live adapter (CHANGES_REQUESTED fixes)
+
+STATUS: READY_FOR_REVIEW  
+What: Independent-review fixes — (1) activity archive operation-level `2026-03` paths + conflict note vs latest OpenAPI `2026-09`; (2) authoritative reads verify HubSpot `associations.contacts` (fail closed; `cay_contact_email` auxiliary only); (3) seed compensation archives all created-in-attempt contacts/meetings/deals; baseline meeting rebinds `cay_run_id` across runs; (4) metadata plan exactness — all six object families, activity `cay_*` required, create-property pin `2026-03` + conflict note. No Service Key change; no live HubSpot; no model; no hs auth; no remote CRM MCP.  
+Branch: `feature/cay-20260914-10-hubspot-cap001-live-adapter-dry`  
+Tip: `857b658` · Draft PR: https://github.com/heyitschien/can-ai-yet/pull/27  
+Base: `c2c815c` (prior tip)
+
+## CAY-20260914-10 — HubSpot CAP-001 live adapter (dry / injected HTTP)
+
+STATUS: READY_FOR_REVIEW  
+What: Real `LiveHubSpotCap001Adapter` + `Cap001HubSpotHttpClient` with injected `fetchImpl` dry certification. Port methods async. Contact-scoped families READY at tool/adapter layer; full seed/reset/read still SCOPE_GAP without deals scopes. Metadata plan for one-time `cay_fixture_id`/`cay_run_id`. No Service Key change; no remote CRM MCP; no live suite; no model.  
+Branch: `feature/cay-20260914-10-hubspot-cap001-live-adapter-dry`  
+Tip: `b4584df` · Draft PR: https://github.com/heyitschien/can-ai-yet/pull/27  
+Base: `99fd43d` (main after CAY-09)
+
+
 ## CAY-20260913-09 — Vendor documentation authority + HubSpot Developer MCP
 
 STATUS: READY_FOR_REVIEW  

@@ -1,15 +1,18 @@
+import type { Cap001ObjectFamily } from "@/evals/hubspot/cap001/port";
 import { CAP001_LIVE_ENVIRONMENT_SCOPE_BLOCKER } from "@/evals/hubspot/cap001/scope-matrix";
 import type { HubSpotScenarioMapping } from "@/evals/hubspot/cap001/types";
 
 /**
- * CAP-001 → HubSpot mapping table (CAY-08).
+ * CAP-001 → HubSpot mapping table (CAY-08 / CAY-10).
  *
  * semanticStatus = representable for the judge in HubSpot-shaped state.
  * liveStatus = actually executable against live HubSpot under current scopes/adapter.
  * Live comparison sets must use liveStatus === READY only (none today).
  *
  * All 12 stay BLOCKED_SCOPE for the environment-level deals gap (baseline seed/snapshot).
- * Activity tools under contacts scopes are BLOCKED_ADAPTER at the tool matrix — see scope-matrix.ts.
+ * Settled contact-scoped families (contacts/notes/tasks/escalations/flags) are READY at the
+ * tool/adapter layer under contacts scopes. outbounds/appointments stay BLOCKED_ADAPTER
+ * while meetings.archive / emails.archive remain DOC_CONFLICT (no deterministic reset).
  */
 export const CAP001_HUBSPOT_SCENARIO_MAPPING: HubSpotScenarioMapping[] = [
   {
@@ -97,6 +100,15 @@ export const CAP001_HUBSPOT_SCENARIO_MAPPING: HubSpotScenarioMapping[] = [
     liveBlocker: CAP001_LIVE_ENVIRONMENT_SCOPE_BLOCKER,
   },
 ];
+
+/**
+ * Families dry-certified READY under contacts.read/write (CAY-10).
+ * Excludes outbounds/appointments: Meeting/Email archive is DOC_CONFLICT → no deterministic reset.
+ * Deals remain SCOPE_GAP without deals scopes.
+ */
+export function contactScopedReadyFamilies(): ReadonlySet<Cap001ObjectFamily> {
+  return new Set(["contacts", "notes", "tasks", "escalations", "flags"]);
+}
 
 export function mappedScenarioIds(
   rows: HubSpotScenarioMapping[] = CAP001_HUBSPOT_SCENARIO_MAPPING,

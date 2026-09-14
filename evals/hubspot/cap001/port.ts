@@ -2,6 +2,7 @@
  * CAP-001 HubSpot environment port.
  * Implementations: in-memory calibration store vs live HubSpot adapter.
  * Live path must fail closed for unauthorized object families (no simulated success).
+ * Port methods are Promise-based so the live adapter can use real HTTP.
  */
 
 import type { HubSpotCap001State } from "@/evals/hubspot/cap001/types";
@@ -28,10 +29,10 @@ export type HubSpotCap001EnvResult<T> =
 
 export type HubSpotCap001EnvironmentPort = {
   readonly kind: "mock" | "live";
-  seedBaseline(runId: string): HubSpotCap001EnvResult<{ runId: string }>;
-  reset(runId: string): HubSpotCap001EnvResult<{ runId: string }>;
+  seedBaseline(runId: string): Promise<HubSpotCap001EnvResult<{ runId: string }>>;
+  reset(runId: string): Promise<HubSpotCap001EnvResult<{ runId: string }>>;
   /** Authoritative CRM state for projection — must not invent missing fixtures. */
-  readAuthoritativeState(): HubSpotCap001EnvResult<HubSpotCap001State>;
+  readAuthoritativeState(): Promise<HubSpotCap001EnvResult<HubSpotCap001State>>;
   /** Declare which object families this implementation can actually execute. */
   supportedFamilies(): ReadonlySet<Cap001ObjectFamily>;
 };
