@@ -20,6 +20,18 @@ Before material work, use `docs/AGENT_SYSTEM_INDEX.md` as the map, then read in 
 
 `docs/ORIGIN_AND_DECISION_TRAIL.md` and `docs/EXPLAINED_LIKE_IM_FIVE.md` explain why the product exists. They are not build authority.
 
+## Vendor documentation authority (mutable facts)
+
+**Mutable vendor facts are never authoritative from model memory.** Before implementing or changing an endpoint, API version, scope, permission, validation rule, pagination behavior, or destructive/reset action, consult current official vendor documentation and record the exact provenance. If the official sources conflict or are ambiguous, stop.
+
+Operational detail: `docs/VENDOR_DOCUMENTATION_PROTOCOL.md` and `docs/VENDOR_SOURCE_REGISTRY.md`.
+
+- Prefer official `llms.txt` / machine-readable OpenAPI (or equivalent) for discovery, then the exact API reference page.
+- Copy documented paths exactly. Never infer a newer date path, undocumented alias, or scope behavior.
+- Record exact source URL, retrieval date, operation, method/path/version, required scopes, and scope logic in repo evidence.
+- Permission changes and live vendor actions still require independent review plus human authorization.
+- HubSpot **Developer MCP** (local docs/dev tooling: `search-docs`, `fetch-doc`) is docs discovery. HubSpot **remote CRM MCP** is experimental CRM access and is **not** capability evidence unless separately authorized.
+
 Use receipt IDs in the form `CAY-YYYYMMDD-NN`. Post ACKs, handoffs, evidence, blockers, and review verdicts on Issue #1.
 
 Do not fabricate benchmark evidence, relabel reference-agent results as frontier-model results, weaken fixtures to improve scores, or run uncontrolled paid-model loops.

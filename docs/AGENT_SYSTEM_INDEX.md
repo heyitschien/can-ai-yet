@@ -44,12 +44,14 @@ These explain the product and operating method. They do not outrank the authorit
 12. `HUBSPOT_COMMISSIONING_SETUP.md` — concise human setup runbook for no-model commissioning (Service Key; no secrets in chat); live smoke still separately authorized.
 13. `HUBSPOT_CAP001_ENV.md` — CAY-08 CAP-001 HubSpot seed/reset/snapshot/mapping versions (no-model calibration; not live suite auth).
 14. `HUBSPOT_CAP001_SCOPE_PLAN.md` — exact least-authority tool→endpoint→scope matrix (deals new; activities under contacts scopes; no key expansion).
-15. `CANAIYET_HUBSPOT_EXPLAINER.md` — plain durable explainer (what/why/how for synthetic→HubSpot); mirrors the Linear document; not build authority.
-14. `CAP_001_INSTRUMENT_SCIENCE.md` — execution vs construct validity, v1 certification matrix pointers, CapabilityContract + EnvironmentManifest discipline (CAY-20260913-03/04; not build authority).
-15. `FALSIFICATION_AND_PHASE_THRESHOLDS.md` — CanAIYet-specific stage gates and stop/narrow/pivot logic.
-16. `CAPABILITY_CONTROL_PLANE_HORIZON.md` — long-horizon hypothesis: capability graph, longitudinal evidence, and possible `measure → qualify → recommend → route → monitor → govern` progression; not a roadmap.
-17. `FOUR_AGENT_SYSTEM.md` — who scouts, runs, judges, and publishes.
-18. `NEXT_MISSIONS.md` — what should happen next.
+15. `VENDOR_DOCUMENTATION_PROTOCOL.md` — when/how to consult official vendor docs; conflict handling; docs MCP vs CRM MCP.
+16. `VENDOR_SOURCE_REGISTRY.md` — HubSpot docs/`llms.txt`/OpenAPI/Developer MCP pointers (no corpus mirror).
+17. `CANAIYET_HUBSPOT_EXPLAINER.md` — plain durable explainer (what/why/how for synthetic→HubSpot); mirrors the Linear document; not build authority.
+18. `CAP_001_INSTRUMENT_SCIENCE.md` — execution vs construct validity, v1 certification matrix pointers, CapabilityContract + EnvironmentManifest discipline (CAY-20260913-03/04; not build authority).
+19. `FALSIFICATION_AND_PHASE_THRESHOLDS.md` — CanAIYet-specific stage gates and stop/narrow/pivot logic.
+20. `CAPABILITY_CONTROL_PLANE_HORIZON.md` — long-horizon hypothesis: capability graph, longitudinal evidence, and possible `measure → qualify → recommend → route → monitor → govern` progression; not a roadmap.
+21. `FOUR_AGENT_SYSTEM.md` — who scouts, runs, judges, and publishes.
+22. `NEXT_MISSIONS.md` — what should happen next.
 
 Demand Scout docs (sensor, not benchmark authority):
 
