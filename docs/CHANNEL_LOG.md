@@ -2,6 +2,14 @@
 
 Short scan log. Newest first.
 
+## CAY-20260914-11 — HubSpot Meeting/Email archive contract reconciliation
+
+STATUS: READY_FOR_REVIEW  
+What: Disposition `RESOLVED_VERSION_COEXISTENCE` (not DOC_CONFLICT_PERSISTS). CAP-001 pins Meeting/Email archive to `DELETE /crm/objects/2026-09/meetings|emails/{id}`; 2026-03 recorded as coexisting older supported contract. Restored `outbounds`/`appointments` + `send_reply`/`get_availability`/`create_appointment` READY; `contactScopedReadyFamilies` includes both. Locked NEXT_MISSIONS sequence after CAY-10 merge. No Service Key change; no live HubSpot; no model; no hs auth; no remote CRM MCP; no property provisioning; no Deals grant; no live archive probe. All 12 scenarios remain environment `BLOCKED_SCOPE`.  
+Branch: `feature/cay-20260914-11-hubspot-archive-contract`  
+Tip: `2675cb22ce229fd227bf1adc65b75eca1a646609` · Draft PR: TBD  
+Base: `842c421f1d1c5977e238faacb7300bb70bdd6604`
+
 ## CAY-20260914-10 — HubSpot CAP-001 live adapter (readiness truth)
 
 STATUS: READY_FOR_REVIEW  
