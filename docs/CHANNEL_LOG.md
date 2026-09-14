@@ -2,6 +2,13 @@
 
 Short scan log. Newest first.
 
+## CAY-20260914-10 — HubSpot CAP-001 live adapter (dry / injected HTTP)
+
+STATUS: READY_FOR_REVIEW  
+What: Real `LiveHubSpotCap001Adapter` + `Cap001HubSpotHttpClient` with injected `fetchImpl` dry certification. Port methods async. Contact-scoped families READY at tool/adapter layer; full seed/reset/read still SCOPE_GAP without deals scopes. Metadata plan for one-time `cay_fixture_id`/`cay_run_id`. No Service Key change; no remote CRM MCP; no live suite; no model.  
+Branch: `feature/cay-20260914-10-hubspot-cap001-live-adapter-dry`  
+Base: `99fd43d` (main after CAY-09)
+
 ## CAY-20260913-09 — Vendor documentation authority + HubSpot Developer MCP
 
 STATUS: READY_FOR_REVIEW  

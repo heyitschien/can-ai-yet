@@ -18,13 +18,13 @@ export type Cap001CalibrationResult = {
   failures: string[];
 };
 
-export function calibrateScenarioAgainstBaseline(input: {
+export async function calibrateScenarioAgainstBaseline(input: {
   store: HubSpotCap001Store;
   runId: string;
   scenarioId: string;
   expectedOverride?: Assertion[];
   forbiddenOverride?: Assertion[];
-}): Cap001CalibrationResult {
+}): Promise<Cap001CalibrationResult> {
   const mapped = comparisonScenarioIds();
   if (!mapped.includes(input.scenarioId)) {
     return {
@@ -35,7 +35,7 @@ export function calibrateScenarioAgainstBaseline(input: {
     };
   }
 
-  const preflight = seedAndPreflight(input.store, input.runId);
+  const preflight = await seedAndPreflight(input.store, input.runId);
   if (!preflight.ok) {
     return {
       scenarioId: input.scenarioId,
@@ -72,13 +72,13 @@ export function calibrateScenarioAgainstBaseline(input: {
   };
 }
 
-export function calibrateForbiddenDetection(input: {
+export async function calibrateForbiddenDetection(input: {
   store: HubSpotCap001Store;
   runId: string;
   mutate: (store: HubSpotCap001Store) => void;
   forbidden: Assertion[];
-}): { caught: boolean; snapshot: HubSpotWorldSnapshot; failures: string[] } {
-  seedAndPreflight(input.store, input.runId);
+}): Promise<{ caught: boolean; snapshot: HubSpotWorldSnapshot; failures: string[] }> {
+  await seedAndPreflight(input.store, input.runId);
   input.mutate(input.store);
   const snapshot = projectHubSpotWorldSnapshot({
     state: input.store.snapshotState(),
@@ -92,21 +92,22 @@ export function calibrateForbiddenDetection(input: {
   };
 }
 
-export function runTripleDryReset(store: HubSpotCap001Store, baseRunId: string): {
+export async function runTripleDryReset(store: HubSpotCap001Store, baseRunId: string): Promise<{
   ok: boolean;
   attempts: Array<{ runId: string; ok: boolean; failures: string[] }>;
-} {
-  const attempts = [1, 2, 3].map((n) => {
+}> {
+  const attempts = [];
+  for (const n of [1, 2, 3]) {
     const runId = `${baseRunId}-reset-${n}`;
-    const result = resetAndPreflight(store, runId);
-    return { runId, ok: result.ok, failures: result.failures };
-  });
+    const result = await resetAndPreflight(store, runId);
+    attempts.push({ runId, ok: result.ok, failures: result.failures });
+  }
   return { ok: attempts.every((row) => row.ok), attempts };
 }
 
-export function captureAuthoritativeSnapshot(
+export async function captureAuthoritativeSnapshot(
   store: HubSpotCap001Store,
-): ReturnType<typeof snapshotWithBoundedRetry> {
+): Promise<Awaited<ReturnType<typeof snapshotWithBoundedRetry>>> {
   return snapshotWithBoundedRetry(store, {
     projectionVersion: HUBSPOT_CAP001_SNAPSHOT_VERSION,
     maxAttempts: 4,

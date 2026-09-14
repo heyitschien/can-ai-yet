@@ -185,26 +185,26 @@ export function projectHubSpotWorldSnapshot(input: {
  * Bounded settle: require full baseline fixture identity set AND stable fingerprint
  * across consecutive reads. Otherwise RUNTIME/API_FAILURE.
  */
-export function snapshotWithBoundedRetry(
+export async function snapshotWithBoundedRetry(
   port: HubSpotCap001EnvironmentPort,
   options: {
     projectionVersion: string;
     maxAttempts?: number;
   },
-): {
+): Promise<{
   ok: boolean;
   snapshot?: HubSpotWorldSnapshot;
   attempts: number;
   failureClass?: "RUNTIME/API_FAILURE" | "SCOPE_GAP" | "ADAPTER_GAP" | "INTEGRATION_FAILURE";
   failures?: string[];
-} {
+}> {
   const maxAttempts = options.maxAttempts ?? 4;
   let attempts = 0;
   let previousFingerprint: string | null = null;
 
   while (attempts < maxAttempts) {
     attempts += 1;
-    const read = port.readAuthoritativeState();
+    const read = await port.readAuthoritativeState();
     if (!read.ok) {
       return {
         ok: false,

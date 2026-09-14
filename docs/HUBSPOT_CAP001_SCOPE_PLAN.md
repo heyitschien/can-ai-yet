@@ -12,7 +12,7 @@
 | `BLOCKED_ADAPTER` | Required scope is already granted (or local-only), but CAP-001 live adapter code is missing. |
 | `LOCAL_ONLY` | No HubSpot call for this tool semantic. |
 
-**Environment-level (all 12 live scenarios):** full CAP-001 live seed / preflight / authoritative snapshot needs baseline **deals**. Until `crm.objects.deals.read` + `crm.objects.deals.write` are granted, every scenario’s `liveStatus` stays `BLOCKED_SCOPE` for that environment reason — **not** because notes/tasks/meetings/emails need extra activity scopes.
+**Environment-level (all 12 live scenarios):** full CAP-001 live seed / preflight / authoritative snapshot needs baseline **deals**. Until `crm.objects.deals.read` + `crm.objects.deals.write` are granted, every scenario’s `liveStatus` stays `BLOCKED_SCOPE` for that environment reason — **not** because notes/tasks/meetings/emails need extra activity scopes. CAY-10 dry-certifies contact-scoped tools as `READY` at the adapter/tool layer under contacts scopes (injected HTTP only).
 
 ## Per-object / per-operation API version provenance
 
@@ -74,6 +74,8 @@ Only these are **genuinely new** relative to today:
 Do **not** add notes/tasks/meetings/emails object scopes solely because CAP-001 uses those tools — current Required Scopes pages authorize them under contact scopes we already hold.
 
 ## Custom test metadata (least authority)
+
+See also `docs/HUBSPOT_CAP001_METADATA_PLAN.md` (CAY-10): prefer one-time `cay_fixture_id` + `cay_run_id` on contacts and deals.
 
 | Need | Strategy |
 | --- | --- |

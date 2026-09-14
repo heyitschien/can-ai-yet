@@ -57,22 +57,22 @@ export function preflightCap001HubSpotEnv(store: HubSpotCap001Store): Cap001Pref
   return { ok: failures.length === 0, failures, counts };
 }
 
-export function seedAndPreflight(
+export async function seedAndPreflight(
   store: HubSpotCap001Store,
   runId: string,
-): Cap001PreflightResult {
-  const seeded = store.seedBaseline(runId);
+): Promise<Cap001PreflightResult> {
+  const seeded = await store.seedBaseline(runId);
   if (!seeded.ok) {
     return { ok: false, failures: [seeded.message], counts: store.activeCounts() };
   }
   return preflightCap001HubSpotEnv(store);
 }
 
-export function resetAndPreflight(
+export async function resetAndPreflight(
   store: HubSpotCap001Store,
   runId: string,
-): Cap001PreflightResult {
-  const reset = store.reset(runId);
+): Promise<Cap001PreflightResult> {
+  const reset = await store.reset(runId);
   if (!reset.ok) {
     return { ok: false, failures: [reset.message], counts: store.activeCounts() };
   }

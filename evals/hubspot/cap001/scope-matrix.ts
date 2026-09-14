@@ -97,7 +97,7 @@ export const CAP001_HUBSPOT_SCOPE_MATRIX: readonly Cap001HubSpotScopeRow[] = [
     requiredScopes: ["crm.objects.contacts.read"],
     scopeLogic: "all",
     grant: "already_granted",
-    liveBlock: "BLOCKED_ADAPTER",
+    liveBlock: "READY",
     docSource:
       "https://developers.hubspot.com/docs/api-reference/2026-03/crm/objects/contacts/search/search-contacts",
   },
@@ -111,10 +111,10 @@ export const CAP001_HUBSPOT_SCOPE_MATRIX: readonly Cap001HubSpotScopeRow[] = [
     requiredScopes: ["crm.objects.contacts.read"],
     scopeLogic: "all",
     grant: "already_granted",
-    liveBlock: "BLOCKED_ADAPTER",
+    liveBlock: "READY",
     docSource:
       "https://developers.hubspot.com/docs/api-reference/2026-03/crm/objects/contacts/get-contact",
-    notes: "Commissioning LiveHubSpotTransport already exercises Contacts CRUD; CAP-001 graph adapter not wired.",
+    notes: "CAY-10 Cap001HubSpotHttpClient + LiveHubSpotCap001Adapter dry-certified (injected HTTP).",
   },
   {
     tool: "create_task",
@@ -126,7 +126,7 @@ export const CAP001_HUBSPOT_SCOPE_MATRIX: readonly Cap001HubSpotScopeRow[] = [
     requiredScopes: ["crm.objects.contacts.write"],
     scopeLogic: "all",
     grant: "already_granted",
-    liveBlock: "BLOCKED_ADAPTER",
+    liveBlock: "READY",
     docSource:
       "https://developers.hubspot.com/docs/api-reference/latest/crm/activities/tasks/create-task",
   },
@@ -168,7 +168,7 @@ export const CAP001_HUBSPOT_SCOPE_MATRIX: readonly Cap001HubSpotScopeRow[] = [
     requiredScopes: ["crm.objects.contacts.write"],
     scopeLogic: "all",
     grant: "already_granted",
-    liveBlock: "BLOCKED_ADAPTER",
+    liveBlock: "READY",
     docSource:
       "https://developers.hubspot.com/docs/api-reference/latest/crm/activities/notes/create-note",
   },
@@ -196,7 +196,7 @@ export const CAP001_HUBSPOT_SCOPE_MATRIX: readonly Cap001HubSpotScopeRow[] = [
     requiredScopes: ["crm.objects.contacts.write", "sales-email-read"],
     scopeLogic: "any",
     grant: "already_granted",
-    liveBlock: "BLOCKED_ADAPTER",
+    liveBlock: "READY",
     docSource:
       "https://developers.hubspot.com/docs/api-reference/latest/crm/activities/emails/create-email",
     notes:
@@ -225,7 +225,7 @@ export const CAP001_HUBSPOT_SCOPE_MATRIX: readonly Cap001HubSpotScopeRow[] = [
     requiredScopes: ["crm.objects.contacts.read"],
     scopeLogic: "all",
     grant: "already_granted",
-    liveBlock: "BLOCKED_ADAPTER",
+    liveBlock: "READY",
     docSource:
       "https://developers.hubspot.com/docs/api-reference/latest/crm/activities/meetings/get-meeting",
   },
@@ -239,7 +239,7 @@ export const CAP001_HUBSPOT_SCOPE_MATRIX: readonly Cap001HubSpotScopeRow[] = [
     requiredScopes: ["crm.objects.contacts.write"],
     scopeLogic: "all",
     grant: "already_granted",
-    liveBlock: "BLOCKED_ADAPTER",
+    liveBlock: "READY",
     docSource:
       "https://developers.hubspot.com/docs/api-reference/latest/crm/activities/meetings/create-meeting",
   },
@@ -253,7 +253,7 @@ export const CAP001_HUBSPOT_SCOPE_MATRIX: readonly Cap001HubSpotScopeRow[] = [
     requiredScopes: ["crm.objects.contacts.write"],
     scopeLogic: "all",
     grant: "already_granted",
-    liveBlock: "BLOCKED_ADAPTER",
+    liveBlock: "READY",
     docSource:
       "https://developers.hubspot.com/docs/api-reference/latest/crm/activities/tasks/create-task",
     notes: "Prefer task/note under contact scopes; do not invent a ticket scope for CAP-001 Envelope A.",
@@ -268,7 +268,7 @@ export const CAP001_HUBSPOT_SCOPE_MATRIX: readonly Cap001HubSpotScopeRow[] = [
     requiredScopes: ["crm.objects.contacts.write"],
     scopeLogic: "all",
     grant: "already_granted",
-    liveBlock: "BLOCKED_ADAPTER",
+    liveBlock: "READY",
     docSource:
       "https://developers.hubspot.com/docs/api-reference/2026-03/crm/objects/contacts/update-contact",
     notes:
@@ -372,7 +372,7 @@ export const CAP001_HUBSPOT_METADATA_PROVISIONING = {
 
 /** Environment-level truth: full CAP-001 live seed/snapshot needs deals even when a scenario never mutates them. */
 export const CAP001_LIVE_ENVIRONMENT_SCOPE_BLOCKER =
-  "Full CAP-001 live seed/preflight/authoritative snapshot requires baseline deals via crm.objects.deals.read/write (verified missing). Activity APIs (notes/tasks/meetings/emails) are contact-scoped per HubSpot Required Scopes — those are BLOCKED_ADAPTER until wired, not missing scopes.";
+  "Full CAP-001 live seed/preflight/authoritative snapshot requires baseline deals via crm.objects.deals.read/write (verified missing). Contact-scoped activity families (contacts/notes/tasks/meetings/emails → notes/tasks/outbounds/escalations/flags/appointments) are READY at the CAY-10 adapter/tool layer under contacts scopes (dry-certified; no live suite).";
 
 export function genuinelyNewScopesFromMatrix(
   rows: readonly Cap001HubSpotScopeRow[] = CAP001_HUBSPOT_SCOPE_MATRIX_WITH_ENV,

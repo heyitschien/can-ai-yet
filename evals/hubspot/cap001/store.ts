@@ -64,7 +64,7 @@ export class HubSpotCap001Store implements HubSpotCap001EnvironmentPort {
    * Idempotent for the SAME runId: removes all scenario-owned mutable state
    * (including scenario appointments) and restores exact baseline fixtures.
    */
-  seedBaseline(runId: string): HubSpotCap001EnvResult<{ runId: string }> {
+  async seedBaseline(runId: string): Promise<HubSpotCap001EnvResult<{ runId: string }>> {
     this.runId = runId;
     this.clearScenarioOwnedState();
     this.retainOnlyBaselineFixtures();
@@ -114,11 +114,11 @@ export class HubSpotCap001Store implements HubSpotCap001EnvironmentPort {
     return { ok: true, data: { runId } };
   }
 
-  reset(runId: string): HubSpotCap001EnvResult<{ runId: string }> {
+  async reset(runId: string): Promise<HubSpotCap001EnvResult<{ runId: string }>> {
     return this.seedBaseline(runId);
   }
 
-  readAuthoritativeState(): HubSpotCap001EnvResult<HubSpotCap001State> {
+  async readAuthoritativeState(): Promise<HubSpotCap001EnvResult<HubSpotCap001State>> {
     return { ok: true, data: this.snapshotState() };
   }
 
