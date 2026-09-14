@@ -1,10 +1,10 @@
 /**
- * Live HubSpot CAP-001 environment adapter (CAY-10).
+ * Live HubSpot CAP-001 environment adapter (CAY-10 / CAY-11).
  *
  * Default grantedScopes = contacts.read + contacts.write only.
  * Full seed/reset/readAuthoritativeState require deals scopes → SCOPE_GAP without them.
- * Contact-scoped helpers dry-certify settled READY families via injected HTTP (no live network).
- * outbounds/appointments are not supported/READY while Meeting/Email archive is DOC_CONFLICT.
+ * Contact-scoped helpers dry-certify READY families via injected HTTP (no live network),
+ * including outbounds/appointments after CAY-11 Meeting/Email archive pin 2026-09.
  * Service Key is unchanged; deals grants appear only when tests inject fake scopes.
  */
 
@@ -59,13 +59,15 @@ const BASELINE_CONTACT_IDS = new Set(CAP001_SEED_CONTACTS.map((row) => row.cayFi
 const BASELINE_DEAL_IDS = new Set(CAP001_SEED_DEALS.map((row) => row.cayFixtureId));
 const BASELINE_APPT_IDS = new Set(CAP001_SEED_APPOINTMENTS.map((row) => row.cayFixtureId));
 
-/** Settled READY families only — excludes outbounds/appointments (archive DOC_CONFLICT). */
+/** Contact-scoped READY families (CAY-11 includes outbounds/appointments). */
 const CONTACT_SCOPED_READY_FAMILIES: readonly Cap001ObjectFamily[] = [
   "contacts",
   "notes",
   "tasks",
   "escalations",
   "flags",
+  "outbounds",
+  "appointments",
 ];
 
 export type LiveHubSpotCap001AdapterOptions = {
@@ -426,29 +428,13 @@ export class LiveHubSpotCap001Adapter implements HubSpotCap001EnvironmentPort {
             "Live CAP-001 deals require crm.objects.deals.read/write (verified missing on Service Key).",
           family,
         };
-      case "outbounds":
-        return {
-          ok: false,
-          failureClass: "ADAPTER_GAP",
-          message: this.client
-            ? "Live CAP-001 family 'outbounds' is BLOCKED_ADAPTER (DOC_CONFLICT: emails.archive unresolved; no deterministic reset)."
-            : "Live CAP-001 family 'outbounds' requires an HTTP client (accessToken/fetchImpl or injected client).",
-          family,
-        };
-      case "appointments":
-        return {
-          ok: false,
-          failureClass: "ADAPTER_GAP",
-          message: this.client
-            ? "Live CAP-001 family 'appointments' is BLOCKED_ADAPTER (DOC_CONFLICT: meetings.archive unresolved; no deterministic reset)."
-            : "Live CAP-001 family 'appointments' requires an HTTP client (accessToken/fetchImpl or injected client).",
-          family,
-        };
       case "contacts":
       case "notes":
       case "tasks":
       case "escalations":
       case "flags":
+      case "outbounds":
+      case "appointments":
         return {
           ok: false,
           failureClass: "ADAPTER_GAP",

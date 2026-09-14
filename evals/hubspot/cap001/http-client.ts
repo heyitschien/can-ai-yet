@@ -19,8 +19,6 @@ import {
   CAP001_NOTE_PROPERTY_NAMES,
   CAP001_TASKS_BASE_PATH,
   CAP001_TASK_PROPERTY_NAMES,
-  DOC_CONFLICT_EMAILS_ARCHIVE,
-  DOC_CONFLICT_MEETINGS_ARCHIVE,
   HUBSPOT_API_BASE_URL,
   HUBSPOT_ASSOC_DEAL_TO_CONTACT,
   HUBSPOT_ASSOC_EMAIL_TO_CONTACT,
@@ -32,6 +30,8 @@ import {
   SCOPE_DEALS_READ,
   SCOPE_DEALS_WRITE,
   cap001DealArchivePath,
+  cap001EmailArchivePath,
+  cap001MeetingArchivePath,
   cap001NoteArchivePath,
   cap001TaskArchivePath,
 } from "@/evals/hubspot/cap001/paths";
@@ -430,29 +430,25 @@ export class Cap001HubSpotHttpClient {
   }
 
   /**
-   * meetings.archive is DOC_CONFLICT (OpenAPI 2026-09 vs rendered/dated 2026-03).
-   * Fail closed — never issue a live DELETE while contested.
+   * meetings.archive — CAP-001 pin 2026-09 (CAY-11 RESOLVED_VERSION_COEXISTENCE).
+   * Issues DELETE /crm/objects/2026-09/meetings/{meetingId}.
    */
   async archiveMeeting(meetingId: string): Promise<HubSpotTransportResult<undefined>> {
-    void meetingId;
-    return {
-      ok: false,
-      failureClass: "INTEGRATION_FAILURE",
-      message: DOC_CONFLICT_MEETINGS_ARCHIVE,
-    };
+    const gap = this.requireScopes([SCOPE_CONTACTS_WRITE]);
+    if (gap) return gap;
+    return this.request<undefined>("DELETE", cap001MeetingArchivePath(meetingId));
   }
 
   /**
-   * emails.archive is DOC_CONFLICT (OpenAPI 2026-09 vs rendered/dated 2026-03).
-   * Fail closed — never issue a live DELETE while contested.
+   * emails.archive — CAP-001 pin 2026-09 (CAY-11 RESOLVED_VERSION_COEXISTENCE).
+   * Issues DELETE /crm/objects/2026-09/emails/{emailId}.
+   * Required scopes (any): crm.objects.contacts.write OR sales-email-read;
+   * contacts.write already granted covers this path.
    */
   async archiveEmail(emailId: string): Promise<HubSpotTransportResult<undefined>> {
-    void emailId;
-    return {
-      ok: false,
-      failureClass: "INTEGRATION_FAILURE",
-      message: DOC_CONFLICT_EMAILS_ARCHIVE,
-    };
+    const gap = this.requireScopes([SCOPE_CONTACTS_WRITE]);
+    if (gap) return gap;
+    return this.request<undefined>("DELETE", cap001EmailArchivePath(emailId));
   }
 }
 
@@ -460,17 +456,11 @@ export function isScopeGapMessage(message: string): boolean {
   return message.startsWith("SCOPE_GAP:");
 }
 
-export function isDocConflictMessage(message: string): boolean {
-  return message.includes("DOC_CONFLICT");
-}
-
 export function mapClientFailureToEnv(
   failureClass: HubSpotFailureClass,
   message: string,
 ): HubSpotFailureClass | "SCOPE_GAP" | "ADAPTER_GAP" {
   if (isScopeGapMessage(message)) return "SCOPE_GAP";
-  // Unresolved vendor docs → not live-ready (ADAPTER_GAP); message retains DOC_CONFLICT.
-  if (isDocConflictMessage(message)) return "ADAPTER_GAP";
   return failureClass;
 }
 

@@ -2,6 +2,22 @@
 
 Short scan log. Newest first.
 
+## CAY-20260914-11 — Meeting/Email archive evidence sufficiency
+
+STATUS: READY_FOR_REVIEW  
+What: Evidence-only refresh after CHANGES_REQUESTED `5134df68`. Keep 2026-09 wiring/readiness. Record independently reproducible public `.md` curl evidence (HTTP 200 @ `2026-09-14T04:59:20Z`) for exact DELETE ops + named specs `crm-meetings/emails-v2026-09`; note exact `/api-reference/2026-09/...` HTML 404 and JSON Asset not found; `_llms/apis/2026-09/crm.md` lists the `.md` sources. No architecture change; no Service Key; no live HubSpot; no model; no probe.  
+Branch: `feature/cay-20260914-11-hubspot-archive-contract`  
+Tip: `67c5f1611708e5d82c1384fbd83212808df4b00a` · Draft PR: https://github.com/heyitschien/can-ai-yet/pull/28  
+Base: `1aa936f993c5eff770f4e8b1a46137ccdc9d8a79` (prior READY tip)
+
+## CAY-20260914-11 — HubSpot Meeting/Email archive contract reconciliation
+
+STATUS: READY_FOR_REVIEW  
+What: Disposition `RESOLVED_VERSION_COEXISTENCE` (not DOC_CONFLICT_PERSISTS). CAP-001 pins Meeting/Email archive to `DELETE /crm/objects/2026-09/meetings|emails/{id}`; 2026-03 recorded as coexisting older supported contract. Restored `outbounds`/`appointments` + `send_reply`/`get_availability`/`create_appointment` READY; `contactScopedReadyFamilies` includes both. Locked NEXT_MISSIONS sequence after CAY-10 merge. No Service Key change; no live HubSpot; no model; no hs auth; no remote CRM MCP; no property provisioning; no Deals grant; no live archive probe. All 12 scenarios remain environment `BLOCKED_SCOPE`.  
+Branch: `feature/cay-20260914-11-hubspot-archive-contract`  
+Tip: `2675cb22ce229fd227bf1adc65b75eca1a646609` · Draft PR: https://github.com/heyitschien/can-ai-yet/pull/28  
+Base: `842c421f1d1c5977e238faacb7300bb70bdd6604`
+
 ## CAY-20260914-10 — HubSpot CAP-001 live adapter (readiness truth)
 
 STATUS: READY_FOR_REVIEW  

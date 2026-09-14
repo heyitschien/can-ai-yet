@@ -1,10 +1,11 @@
 /**
- * CAP-001 HubSpot path + association constants (CAY-10).
+ * CAP-001 HubSpot path + association constants (CAY-10 / CAY-11).
  *
  * Paths match accepted CAY-08 provenance in scope-matrix.ts, with CAY-09/CAY-10
  * activity-archive correction for notes/tasks (settled 2026-09) and create-property
- * (settled 2026-09). meetings.archive / emails.archive are DOC_CONFLICT (retrieval
- * 2026-09-14) — not live-authorized; see DOC_CONFLICT_* markers.
+ * (settled 2026-09). meetings.archive / emails.archive pin CAP-001 to **2026-09**
+ * named DELETE paths (CAY-11 RESOLVED_VERSION_COEXISTENCE — 2026-03 remains a
+ * coexisting supported contract, not the CAP-001 pin).
  * Association type IDs from HubSpot associate-records guide (HUBSPOT_DEFINED).
  * Retrieval date for this module: 2026-09-14.
  */
@@ -15,7 +16,7 @@ export const HUBSPOT_API_BASE_URL = "https://api.hubapi.com";
 /** Contacts remain on proven 2026-03 (CAY-06 / CAY-08). */
 export const CAP001_CONTACTS_API_VERSION = "2026-03";
 
-/** Notes/tasks/meetings/emails create/list + deal create/read/update use 2026-09. */
+/** Notes/tasks/meetings/emails create/list/archive + deal create/read/update use 2026-09. */
 export const CAP001_ACTIVITIES_API_VERSION = "2026-09";
 export const CAP001_DEALS_CRUD_API_VERSION = "2026-09";
 
@@ -43,26 +44,34 @@ export const HUBSPOT_ASSOC_EMAIL_TO_CONTACT = 198;
 export const HUBSPOT_ASSOC_DEAL_TO_CONTACT = 3;
 
 /**
- * DOC_CONFLICT markers (vendor protocol: STOP contested fact; do not silently pick).
- * OpenAPI embedded on latest delete pages vs independent rendered-reference observation
- * of the same latest URLs + dated 2026-03 pages (retrieval 2026-09-14).
+ * CAY-11 disposition: RESOLVED_VERSION_COEXISTENCE (retrieval 2026-09-14).
+ * Date-based API versions are immutable supported contracts (Current → Supported →
+ * Unsupported). Two dates alone do not imply contradiction — see HubSpot versioning
+ * docs. CAP-001 pins Meeting/Email archive to 2026-09 (newest Current GA, same as
+ * create/list). 2026-03 remains documented as an older coexisting supported contract.
+ *
+ * Independently reproducible evidence (no MCP): public curl of
+ * `/api-reference/latest/crm/activities/{meetings|emails}/delete-*.md` (HTTP 200)
+ * embeds `specs/2026-09/crm-*-v2026-09.json` + DELETE `/crm/objects/2026-09/...`.
+ * `_llms/apis/2026-09/crm.md` lists those `.md` URLs. Exact `/api-reference/2026-09/...`
+ * HTML 404; direct JSON specs "Asset not found". Rendered HTML without `.md` may look
+ * 2026-03-shaped — authority is the public `.md` OpenAPI embed. See provenance.ts.
  */
-export const DOC_CONFLICT_MEETINGS_ARCHIVE =
-  "DOC_CONFLICT: meetings.archive — OpenAPI 2026-09 vs rendered/dated 2026-03 (retrieval 2026-09-14)";
+export const RESOLVED_VERSION_COEXISTENCE_MEETINGS_EMAILS_ARCHIVE =
+  "RESOLVED_VERSION_COEXISTENCE: meetings/emails.archive — CAP-001 pin 2026-09; 2026-03 coexists as older supported contract (retrieval 2026-09-14)";
 
-export const DOC_CONFLICT_EMAILS_ARCHIVE =
-  "DOC_CONFLICT: emails.archive — OpenAPI 2026-09 vs rendered/dated 2026-03 (retrieval 2026-09-14)";
-
-/** Contested OpenAPI side (latest page embed / HTML scrape, 2026-09-14). Not live-authorized. */
-export const CAP001_MEETINGS_ARCHIVE_OPENAPI_PATH_TEMPLATE =
+/** CAP-001 pin (2026-09 named OpenAPI). */
+export const CAP001_MEETINGS_ARCHIVE_PATH_TEMPLATE =
   "/crm/objects/2026-09/meetings/{meetingId}";
-export const CAP001_EMAILS_ARCHIVE_OPENAPI_PATH_TEMPLATE =
+export const CAP001_EMAILS_ARCHIVE_PATH_TEMPLATE =
   "/crm/objects/2026-09/emails/{emailId}";
 
-/** Contested rendered/dated side (independent observation + dated pages, 2026-09-14). */
-export const CAP001_MEETINGS_ARCHIVE_RENDERED_PATH_TEMPLATE =
-  "/crm/objects/2026-03/{objectType}/{objectId}";
-export const CAP001_EMAILS_ARCHIVE_RENDERED_PATH_TEMPLATE =
+/**
+ * Older coexisting supported contract (2026-03 OpenAPI) — evidence only, not CAP-001 pin.
+ */
+export const CAP001_MEETINGS_ARCHIVE_2026_03_PATH_TEMPLATE =
+  "/crm/objects/2026-03/meetings/{meetingId}";
+export const CAP001_EMAILS_ARCHIVE_2026_03_PATH_TEMPLATE =
   "/crm/objects/2026-03/emails/{emailId}";
 
 /** One-time provisioned custom properties (runtime writes values only). */
@@ -95,8 +104,7 @@ export function cap001DealArchivePath(dealId: string): string {
 }
 
 /**
- * Settled activity archive paths (notes/tasks — independently confirmed 2026-09).
- * meetings/emails archive are DOC_CONFLICT — use DOC_CONFLICT_* markers; do not call live.
+ * Settled activity archive paths (notes/tasks/meetings/emails — CAP-001 pin 2026-09).
  */
 export function cap001NoteArchivePath(noteId: string): string {
   return `/crm/objects/2026-09/notes/${encodeURIComponent(noteId)}`;
@@ -106,17 +114,13 @@ export function cap001TaskArchivePath(taskId: string): string {
   return `/crm/objects/2026-09/tasks/${encodeURIComponent(taskId)}`;
 }
 
-/**
- * Contested OpenAPI-side path only (evidence). Not live-authorized while DOC_CONFLICT holds.
- */
-export function cap001MeetingArchiveOpenApiPath(meetingId: string): string {
+/** CAP-001 Meeting archive pin: DELETE /crm/objects/2026-09/meetings/{meetingId}. */
+export function cap001MeetingArchivePath(meetingId: string): string {
   return `/crm/objects/2026-09/meetings/${encodeURIComponent(meetingId)}`;
 }
 
-/**
- * Contested OpenAPI-side path only (evidence). Not live-authorized while DOC_CONFLICT holds.
- */
-export function cap001EmailArchiveOpenApiPath(emailId: string): string {
+/** CAP-001 Email archive pin: DELETE /crm/objects/2026-09/emails/{emailId}. */
+export function cap001EmailArchivePath(emailId: string): string {
   return `/crm/objects/2026-09/emails/${encodeURIComponent(emailId)}`;
 }
 

@@ -34,10 +34,10 @@ import {
   CAP001_MEETINGS_BASE_PATH,
   CAP001_EMAILS_BASE_PATH,
   CAP001_DEALS_CRUD_BASE_PATH,
-  DOC_CONFLICT_EMAILS_ARCHIVE,
-  DOC_CONFLICT_MEETINGS_ARCHIVE,
   cap001NoteArchivePath,
   cap001TaskArchivePath,
+  cap001MeetingArchivePath,
+  cap001EmailArchivePath,
 } from "@/evals/hubspot/cap001/paths";
 import { HUBSPOT_CAP001_SNAPSHOT_VERSION } from "@/evals/hubspot/cap001/versions";
 
@@ -389,7 +389,7 @@ describe("Cap001HubSpotHttpClient (injected fetch)", () => {
     expect(fake.fetchMock).not.toHaveBeenCalled();
   });
 
-  it("archives settled notes/tasks on 2026-09 paths; meetings/emails refuse DOC_CONFLICT", async () => {
+  it("archives notes/tasks/meetings/emails on exact 2026-09 DELETE paths", async () => {
     const fake = createFakeCrm();
     const client = new Cap001HubSpotHttpClient({
       accessToken: "t",
@@ -403,20 +403,8 @@ describe("Cap001HubSpotHttpClient (injected fetch)", () => {
 
     expect((await client.archiveNote("n1")).ok).toBe(true);
     expect((await client.archiveTask("t1")).ok).toBe(true);
-
-    const meetingArchive = await client.archiveMeeting("m1");
-    expect(meetingArchive.ok).toBe(false);
-    if (!meetingArchive.ok) {
-      expect(meetingArchive.message).toBe(DOC_CONFLICT_MEETINGS_ARCHIVE);
-      expect(meetingArchive.message).toMatch(/DOC_CONFLICT/);
-    }
-
-    const emailArchive = await client.archiveEmail("e1");
-    expect(emailArchive.ok).toBe(false);
-    if (!emailArchive.ok) {
-      expect(emailArchive.message).toBe(DOC_CONFLICT_EMAILS_ARCHIVE);
-      expect(emailArchive.message).toMatch(/DOC_CONFLICT/);
-    }
+    expect((await client.archiveMeeting("m1")).ok).toBe(true);
+    expect((await client.archiveEmail("e1")).ok).toBe(true);
 
     const deleteUrls = fake.fetchMock.mock.calls
       .filter((call) => call[1]?.method === "DELETE")
@@ -425,12 +413,14 @@ describe("Cap001HubSpotHttpClient (injected fetch)", () => {
       expect.arrayContaining([
         `${HUBSPOT_API_BASE_URL}${cap001NoteArchivePath("n1")}`,
         `${HUBSPOT_API_BASE_URL}${cap001TaskArchivePath("t1")}`,
+        `${HUBSPOT_API_BASE_URL}${cap001MeetingArchivePath("m1")}`,
+        `${HUBSPOT_API_BASE_URL}${cap001EmailArchivePath("e1")}`,
       ]),
     );
-    expect(deleteUrls.every((url) => !url.includes("/meetings/"))).toBe(true);
-    expect(deleteUrls.every((url) => !url.includes("/emails/"))).toBe(true);
+    expect(deleteUrls).toContain(`${HUBSPOT_API_BASE_URL}/crm/objects/2026-09/meetings/m1`);
+    expect(deleteUrls).toContain(`${HUBSPOT_API_BASE_URL}/crm/objects/2026-09/emails/e1`);
     for (const url of deleteUrls) {
-      expect(url).toMatch(/\/crm\/objects\/2026-09\/(notes|tasks)\//);
+      expect(url).toMatch(/\/crm\/objects\/2026-09\/(notes|tasks|meetings|emails)\//);
     }
   });
 
@@ -507,8 +497,8 @@ describe("LiveHubSpotCap001Adapter (dry)", () => {
     });
     expect([...adapter.supportedFamilies()].sort()).toEqual([...contactScopedReadyFamilies()].sort());
     expect(adapter.supportedFamilies().has("deals")).toBe(false);
-    expect(adapter.supportedFamilies().has("outbounds")).toBe(false);
-    expect(adapter.supportedFamilies().has("appointments")).toBe(false);
+    expect(adapter.supportedFamilies().has("outbounds")).toBe(true);
+    expect(adapter.supportedFamilies().has("appointments")).toBe(true);
 
     const seeded = await adapter.seedBaseline("run-x");
     expect(seeded.ok).toBe(false);
@@ -520,17 +510,9 @@ describe("LiveHubSpotCap001Adapter (dry)", () => {
     const notes = adapter.requireFamily("notes");
     expect(notes.ok).toBe(true);
     const appointments = adapter.requireFamily("appointments");
-    expect(appointments.ok).toBe(false);
-    if (!appointments.ok) {
-      expect(appointments.failureClass).toBe("ADAPTER_GAP");
-      expect(appointments.message).toMatch(/DOC_CONFLICT/);
-    }
+    expect(appointments.ok).toBe(true);
     const outbounds = adapter.requireFamily("outbounds");
-    expect(outbounds.ok).toBe(false);
-    if (!outbounds.ok) {
-      expect(outbounds.failureClass).toBe("ADAPTER_GAP");
-      expect(outbounds.message).toMatch(/DOC_CONFLICT/);
-    }
+    expect(outbounds.ok).toBe(true);
     const deals = adapter.requireFamily("deals");
     expect(deals.ok).toBe(false);
     if (!deals.ok) expect(deals.failureClass).toBe("SCOPE_GAP");
@@ -908,7 +890,7 @@ describe("LiveHubSpotCap001Adapter (dry)", () => {
     }
   });
 
-  it("fails closed DOC_CONFLICT when reset would archive meeting/email leftovers", async () => {
+  it("archives meeting/email leftovers on reset via 2026-09 DELETE paths", async () => {
     const fake = createFakeCrm();
     const adapter = new LiveHubSpotCap001Adapter({
       accessToken: "t",
@@ -948,29 +930,24 @@ describe("LiveHubSpotCap001Adapter (dry)", () => {
     });
 
     const reset = await adapter.reset("run-B");
-    expect(reset.ok).toBe(false);
-    if (!reset.ok) {
-      expect(reset.failureClass).toBe("ADAPTER_GAP");
-      expect(reset.message).toMatch(/DOC_CONFLICT/);
-    }
+    expect(reset.ok).toBe(true);
+
     expect(
       [...fake.emails.values()]
         .filter((row) => row.properties[CAP001_PROP_FIXTURE_ID] === "email-run-a")
-        .every((row) => !row.archived),
+        .every((row) => row.archived),
     ).toBe(true);
     expect(
       [...fake.meetings.values()]
         .filter((row) => row.properties[CAP001_PROP_FIXTURE_ID] === "meeting-run-a")
-        .every((row) => !row.archived),
+        .every((row) => row.archived),
     ).toBe(true);
-    expect(fake.fetchMock.mock.calls.every((call) => call[1]?.method !== "DELETE" || !String(call[0]).includes("/emails/"))).toBe(
-      true,
-    );
-    expect(
-      fake.fetchMock.mock.calls.every(
-        (call) => call[1]?.method !== "DELETE" || !String(call[0]).includes("/meetings/"),
-      ),
-    ).toBe(true);
+
+    const deleteUrls = fake.fetchMock.mock.calls
+      .filter((call) => call[1]?.method === "DELETE")
+      .map((call) => String(call[0]));
+    expect(deleteUrls.some((url) => url.includes("/crm/objects/2026-09/emails/"))).toBe(true);
+    expect(deleteUrls.some((url) => url.includes("/crm/objects/2026-09/meetings/"))).toBe(true);
   });
 
   it("rebinds baseline meeting cay_run_id across contact-scoped seeds", async () => {
@@ -997,7 +974,7 @@ describe("LiveHubSpotCap001Adapter (dry)", () => {
     }
   });
 
-  it("deal-stage failure archives contacts; meeting cleanup fails DOC_CONFLICT", async () => {
+  it("deal-stage failure archives contacts and created meetings on 2026-09 paths", async () => {
     const fake = createFakeCrm();
     const wrapped = vi.fn(async (input: string | URL, init?: RequestInit) => {
       const url = String(input);
@@ -1017,19 +994,17 @@ describe("LiveHubSpotCap001Adapter (dry)", () => {
     expect(seeded.ok).toBe(false);
     if (!seeded.ok) {
       expect(seeded.message).toMatch(/deal create boom/);
-      expect(seeded.message).toMatch(/DOC_CONFLICT/);
       expect(seeded.family).toBe("deals");
     }
 
     expect([...fake.contacts.values()].every((row) => row.archived)).toBe(true);
-    // Meeting archive is DOC_CONFLICT — created meetings must remain (fail closed).
-    expect([...fake.meetings.values()].some((row) => !row.archived)).toBe(true);
+    expect([...fake.meetings.values()].every((row) => row.archived)).toBe(true);
     expect(fake.deals.size).toBe(0);
 
     const deleteUrls = wrapped.mock.calls
       .filter((call) => call[1]?.method === "DELETE")
       .map((call) => String(call[0]));
     expect(deleteUrls.some((url) => url.includes(CAP001_CONTACTS_BASE_PATH))).toBe(true);
-    expect(deleteUrls.every((url) => !url.includes("/meetings/"))).toBe(true);
+    expect(deleteUrls.some((url) => url.includes("/crm/objects/2026-09/meetings/"))).toBe(true);
   });
 });
