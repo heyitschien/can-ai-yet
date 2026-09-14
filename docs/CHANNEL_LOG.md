@@ -1,5 +1,7 @@
 # Channel log
 
+Short scan log. Newest first.
+
 ## CAY-20260914-10 — HubSpot CAP-001 live adapter (readiness truth)
 
 STATUS: READY_FOR_REVIEW  
@@ -7,8 +9,6 @@ What: Final readiness alignment — `outbounds`/`appointments` and `send_reply`/
 Branch: `feature/cay-20260914-10-hubspot-cap001-live-adapter-dry`  
 Tip: `e605fb5` · Draft PR: https://github.com/heyitschien/can-ai-yet/pull/27  
 Base: `ff25f55`
-
-Short scan log. Newest first.
 
 ## CAY-20260914-10 — HubSpot CAP-001 live adapter (independent re-review blockers)
 
