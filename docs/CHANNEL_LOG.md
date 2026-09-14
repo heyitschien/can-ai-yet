@@ -2,6 +2,19 @@
 
 Short scan log. Newest first.
 
+## CAY-20260913-09 — Vendor documentation authority + HubSpot Developer MCP
+
+STATUS: READY_FOR_REVIEW  
+What: Permanent vendor-doc rule in `AGENTS.md`; protocol + HubSpot source registry; local Developer MCP (`HubSpotDev`) configured via official `hs mcp setup`; lightweight no-network evidence checks; `NEXT_MISSIONS.md` refreshed to post–CAY-08 reality. No Service Key change; no remote CRM MCP; no live suite; no model.  
+Branch: `feature/cay-20260913-09-vendor-doc-authority`  
+Base: `42ed773` (merged PR #24 / CAY-08)
+
+## CAY-20260913-08 — CAP-001 HubSpot environment machinery
+
+STATUS: ACCEPTED / MERGED (`main` @ `42ed773`)  
+What: CAP-001 HubSpot env seed/snapshot/reset; mock vs live; least-authority matrix; Deal create/read/update `2026-09/0-3`; archive operation-level `2026-03`. Zero models; no live suite; no key expansion.  
+Branch: merged via PR #24
+
 ## CAY-20260913-08 — CAP-001 HubSpot environment machinery
 
 STATUS: READY_FOR_REVIEW (archive operation provenance: Deal archive pinned to documented `2026-03` template; operation-level API versions)  
