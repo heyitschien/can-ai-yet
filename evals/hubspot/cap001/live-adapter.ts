@@ -237,6 +237,71 @@ function mapAppointment(obj: Cap001HubSpotObject): HubSpotCap001Appointment | nu
   };
 }
 
+type SeedAttemptTracker = {
+  createdContactIds: string[];
+  createdMeetingIds: string[];
+  createdDealIds: string[];
+};
+
+function emptySeedTracker(): SeedAttemptTracker {
+  return { createdContactIds: [], createdMeetingIds: [], createdDealIds: [] };
+}
+
+function withCleanupFailures(primary: string, cleanupFailures: string[]): string {
+  if (cleanupFailures.length === 0) return primary;
+  return `${primary}; cleanupFailures: ${cleanupFailures.join("; ")}`;
+}
+
+/**
+ * Authoritative ownership = HubSpot association, not cay_contact_email alone.
+ * Require exactly one associated contact whose email matches the auxiliary label.
+ */
+function verifyActivityContactAssociation(
+  activity: Cap001HubSpotObject,
+  contactIdToEmail: Map<string, string>,
+  family: Cap001ObjectFamily,
+): HubSpotCap001EnvResult<string> {
+  const labeledEmail = prop(activity, CAP001_PROP_CONTACT_EMAIL).trim();
+  const assocResults = activity.associations?.contacts?.results ?? [];
+  if (assocResults.length === 0) {
+    return {
+      ok: false,
+      failureClass: "INTEGRATION_FAILURE",
+      message: `Missing contact association on activity ${activity.id} (cay_contact_email is auxiliary only)`,
+      family,
+    };
+  }
+
+  const matching = assocResults.filter((row) => {
+    const email = contactIdToEmail.get(row.id);
+    if (!email || !labeledEmail) return false;
+    return email.toLowerCase() === labeledEmail.toLowerCase();
+  });
+
+  if (matching.length === 1) {
+    return { ok: true, data: labeledEmail };
+  }
+
+  if (matching.length > 1) {
+    return {
+      ok: false,
+      failureClass: "INTEGRATION_FAILURE",
+      message: `Ambiguous contact associations on activity ${activity.id} matching cay_contact_email`,
+      family,
+    };
+  }
+
+  const associatedEmails = assocResults
+    .map((row) => contactIdToEmail.get(row.id) ?? `(unknown:${row.id})`)
+    .join(", ");
+  return {
+    ok: false,
+    failureClass: "INTEGRATION_FAILURE",
+    message: `Contact association mismatch on activity ${activity.id}: cay_contact_email=${labeledEmail || "(empty)"} associations=[${associatedEmails}]`,
+    family,
+  };
+}
+
 function failFromClient<T>(
   result: {
     ok: false;
@@ -245,6 +310,7 @@ function failFromClient<T>(
     family?: Cap001ObjectFamily;
   },
   family?: Cap001ObjectFamily,
+  cleanupFailures: string[] = [],
 ): HubSpotCap001EnvResult<T> {
   const mapped =
     result.failureClass === "SCOPE_GAP" || result.failureClass === "ADAPTER_GAP"
@@ -253,11 +319,10 @@ function failFromClient<T>(
   return {
     ok: false,
     failureClass: mapped,
-    message: result.message,
+    message: withCleanupFailures(result.message, cleanupFailures),
     family: family ?? result.family,
   };
 }
-
 export class LiveHubSpotCap001Adapter implements HubSpotCap001EnvironmentPort {
   readonly kind = "live" as const;
   private readonly client: Cap001HubSpotHttpClient | null;
@@ -390,7 +455,9 @@ export class LiveHubSpotCap001Adapter implements HubSpotCap001EnvironmentPort {
         family: "contacts",
       };
     }
-    return this.seedContactFixtures(client, runId);
+    const seeded = await this.seedContactFixtures(client, runId);
+    if (!seeded.ok) return seeded;
+    return { ok: true, data: { runId: seeded.data.runId } };
   }
 
   async resetContactScoped(runId: string): Promise<HubSpotCap001EnvResult<{ runId: string }>> {
@@ -398,7 +465,9 @@ export class LiveHubSpotCap001Adapter implements HubSpotCap001EnvironmentPort {
     if (!clientResult.ok) return clientResult;
     const cleared = await this.clearScenarioActivity(clientResult.data, runId, { includeDeals: false });
     if (!cleared.ok) return cleared;
-    return this.seedContactFixtures(clientResult.data, runId);
+    const seeded = await this.seedContactFixtures(clientResult.data, runId);
+    if (!seeded.ok) return seeded;
+    return { ok: true, data: { runId: seeded.data.runId } };
   }
 
   async readContactScopedState(runId: string): Promise<HubSpotCap001EnvResult<HubSpotCap001State>> {
@@ -410,51 +479,62 @@ export class LiveHubSpotCap001Adapter implements HubSpotCap001EnvironmentPort {
   private async seedContactFixtures(
     client: Cap001HubSpotHttpClient,
     runId: string,
-  ): Promise<HubSpotCap001EnvResult<{ runId: string }>> {
-    const createdIds: string[] = [];
+    tracker: SeedAttemptTracker = emptySeedTracker(),
+  ): Promise<HubSpotCap001EnvResult<{ runId: string; tracker: SeedAttemptTracker }>> {
+    const failAndCleanup = async <T>(
+      failure: {
+        ok: false;
+        failureClass: HubSpotFailureClass | "SCOPE_GAP" | "ADAPTER_GAP";
+        message: string;
+        family?: Cap001ObjectFamily;
+      },
+      family: Cap001ObjectFamily,
+    ): Promise<HubSpotCap001EnvResult<T>> => {
+      const cleanupFailures = await this.cleanupSeedAttempt(client, tracker, {
+        includeDeals: false,
+      });
+      return failFromClient(failure, family, cleanupFailures);
+    };
+
     try {
       for (const spec of CAP001_SEED_CONTACTS) {
         const existing = await this.findContactByFixtureId(client, spec.cayFixtureId);
         if (!existing.ok) {
-          await this.cleanupContactIds(client, createdIds);
-          return failFromClient(existing, "contacts");
+          return failAndCleanup(existing, "contacts");
         }
         const properties = contactPropertiesFromSeed(spec, runId);
         if (existing.data) {
           const updated = await client.updateContact(existing.data.id, properties);
           if (!updated.ok) {
-            await this.cleanupContactIds(client, createdIds);
-            return failFromClient(updated, "contacts");
+            return failAndCleanup(updated, "contacts");
           }
         } else {
           const created = await client.createContact(properties);
           if (!created.ok) {
-            await this.cleanupContactIds(client, createdIds);
-            return failFromClient(created, "contacts");
+            return failAndCleanup(created, "contacts");
           }
-          createdIds.push(created.data.id);
+          tracker.createdContactIds.push(created.data.id);
         }
       }
 
       for (const spec of CAP001_SEED_APPOINTMENTS) {
         const contact = await this.findContactByEmail(client, spec.contactEmail);
         if (!contact.ok) {
-          await this.cleanupContactIds(client, createdIds);
-          return failFromClient(contact, "appointments");
+          return failAndCleanup(contact, "appointments");
         }
         if (!contact.data) {
-          await this.cleanupContactIds(client, createdIds);
-          return {
-            ok: false,
-            failureClass: "INTEGRATION_FAILURE",
-            message: `Missing contact for appointment seed ${spec.cayFixtureId}`,
-            family: "appointments",
-          };
+          return failAndCleanup(
+            {
+              ok: false,
+              failureClass: "INTEGRATION_FAILURE",
+              message: `Missing contact for appointment seed ${spec.cayFixtureId}`,
+            },
+            "appointments",
+          );
         }
         const existingAppt = await this.findMeetingByFixtureId(client, spec.cayFixtureId);
         if (!existingAppt.ok) {
-          await this.cleanupContactIds(client, createdIds);
-          return failFromClient(existingAppt, "appointments");
+          return failAndCleanup(existingAppt, "appointments");
         }
         const meetingProperties = {
           hs_meeting_title: spec.title,
@@ -467,25 +547,35 @@ export class LiveHubSpotCap001Adapter implements HubSpotCap001EnvironmentPort {
           [CAP001_PROP_CONTACT_EMAIL]: spec.contactEmail,
           [CAP001_PROP_KIND]: "appointment",
         };
-        if (!existingAppt.data) {
+        if (existingAppt.data) {
+          const updated = await client.updateMeeting(existingAppt.data.id, meetingProperties);
+          if (!updated.ok) {
+            return failAndCleanup(updated, "appointments");
+          }
+        } else {
           const created = await client.createMeeting({
             contactId: contact.data.id,
             properties: meetingProperties,
           });
           if (!created.ok) {
-            await this.cleanupContactIds(client, createdIds);
-            return failFromClient(created, "appointments");
+            return failAndCleanup(created, "appointments");
           }
+          tracker.createdMeetingIds.push(created.data.id);
         }
       }
 
-      return { ok: true, data: { runId } };
+      return { ok: true, data: { runId, tracker } };
     } catch (error) {
-      await this.cleanupContactIds(client, createdIds);
+      const cleanupFailures = await this.cleanupSeedAttempt(client, tracker, {
+        includeDeals: false,
+      });
       return {
         ok: false,
         failureClass: "RUNTIME/API_FAILURE",
-        message: error instanceof Error ? error.message : "seedContactFixtures failed",
+        message: withCleanupFailures(
+          error instanceof Error ? error.message : "seedContactFixtures failed",
+          cleanupFailures,
+        ),
         family: "contacts",
       };
     }
@@ -495,15 +585,17 @@ export class LiveHubSpotCap001Adapter implements HubSpotCap001EnvironmentPort {
     client: Cap001HubSpotHttpClient,
     runId: string,
   ): Promise<HubSpotCap001EnvResult<{ runId: string }>> {
-    const contactSeed = await this.seedContactFixtures(client, runId);
+    const tracker = emptySeedTracker();
+    const contactSeed = await this.seedContactFixtures(client, runId, tracker);
     if (!contactSeed.ok) return contactSeed;
 
-    const createdDealIds: string[] = [];
     for (const spec of CAP001_SEED_DEALS) {
       const existing = await this.findDealByFixtureId(client, spec.cayFixtureId);
       if (!existing.ok) {
-        await this.cleanupDealIds(client, createdDealIds);
-        return failFromClient(existing, "deals");
+        const cleanupFailures = await this.cleanupSeedAttempt(client, tracker, {
+          includeDeals: true,
+        });
+        return failFromClient(existing, "deals", cleanupFailures);
       }
       const properties = {
         dealname: spec.name,
@@ -517,16 +609,20 @@ export class LiveHubSpotCap001Adapter implements HubSpotCap001EnvironmentPort {
       if (existing.data) {
         const updated = await client.updateDeal(existing.data.id, properties);
         if (!updated.ok) {
-          await this.cleanupDealIds(client, createdDealIds);
-          return failFromClient(updated, "deals");
+          const cleanupFailures = await this.cleanupSeedAttempt(client, tracker, {
+            includeDeals: true,
+          });
+          return failFromClient(updated, "deals", cleanupFailures);
         }
       } else {
         const created = await client.createDeal(properties);
         if (!created.ok) {
-          await this.cleanupDealIds(client, createdDealIds);
-          return failFromClient(created, "deals");
+          const cleanupFailures = await this.cleanupSeedAttempt(client, tracker, {
+            includeDeals: true,
+          });
+          return failFromClient(created, "deals", cleanupFailures);
         }
-        createdDealIds.push(created.data.id);
+        tracker.createdDealIds.push(created.data.id);
       }
     }
 
@@ -596,7 +692,8 @@ export class LiveHubSpotCap001Adapter implements HubSpotCap001EnvironmentPort {
     const contactsResult = await this.listContactsForRun(client, runId);
     if (!contactsResult.ok) return contactsResult;
 
-    const contacts = contactsResult.data
+    const contactObjects = contactsResult.data;
+    const contacts = contactObjects
       .map(mapContact)
       .filter((row): row is HubSpotCap001Contact => row !== null && !row.archived);
 
@@ -613,6 +710,12 @@ export class LiveHubSpotCap001Adapter implements HubSpotCap001EnvironmentPort {
       }
     }
 
+    const contactIdToEmail = new Map<string, string>();
+    for (const obj of contactObjects) {
+      const email = prop(obj, "email").trim();
+      if (email) contactIdToEmail.set(obj.id, email);
+    }
+
     const notesList = await client.listNotes();
     if (!notesList.ok) return failFromClient(notesList, "notes");
     const tasksList = await client.listTasks();
@@ -625,22 +728,44 @@ export class LiveHubSpotCap001Adapter implements HubSpotCap001EnvironmentPort {
     const forRun = <T extends Cap001HubSpotObject>(rows: T[]) =>
       rows.filter((row) => prop(row, CAP001_PROP_RUN_ID) === runId && !row.archived);
 
-    const notes = forRun(notesList.data)
+    const runNotes = forRun(notesList.data);
+    const runTasks = forRun(tasksList.data);
+    const runEmails = forRun(emailsList.data);
+    const runMeetings = forRun(meetingsList.data);
+
+    for (const row of runNotes) {
+      const verified = verifyActivityContactAssociation(row, contactIdToEmail, "notes");
+      if (!verified.ok) return verified;
+    }
+    for (const row of runTasks) {
+      const verified = verifyActivityContactAssociation(row, contactIdToEmail, "tasks");
+      if (!verified.ok) return verified;
+    }
+    for (const row of runEmails) {
+      const verified = verifyActivityContactAssociation(row, contactIdToEmail, "outbounds");
+      if (!verified.ok) return verified;
+    }
+    for (const row of runMeetings) {
+      const verified = verifyActivityContactAssociation(row, contactIdToEmail, "appointments");
+      if (!verified.ok) return verified;
+    }
+
+    const notes = runNotes
       .map(mapNote)
       .filter((row): row is HubSpotCap001Note => row !== null);
-    const flags = forRun(notesList.data)
+    const flags = runNotes
       .map(mapFlag)
       .filter((row): row is HubSpotCap001Flag => row !== null);
-    const tasks = forRun(tasksList.data)
+    const tasks = runTasks
       .map(mapTask)
       .filter((row): row is HubSpotCap001Task => row !== null);
-    const escalations = forRun(tasksList.data)
+    const escalations = runTasks
       .map(mapEscalation)
       .filter((row): row is HubSpotCap001Escalation => row !== null);
-    const outbounds = forRun(emailsList.data)
+    const outbounds = runEmails
       .map(mapOutbound)
       .filter((row): row is HubSpotCap001Outbound => row !== null);
-    const appointments = forRun(meetingsList.data)
+    const appointments = runMeetings
       .map(mapAppointment)
       .filter((row): row is HubSpotCap001Appointment => row !== null);
 
@@ -811,15 +936,54 @@ export class LiveHubSpotCap001Adapter implements HubSpotCap001EnvironmentPort {
     return { ok: true, data: found };
   }
 
-  private async cleanupContactIds(client: Cap001HubSpotHttpClient, ids: string[]): Promise<void> {
-    for (const id of ids) {
-      await client.archiveContact(id);
-    }
-  }
+  private async cleanupSeedAttempt(
+    client: Cap001HubSpotHttpClient,
+    tracker: SeedAttemptTracker,
+    options: { includeDeals: boolean },
+  ): Promise<string[]> {
+    const failures: string[] = [];
 
-  private async cleanupDealIds(client: Cap001HubSpotHttpClient, ids: string[]): Promise<void> {
-    for (const id of ids) {
-      await client.archiveDeal(id);
+    if (options.includeDeals) {
+      for (const id of tracker.createdDealIds) {
+        try {
+          const archived = await client.archiveDeal(id);
+          if (!archived.ok && !archived.notFound) {
+            failures.push(`deal:${id}:${archived.message}`);
+          }
+        } catch (error) {
+          failures.push(
+            `deal:${id}:${error instanceof Error ? error.message : "cleanup failed"}`,
+          );
+        }
+      }
     }
+
+    for (const id of tracker.createdMeetingIds) {
+      try {
+        const archived = await client.archiveMeeting(id);
+        if (!archived.ok && !archived.notFound) {
+          failures.push(`meeting:${id}:${archived.message}`);
+        }
+      } catch (error) {
+        failures.push(
+          `meeting:${id}:${error instanceof Error ? error.message : "cleanup failed"}`,
+        );
+      }
+    }
+
+    for (const id of tracker.createdContactIds) {
+      try {
+        const archived = await client.archiveContact(id);
+        if (!archived.ok && !archived.notFound) {
+          failures.push(`contact:${id}:${archived.message}`);
+        }
+      } catch (error) {
+        failures.push(
+          `contact:${id}:${error instanceof Error ? error.message : "cleanup failed"}`,
+        );
+      }
+    }
+
+    return failures;
   }
 }

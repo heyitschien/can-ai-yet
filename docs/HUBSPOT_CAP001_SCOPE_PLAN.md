@@ -83,7 +83,7 @@ See also `docs/HUBSPOT_CAP001_METADATA_PLAN.md` (CAY-10): prefer one-time `cay_f
 | Runtime Service Key | Keep object write only (`contacts.*`, and deals only if accepted later) |
 | Avoid | Permanent `crm.schemas.contacts.write` on the runtime Service Key “for convenience” |
 
-Create-property docs require a schemas/object-write family (`crm.schemas.contacts.write` among OR alternatives on `POST /crm/properties/2026-09/{objectType}`). That is a **setup** authority, not a steady-state CAP-001 runtime authority.
+Create-property docs: independent review requires `POST /crm/properties/2026-03/{objectType}` (setup-only). **Conflict (2026-09-14):** HubSpotDev `fetch-doc` of latest create-property returned OpenAPI `POST /crm/properties/2026-09/{objectType}`. Plan pins to review-required **2026-03**. That is a **setup** authority, not a steady-state CAP-001 runtime authority. Runtime schema-write remains 0.
 
 ## Official sources checked (2026-09-13)
 

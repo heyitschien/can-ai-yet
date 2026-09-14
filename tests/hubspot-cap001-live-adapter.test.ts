@@ -22,6 +22,7 @@ import {
   snapshotWithBoundedRetry,
 } from "@/evals/hubspot/cap001";
 import {
+  CAP001_PROP_CONTACT_EMAIL,
   CAP001_PROP_FIXTURE_ID,
   CAP001_PROP_KIND,
   CAP001_PROP_RUN_ID,
@@ -32,6 +33,11 @@ import {
   CAP001_MEETINGS_BASE_PATH,
   CAP001_EMAILS_BASE_PATH,
   CAP001_DEALS_CRUD_BASE_PATH,
+  CAP001_ACTIVITIES_ARCHIVE_API_VERSION,
+  cap001NoteArchivePath,
+  cap001TaskArchivePath,
+  cap001MeetingArchivePath,
+  cap001EmailArchivePath,
 } from "@/evals/hubspot/cap001/paths";
 import { HUBSPOT_CAP001_SNAPSHOT_VERSION } from "@/evals/hubspot/cap001/versions";
 
@@ -39,6 +45,7 @@ type StoredObject = {
   id: string;
   archived: boolean;
   properties: Record<string, string>;
+  associations?: Record<string, { results?: Array<{ id: string; type?: string }> }>;
 };
 
 function jsonResponse(status: number, body: unknown): Response {
@@ -49,6 +56,27 @@ function jsonResponse(status: number, body: unknown): Response {
       "x-hubspot-correlation-id": `corr-${status}`,
     },
   });
+}
+
+function associationsFromCreateBody(
+  body: Record<string, unknown>,
+): StoredObject["associations"] | undefined {
+  const raw = body.associations;
+  if (!Array.isArray(raw) || raw.length === 0) return undefined;
+  const results: Array<{ id: string; type?: string }> = [];
+  for (const entry of raw) {
+    const record = entry as { to?: { id?: string }; types?: Array<{ associationTypeId?: number }> };
+    const id = record.to?.id;
+    if (!id) continue;
+    results.push({
+      id: String(id),
+      type: record.types?.[0]?.associationTypeId
+        ? String(record.types[0].associationTypeId)
+        : undefined,
+    });
+  }
+  if (results.length === 0) return undefined;
+  return { contacts: { results } };
 }
 
 function createFakeCrm(options: { pageSize?: number } = {}) {
@@ -73,9 +101,15 @@ function createFakeCrm(options: { pageSize?: number } = {}) {
 
   const listPage = (store: Map<string, StoredObject>, url: URL) => {
     const after = url.searchParams.get("after");
+    const includeAssociations = url.searchParams.get("associations") === "contacts";
     const all = [...store.values()].filter((row) => !row.archived);
     const start = after ? Number(after) : 0;
-    const slice = all.slice(start, start + pageSize);
+    const slice = all.slice(start, start + pageSize).map((row) => {
+      if (!includeAssociations) {
+        return { id: row.id, archived: row.archived, properties: row.properties };
+      }
+      return row;
+    });
     const next = start + pageSize < all.length ? String(start + pageSize) : undefined;
     return {
       results: slice,
@@ -118,7 +152,8 @@ function createFakeCrm(options: { pageSize?: number } = {}) {
       if (!store) return jsonResponse(404, { message: "unknown collection" });
       const id = String(seq++);
       const properties = { ...((body.properties as Record<string, string>) ?? {}) };
-      const row: StoredObject = { id, archived: false, properties };
+      const associations = associationsFromCreateBody(body);
+      const row: StoredObject = { id, archived: false, properties, associations };
       store.set(id, row);
       return jsonResponse(201, row);
     }
@@ -353,6 +388,70 @@ describe("Cap001HubSpotHttpClient (injected fetch)", () => {
     }
     expect(fake.fetchMock).not.toHaveBeenCalled();
   });
+
+  it("archives activities on operation-level 2026-03 paths", async () => {
+    const fake = createFakeCrm();
+    const client = new Cap001HubSpotHttpClient({
+      accessToken: "t",
+      fetchImpl: fake.fetchImpl,
+      grantedScopes: CONTACT_SCOPES,
+    });
+    fake.notes.set("n1", { id: "n1", archived: false, properties: {} });
+    fake.tasks.set("t1", { id: "t1", archived: false, properties: {} });
+    fake.meetings.set("m1", { id: "m1", archived: false, properties: {} });
+    fake.emails.set("e1", { id: "e1", archived: false, properties: {} });
+
+    expect((await client.archiveNote("n1")).ok).toBe(true);
+    expect((await client.archiveTask("t1")).ok).toBe(true);
+    expect((await client.archiveMeeting("m1")).ok).toBe(true);
+    expect((await client.archiveEmail("e1")).ok).toBe(true);
+
+    const deleteUrls = fake.fetchMock.mock.calls
+      .filter((call) => call[1]?.method === "DELETE")
+      .map((call) => String(call[0]));
+    expect(deleteUrls).toEqual(
+      expect.arrayContaining([
+        `${HUBSPOT_API_BASE_URL}${cap001NoteArchivePath("n1")}`,
+        `${HUBSPOT_API_BASE_URL}${cap001TaskArchivePath("t1")}`,
+        `${HUBSPOT_API_BASE_URL}${cap001MeetingArchivePath("m1")}`,
+        `${HUBSPOT_API_BASE_URL}${cap001EmailArchivePath("e1")}`,
+      ]),
+    );
+    for (const url of deleteUrls) {
+      expect(url).toContain(`/crm/objects/${CAP001_ACTIVITIES_ARCHIVE_API_VERSION}/`);
+      expect(url).toMatch(/\/crm\/objects\/2026-03\/(notes|tasks|meetings|emails)\//);
+      expect(url).not.toContain("/crm/objects/2026-09/notes/");
+      expect(url).not.toContain("/crm/objects/2026-09/tasks/");
+      expect(url).not.toContain("/crm/objects/2026-09/meetings/");
+      expect(url).not.toContain("/crm/objects/2026-09/emails/");
+    }
+  });
+
+  it("lists activities with associations=contacts query", async () => {
+    const fake = createFakeCrm();
+    const client = new Cap001HubSpotHttpClient({
+      accessToken: "t",
+      fetchImpl: fake.fetchImpl,
+      grantedScopes: CONTACT_SCOPES,
+    });
+    await client.listNotes();
+    await client.listTasks();
+    await client.listMeetings();
+    await client.listEmails();
+    const listUrls = fake.fetchMock.mock.calls.map((call) => String(call[0]));
+    expect(listUrls.some((url) => url.includes("associations=contacts") && url.includes("/notes"))).toBe(
+      true,
+    );
+    expect(listUrls.some((url) => url.includes("associations=contacts") && url.includes("/tasks"))).toBe(
+      true,
+    );
+    expect(
+      listUrls.some((url) => url.includes("associations=contacts") && url.includes("/meetings")),
+    ).toBe(true);
+    expect(listUrls.some((url) => url.includes("associations=contacts") && url.includes("/emails"))).toBe(
+      true,
+    );
+  });
 });
 
 describe("LiveHubSpotCap001Adapter (dry)", () => {
@@ -524,5 +623,91 @@ describe("LiveHubSpotCap001Adapter (dry)", () => {
     });
     expect(result.ok).toBe(true);
     expect(result.attempts).toBeGreaterThanOrEqual(2);
+  });
+
+  it("fails closed when association mismatches cay_contact_email", async () => {
+    const fake = createFakeCrm();
+    const adapter = new LiveHubSpotCap001Adapter({
+      accessToken: "t",
+      fetchImpl: fake.fetchImpl,
+      grantedScopes: CONTACT_SCOPES,
+    });
+    const seeded = await adapter.seedContactScopedBaseline("assoc-mismatch");
+    expect(seeded.ok).toBe(true);
+
+    const meeting = [...fake.meetings.values()].find(
+      (row) => row.properties[CAP001_PROP_FIXTURE_ID] === "appt-busy-lead007",
+    );
+    expect(meeting).toBeTruthy();
+    const wrongContact = [...fake.contacts.values()].find(
+      (row) => row.properties.email !== meeting!.properties[CAP001_PROP_CONTACT_EMAIL],
+    );
+    expect(wrongContact).toBeTruthy();
+    meeting!.associations = { contacts: { results: [{ id: wrongContact!.id }] } };
+
+    const state = await adapter.readContactScopedState("assoc-mismatch");
+    expect(state.ok).toBe(false);
+    if (!state.ok) {
+      expect(state.failureClass).toBe("INTEGRATION_FAILURE");
+      expect(state.message).toMatch(/association mismatch/i);
+    }
+  });
+
+  it("rebinds baseline meeting cay_run_id across contact-scoped seeds", async () => {
+    const fake = createFakeCrm();
+    const adapter = new LiveHubSpotCap001Adapter({
+      accessToken: "t",
+      fetchImpl: fake.fetchImpl,
+      grantedScopes: CONTACT_SCOPES,
+    });
+    expect((await adapter.seedContactScopedBaseline("run-A")).ok).toBe(true);
+    expect((await adapter.seedContactScopedBaseline("run-B")).ok).toBe(true);
+
+    const meeting = [...fake.meetings.values()].find(
+      (row) => row.properties[CAP001_PROP_FIXTURE_ID] === "appt-busy-lead007" && !row.archived,
+    );
+    expect(meeting?.properties[CAP001_PROP_RUN_ID]).toBe("run-B");
+
+    const state = await adapter.readContactScopedState("run-B");
+    expect(state.ok).toBe(true);
+    if (state.ok) {
+      const appt = state.data.appointments.find((row) => row.cayFixtureId === "appt-busy-lead007");
+      expect(appt?.cayRunId).toBe("run-B");
+      expect(state.data.appointments.every((row) => row.cayRunId !== "run-A")).toBe(true);
+    }
+  });
+
+  it("deal-stage failure archives contacts/meetings created in the attempt", async () => {
+    const fake = createFakeCrm();
+    const wrapped = vi.fn(async (input: string | URL, init?: RequestInit) => {
+      const url = String(input);
+      const method = (init?.method ?? "GET").toUpperCase();
+      if (method === "POST" && url.includes(CAP001_DEALS_CRUD_BASE_PATH) && url.endsWith("/0-3")) {
+        return jsonResponse(500, { message: "deal create boom" });
+      }
+      return fake.fetchImpl(input, init);
+    });
+
+    const adapter = new LiveHubSpotCap001Adapter({
+      accessToken: "t",
+      fetchImpl: wrapped as unknown as typeof fetch,
+      grantedScopes: FULL_SCOPES,
+    });
+    const seeded = await adapter.seedBaseline("deal-fail-run");
+    expect(seeded.ok).toBe(false);
+    if (!seeded.ok) {
+      expect(seeded.message).toMatch(/deal create boom/);
+      expect(seeded.family).toBe("deals");
+    }
+
+    expect([...fake.contacts.values()].every((row) => row.archived)).toBe(true);
+    expect([...fake.meetings.values()].every((row) => row.archived)).toBe(true);
+    expect(fake.deals.size).toBe(0);
+
+    const deleteUrls = wrapped.mock.calls
+      .filter((call) => call[1]?.method === "DELETE")
+      .map((call) => String(call[0]));
+    expect(deleteUrls.some((url) => url.includes(CAP001_CONTACTS_BASE_PATH))).toBe(true);
+    expect(deleteUrls.some((url) => url.includes("/crm/objects/2026-03/meetings/"))).toBe(true);
   });
 });

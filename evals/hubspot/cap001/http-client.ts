@@ -29,14 +29,23 @@ import {
   SCOPE_DEALS_READ,
   SCOPE_DEALS_WRITE,
   cap001DealArchivePath,
+  cap001EmailArchivePath,
+  cap001MeetingArchivePath,
+  cap001NoteArchivePath,
+  cap001TaskArchivePath,
 } from "@/evals/hubspot/cap001/paths";
 import { redactSecrets } from "@/evals/hubspot/redact";
 import type { HubSpotFailureClass, HubSpotTransportResult } from "@/evals/hubspot/types";
+
+export type Cap001HubSpotAssociationResults = {
+  results?: Array<{ id: string; type?: string }>;
+};
 
 export type Cap001HubSpotObject = {
   id: string;
   archived?: boolean;
   properties?: Record<string, string | null | undefined>;
+  associations?: Record<string, Cap001HubSpotAssociationResults>;
 };
 
 export type Cap001HubSpotListPage = {
@@ -259,6 +268,7 @@ export class Cap001HubSpotHttpClient {
     if (gap) return gap;
     return this.listAll(CAP001_NOTES_BASE_PATH, {
       properties: CAP001_NOTE_PROPERTY_NAMES.join(","),
+      associations: "contacts",
       ...query,
     });
   }
@@ -283,6 +293,7 @@ export class Cap001HubSpotHttpClient {
     if (gap) return gap;
     return this.listAll(CAP001_TASKS_BASE_PATH, {
       properties: CAP001_TASK_PROPERTY_NAMES.join(","),
+      associations: "contacts",
       ...query,
     });
   }
@@ -307,8 +318,22 @@ export class Cap001HubSpotHttpClient {
     if (gap) return gap;
     return this.listAll(CAP001_MEETINGS_BASE_PATH, {
       properties: CAP001_MEETING_PROPERTY_NAMES.join(","),
+      associations: "contacts",
       ...query,
     });
+  }
+
+  async updateMeeting(
+    meetingId: string,
+    properties: Record<string, string>,
+  ): Promise<HubSpotTransportResult<Cap001HubSpotObject>> {
+    const gap = this.requireScopes([SCOPE_CONTACTS_WRITE]);
+    if (gap) return gap;
+    return this.request<Cap001HubSpotObject>(
+      "PATCH",
+      `${CAP001_MEETINGS_BASE_PATH}/${encodeURIComponent(meetingId)}`,
+      { properties },
+    );
   }
 
   async createEmail(input: {
@@ -332,6 +357,7 @@ export class Cap001HubSpotHttpClient {
     if (gap) return gap;
     return this.listAll(CAP001_EMAILS_BASE_PATH, {
       properties: CAP001_EMAIL_PROPERTY_NAMES.join(","),
+      associations: "contacts",
       ...query,
     });
   }
@@ -385,37 +411,25 @@ export class Cap001HubSpotHttpClient {
   async archiveNote(noteId: string): Promise<HubSpotTransportResult<undefined>> {
     const gap = this.requireScopes([SCOPE_CONTACTS_WRITE]);
     if (gap) return gap;
-    return this.request<undefined>(
-      "DELETE",
-      `${CAP001_NOTES_BASE_PATH}/${encodeURIComponent(noteId)}`,
-    );
+    return this.request<undefined>("DELETE", cap001NoteArchivePath(noteId));
   }
 
   async archiveTask(taskId: string): Promise<HubSpotTransportResult<undefined>> {
     const gap = this.requireScopes([SCOPE_CONTACTS_WRITE]);
     if (gap) return gap;
-    return this.request<undefined>(
-      "DELETE",
-      `${CAP001_TASKS_BASE_PATH}/${encodeURIComponent(taskId)}`,
-    );
+    return this.request<undefined>("DELETE", cap001TaskArchivePath(taskId));
   }
 
   async archiveMeeting(meetingId: string): Promise<HubSpotTransportResult<undefined>> {
     const gap = this.requireScopes([SCOPE_CONTACTS_WRITE]);
     if (gap) return gap;
-    return this.request<undefined>(
-      "DELETE",
-      `${CAP001_MEETINGS_BASE_PATH}/${encodeURIComponent(meetingId)}`,
-    );
+    return this.request<undefined>("DELETE", cap001MeetingArchivePath(meetingId));
   }
 
   async archiveEmail(emailId: string): Promise<HubSpotTransportResult<undefined>> {
     const gap = this.requireScopes([SCOPE_CONTACTS_WRITE]);
     if (gap) return gap;
-    return this.request<undefined>(
-      "DELETE",
-      `${CAP001_EMAILS_BASE_PATH}/${encodeURIComponent(emailId)}`,
-    );
+    return this.request<undefined>("DELETE", cap001EmailArchivePath(emailId));
   }
 }
 

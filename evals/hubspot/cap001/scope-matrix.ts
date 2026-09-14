@@ -41,19 +41,24 @@ export const HUBSPOT_GRANTED_SCOPES = [
 /**
  * Per-object-family API version *summary* (not authority for every operation).
  * Contacts stay on proven `2026-03` (CAY-06).
+ * Activity create/list use `2026-09`; activity archive is operation-level `2026-03`.
  * Deals are **operation-level**: create/read/update use `2026-09`; archive uses `2026-03`.
  * Exact operation matrix is the authority — see `HUBSPOT_CAP001_API_VERSIONS_BY_OPERATION`.
  */
 export const HUBSPOT_CAP001_API_VERSIONS_BY_FAMILY = {
   contacts: "2026-03",
+  /** Summary only — activity archive is 2026-03; do not treat this as archive authority. */
   notes: "2026-09",
   tasks: "2026-09",
   meetings: "2026-09",
   emails: "2026-09",
   /** Summary only — Deal archive is 2026-03; do not treat this as archive authority. */
   deals: "mixed-operation-level",
-  /** Properties create is setup-only; runtime Service Key must not hold schema-write. */
-  properties: "2026-09",
+  /**
+   * Properties create is setup-only (review-required 2026-03). Runtime Service Key must not
+   * hold schema-write. Conflict: fetch-doc latest create-property returned 2026-09 on 2026-09-14.
+   */
+  properties: "2026-03",
 } as const;
 
 /**
@@ -65,16 +70,24 @@ export const HUBSPOT_CAP001_API_VERSIONS_BY_OPERATION = {
   "contacts.read": "2026-03",
   "contacts.write": "2026-03",
   "notes.create": "2026-09",
+  "notes.list": "2026-09",
+  "notes.archive": "2026-03",
   "tasks.create": "2026-09",
+  "tasks.list": "2026-09",
+  "tasks.archive": "2026-03",
   "meetings.create": "2026-09",
   "meetings.read": "2026-09",
+  "meetings.list": "2026-09",
+  "meetings.archive": "2026-03",
   "emails.create": "2026-09",
+  "emails.list": "2026-09",
+  "emails.archive": "2026-03",
   "deals.create": "2026-09",
   "deals.read": "2026-09",
   "deals.update": "2026-09",
   "deals.archive": "2026-03",
   "deals.batch_archive": "2026-03",
-  "properties.create": "2026-09",
+  "properties.create": "2026-03",
 } as const;
 
 /** Official Deal object type ID (object definition). */
@@ -362,12 +375,26 @@ export const CAP001_HUBSPOT_METADATA_PROVISIONING = {
     "tags / handled-today style markers",
     "flag codes (if not encoded as notes)",
   ] as const,
-  createPropertyEndpoint: "POST /crm/properties/2026-09/{objectType}",
+  /**
+   * Review-required pin: POST /crm/properties/2026-03/{objectType}.
+   * Conflict (2026-09-14): HubSpotDev fetch-doc of latest create-property returned
+   * OpenAPI POST /crm/properties/2026-09/{objectType}. Runtime schema-write remains 0.
+   */
+  createPropertyEndpoint: "POST /crm/properties/2026-03/{objectType}",
   createPropertyDoc:
     "https://developers.hubspot.com/docs/api-reference/latest/crm/properties/create-property",
   createPropertyScopeFamily: "crm.schemas.contacts.write (among OR alternatives on the create-property page)",
+  engagementObjectTypes: ["notes", "tasks", "meetings", "emails"] as const,
+  objectTypesNeedingCayProperties: [
+    "contacts",
+    "deals",
+    "notes",
+    "tasks",
+    "meetings",
+    "emails",
+  ] as const,
   rationale:
-    "Prefer provisioning custom test metadata once in the HubSpot test portal (UI or a short-lived setup credential). Runtime Service Key keeps contacts.read/write (+ deals only if accepted later) without permanent schema-write authority.",
+    "Prefer provisioning custom test metadata once in the HubSpot test portal (UI or a short-lived setup credential). Runtime Service Key keeps contacts.read/write (+ deals only if accepted later) without permanent schema-write authority. Activity cay_* properties are required for this adapter (not optional).",
 };
 
 /** Environment-level truth: full CAP-001 live seed/snapshot needs deals even when a scenario never mutates them. */

@@ -5,19 +5,34 @@
 
 ## Recommendation
 
-Provision **once** (HubSpot UI or a short-lived setup credential) these custom properties on **contacts** and **deals**:
+Provision **once** (HubSpot UI or a short-lived setup credential) these custom properties on **every** object family below.
+
+### Object families needing `cay_*` properties
+
+| Object family | Properties |
+| --- | --- |
+| **contacts** | `cay_fixture_id`, `cay_run_id`, `cay_scenario_id`, `cay_status`, `cay_do_not_contact`, `cay_tags`, `cay_owner` |
+| **deals** | `cay_fixture_id`, `cay_run_id`, `cay_scenario_id`, `cay_contact_email` |
+| **notes** | `cay_fixture_id`, `cay_run_id`, `cay_scenario_id`, `cay_kind`, `cay_contact_email` |
+| **tasks** | `cay_fixture_id`, `cay_run_id`, `cay_scenario_id`, `cay_kind`, `cay_contact_email` (+ escalation markers as needed) |
+| **meetings** | `cay_fixture_id`, `cay_run_id`, `cay_scenario_id`, `cay_kind`, `cay_contact_email` |
+| **emails** | `cay_fixture_id`, `cay_run_id`, `cay_scenario_id`, `cay_kind`, `cay_contact_email` |
+
+Engagement objectTypes for property provisioning: **notes, tasks, meetings, emails** (plus contacts and deals).
+
+Activity (`notes` / `tasks` / `meetings` / `emails`) `cay_*` properties are **required** for this adapter implementation — not optional.
 
 | Property | Type | Purpose |
 | --- | --- | --- |
 | `cay_fixture_id` | string | Stable CAP-001 fixture identity across object types |
 | `cay_run_id` | string | Seed/reset run isolation |
 | `cay_scenario_id` | string | Optional scenario ownership |
+| `cay_kind` | string | note \| task \| outbound \| escalation \| flag \| appointment |
+| `cay_contact_email` | string | **Auxiliary label only.** Authoritative ownership = HubSpot contact **association**. Reads must verify `associations.contacts` maps to an email matching this label; do **not** trust the property alone. |
 
-Also provision contact exam semantics (still one-time): `cay_status`, `cay_do_not_contact`, `cay_tags`, `cay_owner`.  
-For deals: `cay_contact_email`.  
-For notes/tasks/meetings/emails (optional but used by the dry adapter): `cay_fixture_id`, `cay_run_id`, `cay_scenario_id`, `cay_kind`, `cay_contact_email`.
+Also provision contact exam semantics (still one-time): `cay_status`, `cay_do_not_contact`, `cay_tags`, `cay_owner`.
 
-**Runtime Service Key** only writes property **values** under `contacts.write` (and `deals.write` later). Do **not** put `crm.schemas.*.write` on the steady-state Service Key.
+**Runtime Service Key** only writes property **values** under `contacts.write` (and `deals.write` later). Do **not** put `crm.schemas.*.write` on the steady-state Service Key. Runtime schema-write remains **0**.
 
 ## Why not email-only identity?
 
@@ -25,4 +40,8 @@ Embedding `runId` in the contact email local-part can isolate contacts, but CAP-
 
 ## Official create-property pointer
 
-`POST /crm/properties/2026-09/{objectType}` — setup-only; see CAY-08 scope plan.
+Independent review requires:
+
+`POST /crm/properties/2026-03/{objectType}` — setup-only.
+
+**Conflict note (2026-09-14):** HubSpotDev `fetch-doc` of latest create-property returned OpenAPI `POST /crm/properties/2026-09/{objectType}`. Plan pins to review-required **2026-03**. See CAY-08/CAY-10 scope plan.

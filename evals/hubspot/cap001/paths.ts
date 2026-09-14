@@ -12,9 +12,17 @@ export const HUBSPOT_API_BASE_URL = "https://api.hubapi.com";
 /** Contacts remain on proven 2026-03 (CAY-06 / CAY-08). */
 export const CAP001_CONTACTS_API_VERSION = "2026-03";
 
-/** Notes/tasks/meetings/emails + deal create/read/update use 2026-09. */
+/** Notes/tasks/meetings/emails create/list + deal create/read/update use 2026-09. */
 export const CAP001_ACTIVITIES_API_VERSION = "2026-09";
 export const CAP001_DEALS_CRUD_API_VERSION = "2026-09";
+
+/**
+ * Activity archive is operation-level 2026-03 — do not inherit create/list 2026-09.
+ * Conflict note (2026-09-14): HubSpotDev fetch-doc of latest delete-task returned OpenAPI
+ * DELETE /crm/objects/2026-09/tasks/{taskId}; independent review requires 2026-03 guide/template
+ * matching Deal archive. Pin is review-required 2026-03.
+ */
+export const CAP001_ACTIVITIES_ARCHIVE_API_VERSION = "2026-03";
 
 /** Deal archive is operation-level 2026-03 — do not inherit CRUD version. */
 export const CAP001_DEALS_ARCHIVE_API_VERSION = "2026-03";
@@ -63,6 +71,23 @@ export const CAP001_DEALS_CRUD_BASE_PATH = `/crm/objects/${CAP001_DEALS_CRUD_API
 /** Template: DELETE /crm/objects/2026-03/{objectType}/{objectId} with objectType=0-3. */
 export function cap001DealArchivePath(dealId: string): string {
   return `/crm/objects/${CAP001_DEALS_ARCHIVE_API_VERSION}/${HUBSPOT_DEAL_OBJECT_TYPE_ID}/${encodeURIComponent(dealId)}`;
+}
+
+/** Template: DELETE /crm/objects/2026-03/notes|{tasks|meetings|emails}/{id}. */
+export function cap001NoteArchivePath(noteId: string): string {
+  return `/crm/objects/${CAP001_ACTIVITIES_ARCHIVE_API_VERSION}/notes/${encodeURIComponent(noteId)}`;
+}
+
+export function cap001TaskArchivePath(taskId: string): string {
+  return `/crm/objects/${CAP001_ACTIVITIES_ARCHIVE_API_VERSION}/tasks/${encodeURIComponent(taskId)}`;
+}
+
+export function cap001MeetingArchivePath(meetingId: string): string {
+  return `/crm/objects/${CAP001_ACTIVITIES_ARCHIVE_API_VERSION}/meetings/${encodeURIComponent(meetingId)}`;
+}
+
+export function cap001EmailArchivePath(emailId: string): string {
+  return `/crm/objects/${CAP001_ACTIVITIES_ARCHIVE_API_VERSION}/emails/${encodeURIComponent(emailId)}`;
 }
 
 export const CAP001_CONTACT_PROPERTY_NAMES = [

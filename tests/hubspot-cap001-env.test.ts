@@ -229,11 +229,27 @@ describe("HubSpot CAP-001 environment machinery (CAY-08)", () => {
       emails: "2026-09",
     });
     expect(env.apiVersionsByOperation).toMatchObject({
+      "notes.create": "2026-09",
+      "notes.list": "2026-09",
+      "notes.archive": "2026-03",
+      "tasks.create": "2026-09",
+      "tasks.list": "2026-09",
+      "tasks.archive": "2026-03",
+      "meetings.create": "2026-09",
+      "meetings.list": "2026-09",
+      "meetings.archive": "2026-03",
+      "emails.create": "2026-09",
+      "emails.list": "2026-09",
+      "emails.archive": "2026-03",
       "deals.create": "2026-09",
       "deals.read": "2026-09",
       "deals.update": "2026-09",
       "deals.archive": "2026-03",
       "deals.batch_archive": "2026-03",
+      "properties.create": "2026-03",
+    });
+    expect(env.apiVersionsByObjectFamily).toMatchObject({
+      properties: "2026-03",
     });
     expect(env.environmentPermissionMechanicsVersion).toBe(
       "hubspot-envelope-a-least-authority-v2",
@@ -287,6 +303,17 @@ describe("HubSpot CAP-001 environment machinery (CAY-08)", () => {
     expect(CAP001_HUBSPOT_METADATA_PROVISIONING.avoidRuntimeScopes).toContain(
       "crm.schemas.contacts.write",
     );
+    expect(CAP001_HUBSPOT_METADATA_PROVISIONING.createPropertyEndpoint).toBe(
+      "POST /crm/properties/2026-03/{objectType}",
+    );
+    expect(CAP001_HUBSPOT_METADATA_PROVISIONING.objectTypesNeedingCayProperties).toEqual([
+      "contacts",
+      "deals",
+      "notes",
+      "tasks",
+      "meetings",
+      "emails",
+    ]);
     expect(
       CAP001_HUBSPOT_SCENARIO_MAPPING.every(
         (row) =>

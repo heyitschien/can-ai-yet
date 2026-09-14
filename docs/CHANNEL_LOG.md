@@ -2,6 +2,14 @@
 
 Short scan log. Newest first.
 
+## CAY-20260914-10 — HubSpot CAP-001 live adapter (CHANGES_REQUESTED fixes)
+
+STATUS: READY_FOR_REVIEW  
+What: Independent-review fixes — (1) activity archive operation-level `2026-03` paths + conflict note vs latest OpenAPI `2026-09`; (2) authoritative reads verify HubSpot `associations.contacts` (fail closed; `cay_contact_email` auxiliary only); (3) seed compensation archives all created-in-attempt contacts/meetings/deals; baseline meeting rebinds `cay_run_id` across runs; (4) metadata plan exactness — all six object families, activity `cay_*` required, create-property pin `2026-03` + conflict note. No Service Key change; no live HubSpot; no model; no hs auth; no remote CRM MCP.  
+Branch: `feature/cay-20260914-10-hubspot-cap001-live-adapter-dry`  
+Tip: _(pending commit)_ · Draft PR: https://github.com/heyitschien/can-ai-yet/pull/27  
+Base: `c2c815c` (prior tip)
+
 ## CAY-20260914-10 — HubSpot CAP-001 live adapter (dry / injected HTTP)
 
 STATUS: READY_FOR_REVIEW  
