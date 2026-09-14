@@ -8,10 +8,10 @@
 ## Scientific rules (post CHANGES_REQUESTED)
 
 1. **Authoritative snapshots:** CAP-001 CRM collections (contacts, deals, notes, tasks, sent, appointments, escalations, flags) come **only** from the HubSpot snapshot. `World.fresh()` may supply immutable non-CRM scaffolding (policies, etc.) but must never resurrect missing HubSpot records.
-2. **Mock vs live:** `HubSpotCap001Store` is a mock calibration harness; `LiveHubSpotCap001Adapter` is the live port (async). Default scopes = contacts only → full `seedBaseline` / `reset` / `readAuthoritativeState` return `SCOPE_GAP` (deals). Contact-scoped helpers (`seedContactScopedBaseline`, `readContactScopedState`, `resetContactScoped`) dry-certify READY families via injected `fetchImpl`.
-3. **Semantic vs live readiness:** `semanticStatus` ≠ `liveStatus`. Live comparison uses `liveStatus === READY` only. All 12 scenarios stay `BLOCKED_SCOPE` for the environment-level deals gap. Contact-scoped tools are `READY` at the adapter/tool matrix (`contactScopedReadyFamilies()`).
+2. **Mock vs live:** `HubSpotCap001Store` is a mock calibration harness; `LiveHubSpotCap001Adapter` is the live port (async). Default scopes = contacts only → full `seedBaseline` / `reset` / `readAuthoritativeState` return `SCOPE_GAP` (deals). Contact-scoped helpers (`seedContactScopedBaseline`, `readContactScopedState`, `resetContactScoped`) dry-certify **settled** READY families via injected `fetchImpl`. Meeting/Email archive remains `DOC_CONFLICT` → `outbounds`/`appointments` are not READY.
+3. **Semantic vs live readiness:** `semanticStatus` ≠ `liveStatus`. Live comparison uses `liveStatus === READY` only. All 12 scenarios stay `BLOCKED_SCOPE` for the environment-level deals gap. Settled contact-scoped tools/families (`contacts`/`notes`/`tasks`/`escalations`/`flags`) are `READY` at the adapter/tool matrix (`contactScopedReadyFamilies()`). `outbounds`/`appointments` and `send_reply`/`get_availability`/`create_appointment` are `BLOCKED_ADAPTER` (`DOC_CONFLICT` archive).
 4. **Snapshot readiness:** complete required baseline fixture IDs + stable consecutive fingerprints, else `RUNTIME/API_FAILURE`.
-5. **Reset:** same `runId` clears scenario-owned activity including scenario appointments.
+5. **Reset:** same `runId` clears scenario-owned **settled** activity (notes/tasks). Meeting/Email scenario cleanup fail closed (`DOC_CONFLICT`) — no contested DELETE.
 
 ## Frozen EnvironmentManifest versions
 
@@ -33,7 +33,8 @@
 | semanticStatus UNMAPPED | 0 |
 | liveStatus READY | 0 |
 | liveStatus BLOCKED_SCOPE | 12 (environment-level deals gap) |
-| tool-matrix READY | contacts/notes/tasks/meetings/emails/escalate/flag (CAY-10 dry adapter) |
+| tool-matrix READY | contacts/notes/tasks/escalate/flag (CAY-10 dry adapter; settled archive paths) |
+| tool-matrix BLOCKED_ADAPTER | `send_reply` / `get_availability` / `create_appointment` (`DOC_CONFLICT` Meeting/Email archive) |
 | tool-matrix BLOCKED_SCOPE | `get_deal` / `update_deal` + env Deal lifecycle (`0-3` paths) |
 
 Metadata: `docs/HUBSPOT_CAP001_METADATA_PLAN.md` (`cay_fixture_id` / `cay_run_id` one-time UI provisioning).  

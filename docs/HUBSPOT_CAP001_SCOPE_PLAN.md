@@ -9,10 +9,10 @@
 | Label | Meaning |
 | --- | --- |
 | `BLOCKED_SCOPE` | Chosen HubSpot endpoint’s Required Scopes accordion lists a scope we do **not** have. |
-| `BLOCKED_ADAPTER` | Required scope is already granted (or local-only), but CAP-001 live adapter code is missing. |
+| `BLOCKED_ADAPTER` | Required scope is already granted (or local-only), but CAP-001 live adapter cannot claim READY — missing code **or** unresolved vendor-doc conflict (`DOC_CONFLICT`) blocking deterministic observation/reset. |
 | `LOCAL_ONLY` | No HubSpot call for this tool semantic. |
 
-**Environment-level (all 12 live scenarios):** full CAP-001 live seed / preflight / authoritative snapshot needs baseline **deals**. Until `crm.objects.deals.read` + `crm.objects.deals.write` are granted, every scenario’s `liveStatus` stays `BLOCKED_SCOPE` for that environment reason — **not** because notes/tasks/meetings/emails need extra activity scopes. CAY-10 dry-certifies contact-scoped tools as `READY` at the adapter/tool layer under contacts scopes (injected HTTP only).
+**Environment-level (all 12 live scenarios):** full CAP-001 live seed / preflight / authoritative snapshot needs baseline **deals**. Until `crm.objects.deals.read` + `crm.objects.deals.write` are granted, every scenario’s `liveStatus` stays `BLOCKED_SCOPE` for that environment reason — **not** because notes/tasks need extra activity scopes. CAY-10 dry-certifies **settled** contact-scoped tools (`contacts`/`notes`/`tasks`/`escalate`/`flag`) as `READY` under contacts scopes (injected HTTP only). `send_reply` / `get_availability` / `create_appointment` stay `BLOCKED_ADAPTER` while Meeting/Email archive provenance is `DOC_CONFLICT`.
 
 ## Per-object / per-operation API version provenance
 
@@ -36,19 +36,19 @@ Columns: **CanAIYet tool → HubSpot representation → action → endpoint/vers
 
 | Tool | HubSpot representation | Action | Endpoint / version | Required scope(s) | Grant | Live block |
 | --- | --- | --- | --- | --- | --- | --- |
-| `search_contact` | Contact search | search | `POST /crm/objects/2026-03/contacts/search` | `crm.objects.contacts.read` | already granted | `BLOCKED_ADAPTER` |
-| `get_contact` | Contact | read | `GET /crm/objects/2026-03/contacts/{contactId}` | `crm.objects.contacts.read` | already granted | `BLOCKED_ADAPTER` |
-| `create_task` | Task engagement | create | `POST /crm/objects/2026-09/tasks` | `crm.objects.contacts.write` | already granted | `BLOCKED_ADAPTER` |
+| `search_contact` | Contact search | search | `POST /crm/objects/2026-03/contacts/search` | `crm.objects.contacts.read` | already granted | `READY` |
+| `get_contact` | Contact | read | `GET /crm/objects/2026-03/contacts/{contactId}` | `crm.objects.contacts.read` | already granted | `READY` |
+| `create_task` | Task engagement | create | `POST /crm/objects/2026-09/tasks` | `crm.objects.contacts.write` | already granted | `READY` |
 | `get_deal` | Deal (`0-3`) | read | `GET /crm/objects/2026-09/0-3/{dealId}` | `crm.objects.deals.read` | **genuinely new** | `BLOCKED_SCOPE` |
 | `update_deal` | Deal (`0-3`) | update | `PATCH /crm/objects/2026-09/0-3/{dealId}` | `crm.objects.deals.write` | **genuinely new** | `BLOCKED_SCOPE` |
-| `add_note` | Note engagement | create | `POST /crm/objects/2026-09/notes` | `crm.objects.contacts.write` | already granted | `BLOCKED_ADAPTER` |
+| `add_note` | Note engagement | create | `POST /crm/objects/2026-09/notes` | `crm.objects.contacts.write` | already granted | `READY` |
 | `draft_reply` | Local draft | compose | `(local)` | none | not required | `LOCAL_ONLY` |
-| `send_reply` | Email engagement log (Envelope A) | create | `POST /crm/objects/2026-09/emails` | `crm.objects.contacts.write` **OR** `sales-email-read` | already granted (via contacts.write) | `BLOCKED_ADAPTER` |
+| `send_reply` | Email engagement log (Envelope A) | create | `POST /crm/objects/2026-09/emails` | `crm.objects.contacts.write` **OR** `sales-email-read` | already granted (via contacts.write) | `BLOCKED_ADAPTER` (`DOC_CONFLICT` archive) |
 | `get_policy` | Local policy pack | read | `(local)` | none | not required | `LOCAL_ONLY` |
-| `get_availability` | Meeting engagement | read | `GET /crm/objects/2026-09/meetings/{meetingId}` | `crm.objects.contacts.read` | already granted | `BLOCKED_ADAPTER` |
-| `create_appointment` | Meeting engagement | create | `POST /crm/objects/2026-09/meetings` | `crm.objects.contacts.write` | already granted | `BLOCKED_ADAPTER` |
-| `escalate` | Task (and/or note) | create | `POST /crm/objects/2026-09/tasks` | `crm.objects.contacts.write` | already granted | `BLOCKED_ADAPTER` |
-| `flag` | Contact property / note | update | `PATCH /crm/objects/2026-03/contacts/{contactId}` | `crm.objects.contacts.write` | already granted | `BLOCKED_ADAPTER` |
+| `get_availability` | Meeting engagement | read | `GET /crm/objects/2026-09/meetings/{meetingId}` | `crm.objects.contacts.read` | already granted | `BLOCKED_ADAPTER` (`DOC_CONFLICT` archive) |
+| `create_appointment` | Meeting engagement | create | `POST /crm/objects/2026-09/meetings` | `crm.objects.contacts.write` | already granted | `BLOCKED_ADAPTER` (`DOC_CONFLICT` archive) |
+| `escalate` | Task (and/or note) | create | `POST /crm/objects/2026-09/tasks` | `crm.objects.contacts.write` | already granted | `READY` |
+| `flag` | Contact property / note | update | `PATCH /crm/objects/2026-03/contacts/{contactId}` | `crm.objects.contacts.write` | already granted | `READY` |
 
 ### Environment-owned Deal lifecycle (justifies live env scopes)
 

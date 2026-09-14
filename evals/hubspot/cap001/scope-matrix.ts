@@ -215,11 +215,11 @@ export const CAP001_HUBSPOT_SCOPE_MATRIX: readonly Cap001HubSpotScopeRow[] = [
     requiredScopes: ["crm.objects.contacts.write", "sales-email-read"],
     scopeLogic: "any",
     grant: "already_granted",
-    liveBlock: "READY",
+    liveBlock: "BLOCKED_ADAPTER",
     docSource:
       "https://developers.hubspot.com/docs/api-reference/latest/crm/activities/emails/create-email",
     notes:
-      "Required Scopes accordion lists contacts.write OR sales-email-read. contacts.write is already granted; no new scope for logging.",
+      "Required Scopes accordion lists contacts.write OR sales-email-read. contacts.write is already granted. Family not READY: emails.archive is DOC_CONFLICT (OpenAPI 2026-09 vs rendered/dated 2026-03) — no deterministic reset/cleanup path.",
   },
   {
     tool: "get_policy",
@@ -244,9 +244,11 @@ export const CAP001_HUBSPOT_SCOPE_MATRIX: readonly Cap001HubSpotScopeRow[] = [
     requiredScopes: ["crm.objects.contacts.read"],
     scopeLogic: "all",
     grant: "already_granted",
-    liveBlock: "READY",
+    liveBlock: "BLOCKED_ADAPTER",
     docSource:
       "https://developers.hubspot.com/docs/api-reference/latest/crm/activities/meetings/get-meeting",
+    notes:
+      "Create/list OpenAPI settled 2026-09, but appointments family not READY: meetings.archive is DOC_CONFLICT — no deterministic reset/cleanup path.",
   },
   {
     tool: "create_appointment",
@@ -258,9 +260,11 @@ export const CAP001_HUBSPOT_SCOPE_MATRIX: readonly Cap001HubSpotScopeRow[] = [
     requiredScopes: ["crm.objects.contacts.write"],
     scopeLogic: "all",
     grant: "already_granted",
-    liveBlock: "READY",
+    liveBlock: "BLOCKED_ADAPTER",
     docSource:
       "https://developers.hubspot.com/docs/api-reference/latest/crm/activities/meetings/create-meeting",
+    notes:
+      "Create path settled 2026-09; appointments family not READY while meetings.archive remains DOC_CONFLICT.",
   },
   {
     tool: "escalate",
@@ -404,7 +408,7 @@ export const CAP001_HUBSPOT_METADATA_PROVISIONING = {
 
 /** Environment-level truth: full CAP-001 live seed/snapshot needs deals even when a scenario never mutates them. */
 export const CAP001_LIVE_ENVIRONMENT_SCOPE_BLOCKER =
-  "Full CAP-001 live seed/preflight/authoritative snapshot requires baseline deals via crm.objects.deals.read/write (verified missing). Contact-scoped activity families (contacts/notes/tasks/meetings/emails → notes/tasks/outbounds/escalations/flags/appointments) are READY at the CAY-10 adapter/tool layer under contacts scopes (dry-certified; no live suite).";
+  "Full CAP-001 live seed/preflight/authoritative snapshot requires baseline deals via crm.objects.deals.read/write (verified missing). Settled contact-scoped families (contacts/notes/tasks/escalations/flags) are READY at the CAY-10 adapter/tool layer under contacts scopes (dry-certified; no live suite). outbounds/appointments remain BLOCKED_ADAPTER while emails.archive/meetings.archive are DOC_CONFLICT.";
 
 export function genuinelyNewScopesFromMatrix(
   rows: readonly Cap001HubSpotScopeRow[] = CAP001_HUBSPOT_SCOPE_MATRIX_WITH_ENV,

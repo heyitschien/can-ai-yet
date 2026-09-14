@@ -507,6 +507,8 @@ describe("LiveHubSpotCap001Adapter (dry)", () => {
     });
     expect([...adapter.supportedFamilies()].sort()).toEqual([...contactScopedReadyFamilies()].sort());
     expect(adapter.supportedFamilies().has("deals")).toBe(false);
+    expect(adapter.supportedFamilies().has("outbounds")).toBe(false);
+    expect(adapter.supportedFamilies().has("appointments")).toBe(false);
 
     const seeded = await adapter.seedBaseline("run-x");
     expect(seeded.ok).toBe(false);
@@ -517,6 +519,18 @@ describe("LiveHubSpotCap001Adapter (dry)", () => {
 
     const notes = adapter.requireFamily("notes");
     expect(notes.ok).toBe(true);
+    const appointments = adapter.requireFamily("appointments");
+    expect(appointments.ok).toBe(false);
+    if (!appointments.ok) {
+      expect(appointments.failureClass).toBe("ADAPTER_GAP");
+      expect(appointments.message).toMatch(/DOC_CONFLICT/);
+    }
+    const outbounds = adapter.requireFamily("outbounds");
+    expect(outbounds.ok).toBe(false);
+    if (!outbounds.ok) {
+      expect(outbounds.failureClass).toBe("ADAPTER_GAP");
+      expect(outbounds.message).toMatch(/DOC_CONFLICT/);
+    }
     const deals = adapter.requireFamily("deals");
     expect(deals.ok).toBe(false);
     if (!deals.ok) expect(deals.failureClass).toBe("SCOPE_GAP");

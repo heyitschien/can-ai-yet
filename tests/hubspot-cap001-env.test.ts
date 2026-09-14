@@ -191,6 +191,12 @@ describe("HubSpot CAP-001 environment machinery (CAY-08)", () => {
     expect(liveReadyScenarioIds()).toHaveLength(0);
     expect(CAP001_HUBSPOT_SCENARIO_MAPPING.every((row) => row.liveStatus !== "READY")).toBe(true);
     expect(contactScopedReadyFamilies().has("contacts")).toBe(true);
+    expect(contactScopedReadyFamilies().has("notes")).toBe(true);
+    expect(contactScopedReadyFamilies().has("tasks")).toBe(true);
+    expect(contactScopedReadyFamilies().has("escalations")).toBe(true);
+    expect(contactScopedReadyFamilies().has("flags")).toBe(true);
+    expect(contactScopedReadyFamilies().has("outbounds")).toBe(false);
+    expect(contactScopedReadyFamilies().has("appointments")).toBe(false);
     expect(contactScopedReadyFamilies().has("deals")).toBe(false);
   });
 
@@ -282,23 +288,32 @@ describe("HubSpot CAP-001 environment machinery (CAY-08)", () => {
       expect(row.endpoint).toContain("/crm/objects/2026-09/0-3");
       expect(row.endpoint).not.toContain("/deals/");
     }
-    expect(toolRowsBlockedAdapter()).toHaveLength(0);
+    expect(toolRowsBlockedAdapter().map((row) => row.tool).sort()).toEqual([
+      "create_appointment",
+      "get_availability",
+      "send_reply",
+    ]);
     const readyTools = CAP001_HUBSPOT_SCOPE_MATRIX.filter((row) => row.liveBlock === "READY").map(
       (row) => row.tool,
     );
-    expect(readyTools).toEqual(
-      expect.arrayContaining([
-        "search_contact",
-        "get_contact",
-        "create_task",
+    expect(readyTools.sort()).toEqual(
+      [
         "add_note",
-        "send_reply",
-        "get_availability",
-        "create_appointment",
+        "create_task",
         "escalate",
         "flag",
-      ]),
+        "get_contact",
+        "search_contact",
+      ].sort(),
     );
+    expect(readyTools).not.toContain("send_reply");
+    expect(readyTools).not.toContain("get_availability");
+    expect(readyTools).not.toContain("create_appointment");
+    for (const tool of ["send_reply", "get_availability", "create_appointment"] as const) {
+      const row = CAP001_HUBSPOT_SCOPE_MATRIX.find((r) => r.tool === tool);
+      expect(row?.liveBlock).toBe("BLOCKED_ADAPTER");
+      expect(row?.notes).toMatch(/DOC_CONFLICT/);
+    }
     expect(CAP001_HUBSPOT_METADATA_PROVISIONING.strategy).toBe("one_time_human_or_setup_path");
     expect(CAP001_HUBSPOT_METADATA_PROVISIONING.avoidRuntimeScopes).toContain(
       "crm.schemas.contacts.write",

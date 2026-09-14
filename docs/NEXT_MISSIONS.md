@@ -23,7 +23,7 @@ Milestone 1 remains complete: first independently reviewed real-model CAP-001 fi
 | 12-scenario no-model live HubSpot calibration | **not authorized yet** |
 | Freeze HubSpot EnvironmentManifest + same-model transfer | later |
 
-All 12 scenarios remain deliberately **not** live-ready until deals scopes + live calibration prove the road course. Contact-scoped families are dry-certified READY at the adapter/tool layer under contacts scopes.
+All 12 scenarios remain deliberately **not** live-ready until deals scopes + live calibration prove the road course. Settled contact-scoped families (`contacts`/`notes`/`tasks`/`escalations`/`flags`) are dry-certified READY at the adapter/tool layer under contacts scopes. `outbounds`/`appointments` stay BLOCKED_ADAPTER while Meeting/Email archive is DOC_CONFLICT.
 
 ### Demand Scout — PARKED_UNCOMMISSIONED
 
