@@ -1,4 +1,4 @@
-# HubSpot CAP-001 exact scope / API provenance (CAY-08)
+# HubSpot CAP-001 exact scope / API provenance (CAY-08 / CAY-11)
 
 **Status:** exact least-authority matrix for human review — **not** authorization to expand scopes, call live APIs, or change the Service Key.  
 **Current Service Key (unchanged):** `crm.objects.contacts.read`, `crm.objects.contacts.write`.  
@@ -9,10 +9,10 @@
 | Label | Meaning |
 | --- | --- |
 | `BLOCKED_SCOPE` | Chosen HubSpot endpoint’s Required Scopes accordion lists a scope we do **not** have. |
-| `BLOCKED_ADAPTER` | Required scope is already granted (or local-only), but CAP-001 live adapter cannot claim READY — missing code **or** unresolved vendor-doc conflict (`DOC_CONFLICT`) blocking deterministic observation/reset. |
+| `BLOCKED_ADAPTER` | Required scope is already granted (or local-only), but CAP-001 live adapter cannot claim READY — missing code. |
 | `LOCAL_ONLY` | No HubSpot call for this tool semantic. |
 
-**Environment-level (all 12 live scenarios):** full CAP-001 live seed / preflight / authoritative snapshot needs baseline **deals**. Until `crm.objects.deals.read` + `crm.objects.deals.write` are granted, every scenario’s `liveStatus` stays `BLOCKED_SCOPE` for that environment reason — **not** because notes/tasks need extra activity scopes. CAY-10 dry-certifies **settled** contact-scoped tools (`contacts`/`notes`/`tasks`/`escalate`/`flag`) as `READY` under contacts scopes (injected HTTP only). `send_reply` / `get_availability` / `create_appointment` stay `BLOCKED_ADAPTER` while Meeting/Email archive provenance is `DOC_CONFLICT`.
+**Environment-level (all 12 live scenarios):** full CAP-001 live seed / preflight / authoritative snapshot needs baseline **deals**. Until `crm.objects.deals.read` + `crm.objects.deals.write` are granted, every scenario’s `liveStatus` stays `BLOCKED_SCOPE` for that environment reason — **not** because notes/tasks/meetings/emails need extra activity scopes. CAY-11 dry-certifies contact-scoped tools (`contacts`/`notes`/`tasks`/`escalate`/`flag`/`send_reply`/`get_availability`/`create_appointment`) as `READY` under contacts scopes (injected HTTP only).
 
 ## Per-object / per-operation API version provenance
 
@@ -22,7 +22,7 @@ HubSpot’s dated paths are **not** uniform across families **or** across operat
 | --- | --- | --- |
 | Contacts | `2026-03` | search/get/update on dated `2026-03` contacts paths (proven CAY-06) |
 | Notes / Tasks | `2026-09` | create/list/archive settled on latest OpenAPI named paths |
-| Meetings / Emails | **mixed (operation-level)** | create/list = `2026-09`; **archive = `DOC_CONFLICT`** (OpenAPI 2026-09 vs rendered/dated 2026-03) |
+| Meetings / Emails | `2026-09` | create/list/archive CAP-001 pin `2026-09` (CAY-11); 2026-03 coexists as older supported contract |
 | Deals | **mixed (operation-level)** | create/read/update = `2026-09/0-3`; **archive = `2026-03`** |
 | Properties (setup-only) | `2026-09` | create-property; **not** a runtime Service Key grant |
 
@@ -43,10 +43,10 @@ Columns: **CanAIYet tool → HubSpot representation → action → endpoint/vers
 | `update_deal` | Deal (`0-3`) | update | `PATCH /crm/objects/2026-09/0-3/{dealId}` | `crm.objects.deals.write` | **genuinely new** | `BLOCKED_SCOPE` |
 | `add_note` | Note engagement | create | `POST /crm/objects/2026-09/notes` | `crm.objects.contacts.write` | already granted | `READY` |
 | `draft_reply` | Local draft | compose | `(local)` | none | not required | `LOCAL_ONLY` |
-| `send_reply` | Email engagement log (Envelope A) | create | `POST /crm/objects/2026-09/emails` | `crm.objects.contacts.write` **OR** `sales-email-read` | already granted (via contacts.write) | `BLOCKED_ADAPTER` (`DOC_CONFLICT` archive) |
+| `send_reply` | Email engagement log (Envelope A) | create | `POST /crm/objects/2026-09/emails` | `crm.objects.contacts.write` **OR** `sales-email-read` | already granted (via contacts.write) | `READY` |
 | `get_policy` | Local policy pack | read | `(local)` | none | not required | `LOCAL_ONLY` |
-| `get_availability` | Meeting engagement | read | `GET /crm/objects/2026-09/meetings/{meetingId}` | `crm.objects.contacts.read` | already granted | `BLOCKED_ADAPTER` (`DOC_CONFLICT` archive) |
-| `create_appointment` | Meeting engagement | create | `POST /crm/objects/2026-09/meetings` | `crm.objects.contacts.write` | already granted | `BLOCKED_ADAPTER` (`DOC_CONFLICT` archive) |
+| `get_availability` | Meeting engagement | read | `GET /crm/objects/2026-09/meetings/{meetingId}` | `crm.objects.contacts.read` | already granted | `READY` |
+| `create_appointment` | Meeting engagement | create | `POST /crm/objects/2026-09/meetings` | `crm.objects.contacts.write` | already granted | `READY` |
 | `escalate` | Task (and/or note) | create | `POST /crm/objects/2026-09/tasks` | `crm.objects.contacts.write` | already granted | `READY` |
 | `flag` | Contact property / note | update | `PATCH /crm/objects/2026-03/contacts/{contactId}` | `crm.objects.contacts.write` | already granted | `READY` |
 
@@ -76,11 +76,11 @@ Do **not** add notes/tasks/meetings/emails object scopes solely because CAP-001 
 
 ## Custom test metadata (least authority)
 
-See also `docs/HUBSPOT_CAP001_METADATA_PLAN.md` (CAY-10): prefer one-time `cay_fixture_id` + `cay_run_id` on contacts and deals.
+See also `docs/HUBSPOT_CAP001_METADATA_PLAN.md` (CAY-10): prefer one-time provisioning of the **full required family-specific `cay_*` set** (contacts, deals, notes, tasks, meetings, emails — not merely fixture/run shorthand).
 
 | Need | Strategy |
 | --- | --- |
-| `cay_fixture_id`, `cay_run_id`, `cay_scenario_id`, DNC/tags/flag encodings | **Provision once** in the HubSpot test account (UI or short-lived setup credential) |
+| Full family-specific `cay_*` set per metadata plan | **Provision once** in the HubSpot test account (UI or short-lived setup credential) |
 | Runtime Service Key | Keep object write only (`contacts.*`, and deals only if accepted later) |
 | Avoid | Permanent `crm.schemas.contacts.write` on the runtime Service Key “for convenience” |
 
@@ -90,21 +90,23 @@ Create-property docs (setup-only): HubSpotDev `fetch-doc` of latest create-prope
 
 - Contacts `2026-03` create / get / update / search Required Scopes
 - Notes / Tasks `2026-09` create / get / **delete** Required Scopes (latest OpenAPI named paths — settled)
-- Meetings / Emails create / list `2026-09` (settled); **archive = DOC_CONFLICT** (see below)
+- Meetings / Emails create / list / **archive** `2026-09` (CAY-11 CAP-001 pin); 2026-03 coexists (see below)
 - Deals create / get / update Required Scopes (`0-3` on `2026-09`)
 - Deals archive Required Scopes on dated `2026-03` path (`DELETE /crm/objects/2026-03/{objectType}/{objectId}`; Deal `objectType=0-3`)
 - Deals batch archive on dated `2026-03` (`POST /crm/objects/2026-03/0-3/batch/archive`)
 - Properties create Required Scopes (setup-only; latest OpenAPI `2026-09`)
 
-### meetings.archive / emails.archive — DOC_CONFLICT (retrieval 2026-09-14)
+### meetings.archive / emails.archive — RESOLVED_VERSION_COEXISTENCE (retrieval 2026-09-14)
 
-Vendor protocol: when official sources disagree, **STOP** the contested fact; do not silently pick one. Not live-ready — `archiveMeeting` / `archiveEmail` and any reset/seed cleanup that would call them fail closed (`ADAPTER_GAP` + `DOC_CONFLICT` message).
+**Disposition:** `RESOLVED_VERSION_COEXISTENCE` — **not** `DOC_CONFLICT_PERSISTS`.
 
-| Operation | OpenAPI / latest embed (WebFetch scrape) | Independent rendered / dated observation |
+HubSpot [versioning](https://developers.hubspot.com/docs/developer-tooling/platform/versioning): date-based API versions are GA every ~6 months and are immutable supported contracts (Current → Supported → Unsupported after ~18 months). Two dates alone do **not** imply contradiction.
+
+| Operation | CAP-001 pin (2026-09 OpenAPI) | Coexisting older contract (2026-03 OpenAPI) |
 | --- | --- | --- |
-| `meetings.archive` | `DELETE /crm/objects/2026-09/meetings/{meetingId}` — [latest delete-meeting](https://developers.hubspot.com/docs/api-reference/latest/crm/activities/meetings/delete-meeting) | Same latest URL rendered as `DELETE /crm/objects/2026-03/{objectType}/{objectId}`; dated [2026-03 delete-meeting](https://developers.hubspot.com/docs/api-reference/2026-03/crm/activities/meetings/delete-meeting) |
-| `emails.archive` | `DELETE /crm/objects/2026-09/emails/{emailId}` — [latest delete-email](https://developers.hubspot.com/docs/api-reference/latest/crm/activities/emails/delete-email) | Same latest URL rendered as `DELETE /crm/objects/2026-03/emails/{emailId}`; dated [2026-03 delete-email](https://developers.hubspot.com/docs/api-reference/2026-03/crm/activities/emails/delete-email) |
+| `meetings.archive` | `DELETE /crm/objects/2026-09/meetings/{meetingId}` — [latest delete-meeting](https://developers.hubspot.com/docs/api-reference/latest/crm/activities/meetings/delete-meeting); scopes: `crm.objects.contacts.write` | `DELETE /crm/objects/2026-03/meetings/{meetingId}` — [2026-03 delete-meeting](https://developers.hubspot.com/docs/api-reference/2026-03/crm/activities/meetings/delete-meeting) |
+| `emails.archive` | `DELETE /crm/objects/2026-09/emails/{emailId}` — [latest delete-email](https://developers.hubspot.com/docs/api-reference/latest/crm/activities/emails/delete-email); scopes: `crm.objects.contacts.write` **OR** `sales-email-read` | `DELETE /crm/objects/2026-03/emails/{emailId}` — [2026-03 delete-email](https://developers.hubspot.com/docs/api-reference/2026-03/crm/activities/emails/delete-email) |
 
-Also: `llms.txt` lists both `crm-meetings-v2026-09` / `crm-emails-v2026-09` and `crm-meetings-v2026-03` / `crm-emails-v2026-03`; direct JSON asset URLs returned **Asset not found** (2026-09-14). Notes archive + task delete + create-property remain settled `2026-09` — do not reopen.
+Also: `llms.txt` lists both `crm-meetings/emails-v2026-09` and `v2026-03` specs; direct JSON asset URLs returned **Asset not found** (2026-09-14) — recorded; Developer MCP `fetch-doc` embeds the named OpenAPI. Misleading `latest` HTML scrape can surface 2026-03-shaped path noise; authority is the versioned OpenAPI embed (`specs/2026-09/...`). CAP-001 pins archive to **2026-09** (same as create/list; newest Current GA for new integrations).
 
 **Do not change the Service Key until this matrix is accepted and a separate human authorization receipt names the exact scopes.**

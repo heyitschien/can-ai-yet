@@ -41,8 +41,7 @@ export const HUBSPOT_GRANTED_SCOPES = [
 /**
  * Per-object-family API version *summary* (not authority for every operation).
  * Contacts stay on proven `2026-03` (CAY-06).
- * Notes/tasks create/list/archive use settled `2026-09`.
- * Meetings/emails create/list use `2026-09`; **archive is DOC_CONFLICT** (not live-ready).
+ * Notes/tasks/meetings/emails create/list/archive use settled `2026-09` (CAY-11 archive pin).
  * Deals are **operation-level**: create/read/update use `2026-09`; archive uses `2026-03`.
  * Exact operation matrix is the authority — see `HUBSPOT_CAP001_API_VERSIONS_BY_OPERATION`.
  */
@@ -50,10 +49,10 @@ export const HUBSPOT_CAP001_API_VERSIONS_BY_FAMILY = {
   contacts: "2026-03",
   notes: "2026-09",
   tasks: "2026-09",
-  /** Summary — meetings.archive is DOC_CONFLICT; do not treat as archive authority. */
-  meetings: "mixed-operation-level",
-  /** Summary — emails.archive is DOC_CONFLICT; do not treat as archive authority. */
-  emails: "mixed-operation-level",
+  /** CAP-001 pin 2026-09 create/list/archive; 2026-03 coexists (not CAP-001 pin). */
+  meetings: "2026-09",
+  /** CAP-001 pin 2026-09 create/list/archive; 2026-03 coexists (not CAP-001 pin). */
+  emails: "2026-09",
   /** Summary only — Deal archive is 2026-03; do not treat this as archive authority. */
   deals: "mixed-operation-level",
   /**
@@ -66,7 +65,7 @@ export const HUBSPOT_CAP001_API_VERSIONS_BY_FAMILY = {
 /**
  * Operation-level HubSpot dated API pins for CAP-001.
  * Never infer a destructive/reset path version from create/read/update of the same object family.
- * notes/tasks archive settled 2026-09; meetings/emails archive = DOC_CONFLICT (not live-ready);
+ * notes/tasks/meetings/emails archive settled 2026-09 (CAY-11 RESOLVED_VERSION_COEXISTENCE);
  * Deal archive stays operation-level 2026-03 (CAY-08).
  */
 export const HUBSPOT_CAP001_API_VERSIONS_BY_OPERATION = {
@@ -82,12 +81,12 @@ export const HUBSPOT_CAP001_API_VERSIONS_BY_OPERATION = {
   "meetings.create": "2026-09",
   "meetings.read": "2026-09",
   "meetings.list": "2026-09",
-  /** OpenAPI 2026-09 vs rendered/dated 2026-03 — not live-authorized. */
-  "meetings.archive": "DOC_CONFLICT",
+  /** CAP-001 pin 2026-09; 2026-03 coexists as older supported contract. */
+  "meetings.archive": "2026-09",
   "emails.create": "2026-09",
   "emails.list": "2026-09",
-  /** OpenAPI 2026-09 vs rendered/dated 2026-03 — not live-authorized. */
-  "emails.archive": "DOC_CONFLICT",
+  /** CAP-001 pin 2026-09; 2026-03 coexists as older supported contract. */
+  "emails.archive": "2026-09",
   "deals.create": "2026-09",
   "deals.read": "2026-09",
   "deals.update": "2026-09",
@@ -215,11 +214,11 @@ export const CAP001_HUBSPOT_SCOPE_MATRIX: readonly Cap001HubSpotScopeRow[] = [
     requiredScopes: ["crm.objects.contacts.write", "sales-email-read"],
     scopeLogic: "any",
     grant: "already_granted",
-    liveBlock: "BLOCKED_ADAPTER",
+    liveBlock: "READY",
     docSource:
       "https://developers.hubspot.com/docs/api-reference/latest/crm/activities/emails/create-email",
     notes:
-      "Required Scopes accordion lists contacts.write OR sales-email-read. contacts.write is already granted. Family not READY: emails.archive is DOC_CONFLICT (OpenAPI 2026-09 vs rendered/dated 2026-03) — no deterministic reset/cleanup path.",
+      "Required Scopes accordion lists contacts.write OR sales-email-read. contacts.write is already granted. emails.archive CAP-001 pin 2026-09 (CAY-11 RESOLVED_VERSION_COEXISTENCE) enables deterministic reset/cleanup.",
   },
   {
     tool: "get_policy",
@@ -244,11 +243,11 @@ export const CAP001_HUBSPOT_SCOPE_MATRIX: readonly Cap001HubSpotScopeRow[] = [
     requiredScopes: ["crm.objects.contacts.read"],
     scopeLogic: "all",
     grant: "already_granted",
-    liveBlock: "BLOCKED_ADAPTER",
+    liveBlock: "READY",
     docSource:
       "https://developers.hubspot.com/docs/api-reference/latest/crm/activities/meetings/get-meeting",
     notes:
-      "Create/list OpenAPI settled 2026-09, but appointments family not READY: meetings.archive is DOC_CONFLICT — no deterministic reset/cleanup path.",
+      "Create/list/archive OpenAPI settled 2026-09 (CAY-11 RESOLVED_VERSION_COEXISTENCE). appointments family READY at adapter/tool layer under contacts scopes.",
   },
   {
     tool: "create_appointment",
@@ -260,11 +259,11 @@ export const CAP001_HUBSPOT_SCOPE_MATRIX: readonly Cap001HubSpotScopeRow[] = [
     requiredScopes: ["crm.objects.contacts.write"],
     scopeLogic: "all",
     grant: "already_granted",
-    liveBlock: "BLOCKED_ADAPTER",
+    liveBlock: "READY",
     docSource:
       "https://developers.hubspot.com/docs/api-reference/latest/crm/activities/meetings/create-meeting",
     notes:
-      "Create path settled 2026-09; appointments family not READY while meetings.archive remains DOC_CONFLICT.",
+      "Create + archive paths settled 2026-09 (CAY-11). appointments family READY at adapter/tool layer under contacts scopes.",
   },
   {
     tool: "escalate",
@@ -408,7 +407,7 @@ export const CAP001_HUBSPOT_METADATA_PROVISIONING = {
 
 /** Environment-level truth: full CAP-001 live seed/snapshot needs deals even when a scenario never mutates them. */
 export const CAP001_LIVE_ENVIRONMENT_SCOPE_BLOCKER =
-  "Full CAP-001 live seed/preflight/authoritative snapshot requires baseline deals via crm.objects.deals.read/write (verified missing). Settled contact-scoped families (contacts/notes/tasks/escalations/flags) are READY at the CAY-10 adapter/tool layer under contacts scopes (dry-certified; no live suite). outbounds/appointments remain BLOCKED_ADAPTER while emails.archive/meetings.archive are DOC_CONFLICT.";
+  "Full CAP-001 live seed/preflight/authoritative snapshot requires baseline deals via crm.objects.deals.read/write (verified missing). Contact-scoped families (contacts/notes/tasks/escalations/flags/outbounds/appointments) are READY at the CAY-11 adapter/tool layer under contacts scopes (dry-certified; no live suite). Meeting/Email archive pin 2026-09 (RESOLVED_VERSION_COEXISTENCE).";
 
 export function genuinelyNewScopesFromMatrix(
   rows: readonly Cap001HubSpotScopeRow[] = CAP001_HUBSPOT_SCOPE_MATRIX_WITH_ENV,

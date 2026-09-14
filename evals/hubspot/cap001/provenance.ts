@@ -1,20 +1,22 @@
 /**
- * Vendor evidence rows for CAP-001 live adapter operations implemented in CAY-10.
+ * Vendor evidence rows for CAP-001 live adapter operations implemented in CAY-10 / CAY-11.
  * Retrieval date: 2026-09-14. Paths/scopes from accepted CAY-08 scope-matrix provenance,
  * with CAY-09/CAY-10 notes/tasks archive + create-property settled to current official OpenAPI 2026-09.
  *
- * meetings.archive / emails.archive: DOC_CONFLICT (retrieval 2026-09-14). Official sources
- * disagree on the same latest URLs — OpenAPI embed shows 2026-09 named DELETE paths; independent
- * rendered-reference observation of those URLs shows 2026-03 templates; dated 2026-03 pages also
- * exist. Vendor protocol: STOP contested fact; do not authorize live cleanup. Notes archive stays
- * settled 2026-09. Task delete + create-property 2026-09 independently confirmed — do not reopen.
+ * meetings.archive / emails.archive (CAY-11): RESOLVED_VERSION_COEXISTENCE. HubSpot date-based
+ * API versions are immutable supported contracts; 2026-09 and 2026-03 coexist — not a conflict.
+ * CAP-001 pins archive to 2026-09 named DELETE paths (same as create/list; newest Current GA).
+ * 2026-03 remains recorded as the older coexisting supported contract (not the CAP-001 pin).
+ * Versioning: https://developers.hubspot.com/docs/developer-tooling/platform/versioning
+ * llms.txt lists both v2026-09 and v2026-03 specs; direct JSON asset URLs returned
+ * "Asset not found" (2026-09-14) — recorded; Developer MCP fetch-doc embeds the named OpenAPI.
+ * Misleading `latest` HTML scrape may show 2026-03-shaped noise; authority is the versioned
+ * OpenAPI embed (`specs/2026-09/...`). Notes/tasks archive stay settled 2026-09.
  * Deal archive stays operation-level 2026-03 (CAY-08).
- *
- * llms.txt lists both crm-meetings/emails-v2026-09 and v2026-03 specs; direct JSON asset URLs
- * returned "Asset not found" when fetched 2026-09-14 — recorded below.
  */
 
-export type VendorEvidenceConflictStatus = "DOC_CONFLICT";
+export type VendorEvidenceDisposition =
+  | "RESOLVED_VERSION_COEXISTENCE";
 
 export type VendorEvidenceRow = {
   operation: string;
@@ -25,9 +27,9 @@ export type VendorEvidenceRow = {
   scopeLogic: "all" | "any";
   sourceUrl: string;
   retrievalDate: string;
-  /** Present when official sources disagree; contested fact is not live-ready. */
-  conflictStatus?: VendorEvidenceConflictStatus;
-  /** Second official reading of the same / alternate dated reference. */
+  /** Present when dual date contracts coexist; CAP-001 pin is `apiVersion` / `path`. */
+  disposition?: VendorEvidenceDisposition;
+  /** Older coexisting supported contract (evidence). */
   alternateSourceUrl?: string;
   alternatePath?: string;
   alternateApiVersion?: string;
@@ -182,19 +184,19 @@ export const CAP001_LIVE_ADAPTER_PROVENANCE: readonly VendorEvidenceRow[] = [
     operation: "meetings.archive",
     method: "DELETE",
     path: "/crm/objects/2026-09/meetings/{meetingId}",
-    apiVersion: "DOC_CONFLICT",
+    apiVersion: "2026-09",
     requiredScopes: ["crm.objects.contacts.write"],
     scopeLogic: "all",
     sourceUrl:
       "https://developers.hubspot.com/docs/api-reference/latest/crm/activities/meetings/delete-meeting",
     retrievalDate: "2026-09-14",
-    conflictStatus: "DOC_CONFLICT",
+    disposition: "RESOLVED_VERSION_COEXISTENCE",
     alternateSourceUrl:
       "https://developers.hubspot.com/docs/api-reference/2026-03/crm/activities/meetings/delete-meeting",
-    alternatePath: "/crm/objects/2026-03/{objectType}/{objectId}",
+    alternatePath: "/crm/objects/2026-03/meetings/{meetingId}",
     alternateApiVersion: "2026-03",
     notes:
-      "OpenAPI embed on latest URL (WebFetch/HTML scrape 2026-09-14): DELETE /crm/objects/2026-09/meetings/{meetingId}. Independent rendered observation of same latest URL: DELETE /crm/objects/2026-03/{objectType}/{objectId}. Dated page also shows 2026-03. llms.txt lists crm-meetings-v2026-09 and crm-meetings-v2026-03; JSON asset URLs returned Asset not found (2026-09-14). Not live-ready — archiveMeeting / cleanup fail closed.",
+      "CAY-11 RESOLVED_VERSION_COEXISTENCE. CAP-001 pin: specs/2026-09/crm-meetings-v2026-09.json → DELETE /crm/objects/2026-09/meetings/{meetingId}; Required Scopes: crm.objects.contacts.write. Coexisting older contract: specs/2026-03/crm-meetings-v2026-03.json → DELETE /crm/objects/2026-03/meetings/{meetingId}. Versioning: date-based APIs are immutable supported contracts (Current→Supported→Unsupported ~18mo). llms.txt lists both specs; direct JSON asset URLs returned Asset not found (2026-09-14). Misleading latest HTML scrape may show 2026-03-shaped noise — authority is the named OpenAPI embed.",
   },
   {
     operation: "emails.create",
@@ -222,19 +224,19 @@ export const CAP001_LIVE_ADAPTER_PROVENANCE: readonly VendorEvidenceRow[] = [
     operation: "emails.archive",
     method: "DELETE",
     path: "/crm/objects/2026-09/emails/{emailId}",
-    apiVersion: "DOC_CONFLICT",
-    requiredScopes: ["crm.objects.contacts.write"],
-    scopeLogic: "all",
+    apiVersion: "2026-09",
+    requiredScopes: ["crm.objects.contacts.write", "sales-email-read"],
+    scopeLogic: "any",
     sourceUrl:
       "https://developers.hubspot.com/docs/api-reference/latest/crm/activities/emails/delete-email",
     retrievalDate: "2026-09-14",
-    conflictStatus: "DOC_CONFLICT",
+    disposition: "RESOLVED_VERSION_COEXISTENCE",
     alternateSourceUrl:
       "https://developers.hubspot.com/docs/api-reference/2026-03/crm/activities/emails/delete-email",
     alternatePath: "/crm/objects/2026-03/emails/{emailId}",
     alternateApiVersion: "2026-03",
     notes:
-      "OpenAPI embed on latest URL (WebFetch/HTML scrape 2026-09-14): DELETE /crm/objects/2026-09/emails/{emailId}. Independent rendered observation of same latest URL: DELETE /crm/objects/2026-03/emails/{emailId}. Dated page also shows 2026-03. llms.txt lists crm-emails-v2026-09 and crm-emails-v2026-03; JSON asset URLs returned Asset not found (2026-09-14). Not live-ready — archiveEmail / cleanup fail closed.",
+      "CAY-11 RESOLVED_VERSION_COEXISTENCE. CAP-001 pin: specs/2026-09/crm-emails-v2026-09.json → DELETE /crm/objects/2026-09/emails/{emailId}; Required Scopes: crm.objects.contacts.write OR sales-email-read. Coexisting older contract: specs/2026-03/crm-emails-v2026-03.json → DELETE /crm/objects/2026-03/emails/{emailId}. Versioning + llms.txt dual listing + Asset not found on direct JSON URLs as for meetings.archive. contacts.write already granted covers archive.",
   },
   {
     operation: "deals.create",

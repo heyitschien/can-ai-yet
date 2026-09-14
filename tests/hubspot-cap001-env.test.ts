@@ -195,8 +195,8 @@ describe("HubSpot CAP-001 environment machinery (CAY-08)", () => {
     expect(contactScopedReadyFamilies().has("tasks")).toBe(true);
     expect(contactScopedReadyFamilies().has("escalations")).toBe(true);
     expect(contactScopedReadyFamilies().has("flags")).toBe(true);
-    expect(contactScopedReadyFamilies().has("outbounds")).toBe(false);
-    expect(contactScopedReadyFamilies().has("appointments")).toBe(false);
+    expect(contactScopedReadyFamilies().has("outbounds")).toBe(true);
+    expect(contactScopedReadyFamilies().has("appointments")).toBe(true);
     expect(contactScopedReadyFamilies().has("deals")).toBe(false);
   });
 
@@ -231,8 +231,8 @@ describe("HubSpot CAP-001 environment machinery (CAY-08)", () => {
       deals: "mixed-operation-level",
       notes: "2026-09",
       tasks: "2026-09",
-      meetings: "mixed-operation-level",
-      emails: "mixed-operation-level",
+      meetings: "2026-09",
+      emails: "2026-09",
     });
     expect(env.apiVersionsByOperation).toMatchObject({
       "notes.create": "2026-09",
@@ -243,10 +243,10 @@ describe("HubSpot CAP-001 environment machinery (CAY-08)", () => {
       "tasks.archive": "2026-09",
       "meetings.create": "2026-09",
       "meetings.list": "2026-09",
-      "meetings.archive": "DOC_CONFLICT",
+      "meetings.archive": "2026-09",
       "emails.create": "2026-09",
       "emails.list": "2026-09",
-      "emails.archive": "DOC_CONFLICT",
+      "emails.archive": "2026-09",
       "deals.create": "2026-09",
       "deals.read": "2026-09",
       "deals.update": "2026-09",
@@ -288,31 +288,27 @@ describe("HubSpot CAP-001 environment machinery (CAY-08)", () => {
       expect(row.endpoint).toContain("/crm/objects/2026-09/0-3");
       expect(row.endpoint).not.toContain("/deals/");
     }
-    expect(toolRowsBlockedAdapter().map((row) => row.tool).sort()).toEqual([
-      "create_appointment",
-      "get_availability",
-      "send_reply",
-    ]);
+    expect(toolRowsBlockedAdapter().map((row) => row.tool).sort()).toEqual([]);
     const readyTools = CAP001_HUBSPOT_SCOPE_MATRIX.filter((row) => row.liveBlock === "READY").map(
       (row) => row.tool,
     );
     expect(readyTools.sort()).toEqual(
       [
         "add_note",
+        "create_appointment",
         "create_task",
         "escalate",
         "flag",
+        "get_availability",
         "get_contact",
         "search_contact",
+        "send_reply",
       ].sort(),
     );
-    expect(readyTools).not.toContain("send_reply");
-    expect(readyTools).not.toContain("get_availability");
-    expect(readyTools).not.toContain("create_appointment");
     for (const tool of ["send_reply", "get_availability", "create_appointment"] as const) {
       const row = CAP001_HUBSPOT_SCOPE_MATRIX.find((r) => r.tool === tool);
-      expect(row?.liveBlock).toBe("BLOCKED_ADAPTER");
-      expect(row?.notes).toMatch(/DOC_CONFLICT/);
+      expect(row?.liveBlock).toBe("READY");
+      expect(row?.apiVersion).toBe("2026-09");
     }
     expect(CAP001_HUBSPOT_METADATA_PROVISIONING.strategy).toBe("one_time_human_or_setup_path");
     expect(CAP001_HUBSPOT_METADATA_PROVISIONING.avoidRuntimeScopes).toContain(

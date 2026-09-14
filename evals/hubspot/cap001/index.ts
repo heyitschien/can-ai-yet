@@ -13,7 +13,6 @@ export {
 export { LiveHubSpotCap001Adapter } from "@/evals/hubspot/cap001/live-adapter";
 export {
   Cap001HubSpotHttpClient,
-  isDocConflictMessage,
   isScopeGapMessage,
   mapClientFailureToEnv,
 } from "@/evals/hubspot/cap001/http-client";
@@ -70,16 +69,19 @@ export {
 export {
   CAP001_CONTACTS_BASE_PATH,
   CAP001_DEFAULT_GRANTED_SCOPES,
-  DOC_CONFLICT_EMAILS_ARCHIVE,
-  DOC_CONFLICT_MEETINGS_ARCHIVE,
   HUBSPOT_API_BASE_URL,
   HUBSPOT_ASSOC_DEAL_TO_CONTACT,
   HUBSPOT_ASSOC_EMAIL_TO_CONTACT,
   HUBSPOT_ASSOC_MEETING_TO_CONTACT,
   HUBSPOT_ASSOC_NOTE_TO_CONTACT,
   HUBSPOT_ASSOC_TASK_TO_CONTACT,
+  RESOLVED_VERSION_COEXISTENCE_MEETINGS_EMAILS_ARCHIVE,
   SCOPE_CONTACTS_READ,
   SCOPE_CONTACTS_WRITE,
   SCOPE_DEALS_READ,
   SCOPE_DEALS_WRITE,
+  cap001EmailArchivePath,
+  cap001MeetingArchivePath,
+  cap001NoteArchivePath,
+  cap001TaskArchivePath,
 } from "@/evals/hubspot/cap001/paths";
