@@ -254,7 +254,9 @@ function withCleanupFailures(primary: string, cleanupFailures: string[]): string
 
 /**
  * Authoritative ownership = HubSpot association, not cay_contact_email alone.
- * Require exactly one associated contact whose email matches the auxiliary label.
+ * CAP-001 one-person activities/deals: require exactly one contact association total,
+ * and that contact's email must match cay_contact_email. Extra associations fail closed
+ * as ambiguous even when one of them matches the label.
  */
 function verifyContactAssociation(
   record: Cap001HubSpotObject,
@@ -272,32 +274,32 @@ function verifyContactAssociation(
     };
   }
 
-  const matching = assocResults.filter((row) => {
-    const email = contactIdToEmail.get(row.id);
-    if (!email || !labeledEmail) return false;
-    return email.toLowerCase() === labeledEmail.toLowerCase();
-  });
-
-  if (matching.length === 1) {
-    return { ok: true, data: labeledEmail };
-  }
-
-  if (matching.length > 1) {
+  if (assocResults.length !== 1) {
+    const associatedEmails = assocResults
+      .map((row) => contactIdToEmail.get(row.id) ?? `(unknown:${row.id})`)
+      .join(", ");
     return {
       ok: false,
       failureClass: "INTEGRATION_FAILURE",
-      message: `Ambiguous contact associations on ${family} ${record.id} matching cay_contact_email`,
+      message: `Ambiguous contact associations on ${family} ${record.id}: expected exactly one contact association, found ${assocResults.length} associations=[${associatedEmails}]`,
       family,
     };
   }
 
-  const associatedEmails = assocResults
-    .map((row) => contactIdToEmail.get(row.id) ?? `(unknown:${row.id})`)
-    .join(", ");
+  const only = assocResults[0];
+  const associatedEmail = contactIdToEmail.get(only.id);
+  if (
+    associatedEmail &&
+    labeledEmail &&
+    associatedEmail.toLowerCase() === labeledEmail.toLowerCase()
+  ) {
+    return { ok: true, data: labeledEmail };
+  }
+
   return {
     ok: false,
     failureClass: "INTEGRATION_FAILURE",
-    message: `Contact association mismatch on ${family} ${record.id}: cay_contact_email=${labeledEmail || "(empty)"} associations=[${associatedEmails}]`,
+    message: `Contact association mismatch on ${family} ${record.id}: cay_contact_email=${labeledEmail || "(empty)"} associations=[${associatedEmail ?? `(unknown:${only.id})`}]`,
     family,
   };
 }

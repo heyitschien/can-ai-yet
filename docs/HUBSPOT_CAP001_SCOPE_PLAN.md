@@ -21,7 +21,8 @@ HubSpot’s dated paths are **not** uniform across families **or** across operat
 | Object family | Summary pin | Operation authority |
 | --- | --- | --- |
 | Contacts | `2026-03` | search/get/update on dated `2026-03` contacts paths (proven CAY-06) |
-| Notes / Tasks / Meetings / Emails | `2026-09` | create/list/archive on current latest activity OpenAPI (named object paths) |
+| Notes / Tasks | `2026-09` | create/list/archive settled on latest OpenAPI named paths |
+| Meetings / Emails | **mixed (operation-level)** | create/list = `2026-09`; **archive = `DOC_CONFLICT`** (OpenAPI 2026-09 vs rendered/dated 2026-03) |
 | Deals | **mixed (operation-level)** | create/read/update = `2026-09/0-3`; **archive = `2026-03`** |
 | Properties (setup-only) | `2026-09` | create-property; **not** a runtime Service Key grant |
 
@@ -88,12 +89,22 @@ Create-property docs (setup-only): HubSpotDev `fetch-doc` of latest create-prope
 ## Official sources checked (2026-09-13 / activity archive re-fetch 2026-09-14)
 
 - Contacts `2026-03` create / get / update / search Required Scopes
-- Notes / Tasks / Meetings / Emails `2026-09` create / get / **delete** Required Scopes (latest OpenAPI named paths)
+- Notes / Tasks `2026-09` create / get / **delete** Required Scopes (latest OpenAPI named paths — settled)
+- Meetings / Emails create / list `2026-09` (settled); **archive = DOC_CONFLICT** (see below)
 - Deals create / get / update Required Scopes (`0-3` on `2026-09`)
 - Deals archive Required Scopes on dated `2026-03` path (`DELETE /crm/objects/2026-03/{objectType}/{objectId}`; Deal `objectType=0-3`)
 - Deals batch archive on dated `2026-03` (`POST /crm/objects/2026-03/0-3/batch/archive`)
 - Properties create Required Scopes (setup-only; latest OpenAPI `2026-09`)
 
-**Activity archive note (CAY-09):** independent re-review claimed meeting/email latest pages showed 2026-03 templates; builder HubSpotDev re-fetch of the same latest URLs returned OpenAPI 2026-09 named paths — implementation follows retrieved OpenAPI (no silent DOC_CONFLICT).
+### meetings.archive / emails.archive — DOC_CONFLICT (retrieval 2026-09-14)
+
+Vendor protocol: when official sources disagree, **STOP** the contested fact; do not silently pick one. Not live-ready — `archiveMeeting` / `archiveEmail` and any reset/seed cleanup that would call them fail closed (`ADAPTER_GAP` + `DOC_CONFLICT` message).
+
+| Operation | OpenAPI / latest embed (WebFetch scrape) | Independent rendered / dated observation |
+| --- | --- | --- |
+| `meetings.archive` | `DELETE /crm/objects/2026-09/meetings/{meetingId}` — [latest delete-meeting](https://developers.hubspot.com/docs/api-reference/latest/crm/activities/meetings/delete-meeting) | Same latest URL rendered as `DELETE /crm/objects/2026-03/{objectType}/{objectId}`; dated [2026-03 delete-meeting](https://developers.hubspot.com/docs/api-reference/2026-03/crm/activities/meetings/delete-meeting) |
+| `emails.archive` | `DELETE /crm/objects/2026-09/emails/{emailId}` — [latest delete-email](https://developers.hubspot.com/docs/api-reference/latest/crm/activities/emails/delete-email) | Same latest URL rendered as `DELETE /crm/objects/2026-03/emails/{emailId}`; dated [2026-03 delete-email](https://developers.hubspot.com/docs/api-reference/2026-03/crm/activities/emails/delete-email) |
+
+Also: `llms.txt` lists both `crm-meetings-v2026-09` / `crm-emails-v2026-09` and `crm-meetings-v2026-03` / `crm-emails-v2026-03`; direct JSON asset URLs returned **Asset not found** (2026-09-14). Notes archive + task delete + create-property remain settled `2026-09` — do not reopen.
 
 **Do not change the Service Key until this matrix is accepted and a separate human authorization receipt names the exact scopes.**

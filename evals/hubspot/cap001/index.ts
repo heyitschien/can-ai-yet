@@ -11,7 +11,12 @@ export {
   runTripleDryReset,
 } from "@/evals/hubspot/cap001/calibration";
 export { LiveHubSpotCap001Adapter } from "@/evals/hubspot/cap001/live-adapter";
-export { Cap001HubSpotHttpClient, isScopeGapMessage, mapClientFailureToEnv } from "@/evals/hubspot/cap001/http-client";
+export {
+  Cap001HubSpotHttpClient,
+  isDocConflictMessage,
+  isScopeGapMessage,
+  mapClientFailureToEnv,
+} from "@/evals/hubspot/cap001/http-client";
 export { CAP001_METADATA_PLAN } from "@/evals/hubspot/cap001/metadata-plan";
 export {
   CAP001_HUBSPOT_SCENARIO_MAPPING,
@@ -65,6 +70,8 @@ export {
 export {
   CAP001_CONTACTS_BASE_PATH,
   CAP001_DEFAULT_GRANTED_SCOPES,
+  DOC_CONFLICT_EMAILS_ARCHIVE,
+  DOC_CONFLICT_MEETINGS_ARCHIVE,
   HUBSPOT_API_BASE_URL,
   HUBSPOT_ASSOC_DEAL_TO_CONTACT,
   HUBSPOT_ASSOC_EMAIL_TO_CONTACT,

@@ -1,19 +1,20 @@
 /**
  * Vendor evidence rows for CAP-001 live adapter operations implemented in CAY-10.
  * Retrieval date: 2026-09-14. Paths/scopes from accepted CAY-08 scope-matrix provenance,
- * with CAY-09/CAY-10 activity-archive + create-property correction to current official OpenAPI.
+ * with CAY-09/CAY-10 notes/tasks archive + create-property settled to current official OpenAPI 2026-09.
  *
- * Activity archive (CAY-09 rule): current official docs outrank prior reviewer instruction that
- * forced family-wide 2026-03. HubSpotDev `fetch-doc` of latest delete-note/task/meeting/email
- * pages (2026-09-14) returned OpenAPI `DELETE /crm/objects/2026-09/{notes|tasks|meetings|emails}/{id}`.
- * Note: independent re-review claimed meeting/email latest pages showed 2026-03 templates; builder
- * HubSpotDev re-fetch of the same latest URLs returned OpenAPI 2026-09 named paths — implementation
- * follows retrieved OpenAPI from those pages (no silent DOC_CONFLICT; primary source consistent
- * within our fetch). Create/list remain 2026-09. Deal archive stays operation-level 2026-03 (CAY-08).
+ * meetings.archive / emails.archive: DOC_CONFLICT (retrieval 2026-09-14). Official sources
+ * disagree on the same latest URLs — OpenAPI embed shows 2026-09 named DELETE paths; independent
+ * rendered-reference observation of those URLs shows 2026-03 templates; dated 2026-03 pages also
+ * exist. Vendor protocol: STOP contested fact; do not authorize live cleanup. Notes archive stays
+ * settled 2026-09. Task delete + create-property 2026-09 independently confirmed — do not reopen.
+ * Deal archive stays operation-level 2026-03 (CAY-08).
  *
- * Create-property (setup-only): HubSpotDev `fetch-doc` of latest create-property (2026-09-14)
- * returned OpenAPI `POST /crm/properties/2026-09/{objectType}`. Runtime schema-write remains 0.
+ * llms.txt lists both crm-meetings/emails-v2026-09 and v2026-03 specs; direct JSON asset URLs
+ * returned "Asset not found" when fetched 2026-09-14 — recorded below.
  */
+
+export type VendorEvidenceConflictStatus = "DOC_CONFLICT";
 
 export type VendorEvidenceRow = {
   operation: string;
@@ -24,6 +25,13 @@ export type VendorEvidenceRow = {
   scopeLogic: "all" | "any";
   sourceUrl: string;
   retrievalDate: string;
+  /** Present when official sources disagree; contested fact is not live-ready. */
+  conflictStatus?: VendorEvidenceConflictStatus;
+  /** Second official reading of the same / alternate dated reference. */
+  alternateSourceUrl?: string;
+  alternatePath?: string;
+  alternateApiVersion?: string;
+  notes?: string;
 };
 
 export const CAP001_LIVE_ADAPTER_PROVENANCE: readonly VendorEvidenceRow[] = [
@@ -174,12 +182,19 @@ export const CAP001_LIVE_ADAPTER_PROVENANCE: readonly VendorEvidenceRow[] = [
     operation: "meetings.archive",
     method: "DELETE",
     path: "/crm/objects/2026-09/meetings/{meetingId}",
-    apiVersion: "2026-09",
+    apiVersion: "DOC_CONFLICT",
     requiredScopes: ["crm.objects.contacts.write"],
     scopeLogic: "all",
     sourceUrl:
       "https://developers.hubspot.com/docs/api-reference/latest/crm/activities/meetings/delete-meeting",
     retrievalDate: "2026-09-14",
+    conflictStatus: "DOC_CONFLICT",
+    alternateSourceUrl:
+      "https://developers.hubspot.com/docs/api-reference/2026-03/crm/activities/meetings/delete-meeting",
+    alternatePath: "/crm/objects/2026-03/{objectType}/{objectId}",
+    alternateApiVersion: "2026-03",
+    notes:
+      "OpenAPI embed on latest URL (WebFetch/HTML scrape 2026-09-14): DELETE /crm/objects/2026-09/meetings/{meetingId}. Independent rendered observation of same latest URL: DELETE /crm/objects/2026-03/{objectType}/{objectId}. Dated page also shows 2026-03. llms.txt lists crm-meetings-v2026-09 and crm-meetings-v2026-03; JSON asset URLs returned Asset not found (2026-09-14). Not live-ready — archiveMeeting / cleanup fail closed.",
   },
   {
     operation: "emails.create",
@@ -207,12 +222,19 @@ export const CAP001_LIVE_ADAPTER_PROVENANCE: readonly VendorEvidenceRow[] = [
     operation: "emails.archive",
     method: "DELETE",
     path: "/crm/objects/2026-09/emails/{emailId}",
-    apiVersion: "2026-09",
+    apiVersion: "DOC_CONFLICT",
     requiredScopes: ["crm.objects.contacts.write"],
     scopeLogic: "all",
     sourceUrl:
       "https://developers.hubspot.com/docs/api-reference/latest/crm/activities/emails/delete-email",
     retrievalDate: "2026-09-14",
+    conflictStatus: "DOC_CONFLICT",
+    alternateSourceUrl:
+      "https://developers.hubspot.com/docs/api-reference/2026-03/crm/activities/emails/delete-email",
+    alternatePath: "/crm/objects/2026-03/emails/{emailId}",
+    alternateApiVersion: "2026-03",
+    notes:
+      "OpenAPI embed on latest URL (WebFetch/HTML scrape 2026-09-14): DELETE /crm/objects/2026-09/emails/{emailId}. Independent rendered observation of same latest URL: DELETE /crm/objects/2026-03/emails/{emailId}. Dated page also shows 2026-03. llms.txt lists crm-emails-v2026-09 and crm-emails-v2026-03; JSON asset URLs returned Asset not found (2026-09-14). Not live-ready — archiveEmail / cleanup fail closed.",
   },
   {
     operation: "deals.create",

@@ -2,8 +2,9 @@
  * CAP-001 HubSpot path + association constants (CAY-10).
  *
  * Paths match accepted CAY-08 provenance in scope-matrix.ts, with CAY-09/CAY-10
- * activity-archive correction: current official latest OpenAPI outranks prior
- * review-forced 2026-03 family pin (retrieval 2026-09-14).
+ * activity-archive correction for notes/tasks (settled 2026-09) and create-property
+ * (settled 2026-09). meetings.archive / emails.archive are DOC_CONFLICT (retrieval
+ * 2026-09-14) — not live-authorized; see DOC_CONFLICT_* markers.
  * Association type IDs from HubSpot associate-records guide (HUBSPOT_DEFINED).
  * Retrieval date for this module: 2026-09-14.
  */
@@ -41,6 +42,29 @@ export const HUBSPOT_ASSOC_EMAIL_TO_CONTACT = 198;
 /** Deal → Contact (HUBSPOT_DEFINED). Associate-records guide: Deal to contact = 3. */
 export const HUBSPOT_ASSOC_DEAL_TO_CONTACT = 3;
 
+/**
+ * DOC_CONFLICT markers (vendor protocol: STOP contested fact; do not silently pick).
+ * OpenAPI embedded on latest delete pages vs independent rendered-reference observation
+ * of the same latest URLs + dated 2026-03 pages (retrieval 2026-09-14).
+ */
+export const DOC_CONFLICT_MEETINGS_ARCHIVE =
+  "DOC_CONFLICT: meetings.archive — OpenAPI 2026-09 vs rendered/dated 2026-03 (retrieval 2026-09-14)";
+
+export const DOC_CONFLICT_EMAILS_ARCHIVE =
+  "DOC_CONFLICT: emails.archive — OpenAPI 2026-09 vs rendered/dated 2026-03 (retrieval 2026-09-14)";
+
+/** Contested OpenAPI side (latest page embed / HTML scrape, 2026-09-14). Not live-authorized. */
+export const CAP001_MEETINGS_ARCHIVE_OPENAPI_PATH_TEMPLATE =
+  "/crm/objects/2026-09/meetings/{meetingId}";
+export const CAP001_EMAILS_ARCHIVE_OPENAPI_PATH_TEMPLATE =
+  "/crm/objects/2026-09/emails/{emailId}";
+
+/** Contested rendered/dated side (independent observation + dated pages, 2026-09-14). */
+export const CAP001_MEETINGS_ARCHIVE_RENDERED_PATH_TEMPLATE =
+  "/crm/objects/2026-03/{objectType}/{objectId}";
+export const CAP001_EMAILS_ARCHIVE_RENDERED_PATH_TEMPLATE =
+  "/crm/objects/2026-03/emails/{emailId}";
+
 /** One-time provisioned custom properties (runtime writes values only). */
 export const CAP001_PROP_FIXTURE_ID = "cay_fixture_id";
 export const CAP001_PROP_RUN_ID = "cay_run_id";
@@ -71,9 +95,8 @@ export function cap001DealArchivePath(dealId: string): string {
 }
 
 /**
- * Per-operation activity archive paths (CAY-09 rule: current official OpenAPI wins).
- * HubSpotDev fetch-doc of latest delete-* pages (retrieval 2026-09-14) returned
- * DELETE /crm/objects/2026-09/{notes|tasks|meetings|emails}/{id}. No shared archive pin.
+ * Settled activity archive paths (notes/tasks — independently confirmed 2026-09).
+ * meetings/emails archive are DOC_CONFLICT — use DOC_CONFLICT_* markers; do not call live.
  */
 export function cap001NoteArchivePath(noteId: string): string {
   return `/crm/objects/2026-09/notes/${encodeURIComponent(noteId)}`;
@@ -83,11 +106,17 @@ export function cap001TaskArchivePath(taskId: string): string {
   return `/crm/objects/2026-09/tasks/${encodeURIComponent(taskId)}`;
 }
 
-export function cap001MeetingArchivePath(meetingId: string): string {
+/**
+ * Contested OpenAPI-side path only (evidence). Not live-authorized while DOC_CONFLICT holds.
+ */
+export function cap001MeetingArchiveOpenApiPath(meetingId: string): string {
   return `/crm/objects/2026-09/meetings/${encodeURIComponent(meetingId)}`;
 }
 
-export function cap001EmailArchivePath(emailId: string): string {
+/**
+ * Contested OpenAPI-side path only (evidence). Not live-authorized while DOC_CONFLICT holds.
+ */
+export function cap001EmailArchiveOpenApiPath(emailId: string): string {
   return `/crm/objects/2026-09/emails/${encodeURIComponent(emailId)}`;
 }
 

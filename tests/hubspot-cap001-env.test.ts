@@ -225,8 +225,8 @@ describe("HubSpot CAP-001 environment machinery (CAY-08)", () => {
       deals: "mixed-operation-level",
       notes: "2026-09",
       tasks: "2026-09",
-      meetings: "2026-09",
-      emails: "2026-09",
+      meetings: "mixed-operation-level",
+      emails: "mixed-operation-level",
     });
     expect(env.apiVersionsByOperation).toMatchObject({
       "notes.create": "2026-09",
@@ -237,10 +237,10 @@ describe("HubSpot CAP-001 environment machinery (CAY-08)", () => {
       "tasks.archive": "2026-09",
       "meetings.create": "2026-09",
       "meetings.list": "2026-09",
-      "meetings.archive": "2026-09",
+      "meetings.archive": "DOC_CONFLICT",
       "emails.create": "2026-09",
       "emails.list": "2026-09",
-      "emails.archive": "2026-09",
+      "emails.archive": "DOC_CONFLICT",
       "deals.create": "2026-09",
       "deals.read": "2026-09",
       "deals.update": "2026-09",

@@ -21,8 +21,8 @@
 | seedResetVersion | `hubspot-seed-reset-v1` |
 | snapshotProjectionVersion | `hubspot-snapshot-v1` |
 | apiVersion (contacts pin) | `2026-03` |
-| apiVersionsByObjectFamily | contacts=`2026-03`; notes/tasks/meetings/emails=`2026-09` (archive per-op `2026-09`); deals=`mixed-operation-level`; properties=`2026-09` |
-| apiVersionsByOperation | notes/tasks/meetings/emails create/list/archive=`2026-09`; deals.create/read/update=`2026-09`; deals.archive / deals.batch_archive=`2026-03`; properties.create=`2026-09` (matrix is authority) |
+| apiVersionsByObjectFamily | contacts=`2026-03`; notes/tasks=`2026-09`; meetings/emails=`mixed-operation-level` (archive DOC_CONFLICT); deals=`mixed-operation-level`; properties=`2026-09` |
+| apiVersionsByOperation | notes/tasks create/list/archive=`2026-09`; meetings/emails create/list=`2026-09`; meetings.archive/emails.archive=`DOC_CONFLICT`; deals.create/read/update=`2026-09`; deals.archive / deals.batch_archive=`2026-03`; properties.create=`2026-09` (matrix is authority) |
 | permissionMechanics | `hubspot-envelope-a-least-authority-v2` |
 
 ## Mapping summary
