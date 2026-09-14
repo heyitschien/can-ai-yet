@@ -1,5 +1,13 @@
 # Channel log
 
+## CAY-20260914-10 — HubSpot CAP-001 live adapter (readiness truth)
+
+STATUS: READY_FOR_REVIEW  
+What: Final readiness alignment — `outbounds`/`appointments` and `send_reply`/`get_availability`/`create_appointment` marked `BLOCKED_ADAPTER` (`DOC_CONFLICT` Meeting/Email archive); settled `contacts`/`notes`/`tasks`/`escalations`/`flags` stay READY; `contactScopedReadyFamilies`/`supportedFamilies`/scope matrix/docs consistent. No Service Key change; no live HubSpot; no model; no hs auth; no remote CRM MCP. All 12 scenarios remain environment `BLOCKED_SCOPE`.  
+Branch: `feature/cay-20260914-10-hubspot-cap001-live-adapter-dry`  
+Tip: `e605fb5` · Draft PR: https://github.com/heyitschien/can-ai-yet/pull/27  
+Base: `ff25f55`
+
 Short scan log. Newest first.
 
 ## CAY-20260914-10 — HubSpot CAP-001 live adapter (independent re-review blockers)
