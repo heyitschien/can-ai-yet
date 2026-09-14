@@ -21,7 +21,7 @@ HubSpot’s dated paths are **not** uniform across families **or** across operat
 | Object family | Summary pin | Operation authority |
 | --- | --- | --- |
 | Contacts | `2026-03` | search/get/update on dated `2026-03` contacts paths (proven CAY-06) |
-| Notes / Tasks / Meetings / Emails | `2026-09` | current activity Required Scopes pages |
+| Notes / Tasks / Meetings / Emails | `2026-09` | create/list/archive on current latest activity OpenAPI (named object paths) |
 | Deals | **mixed (operation-level)** | create/read/update = `2026-09/0-3`; **archive = `2026-03`** |
 | Properties (setup-only) | `2026-09` | create-property; **not** a runtime Service Key grant |
 
@@ -83,15 +83,17 @@ See also `docs/HUBSPOT_CAP001_METADATA_PLAN.md` (CAY-10): prefer one-time `cay_f
 | Runtime Service Key | Keep object write only (`contacts.*`, and deals only if accepted later) |
 | Avoid | Permanent `crm.schemas.contacts.write` on the runtime Service Key “for convenience” |
 
-Create-property docs: independent review requires `POST /crm/properties/2026-03/{objectType}` (setup-only). **Conflict (2026-09-14):** HubSpotDev `fetch-doc` of latest create-property returned OpenAPI `POST /crm/properties/2026-09/{objectType}`. Plan pins to review-required **2026-03**. That is a **setup** authority, not a steady-state CAP-001 runtime authority. Runtime schema-write remains 0.
+Create-property docs (setup-only): HubSpotDev `fetch-doc` of latest create-property (2026-09-14) returned OpenAPI `POST /crm/properties/2026-09/{objectType}` (CAY-09: current official docs win). That is a **setup** authority, not a steady-state CAP-001 runtime authority. Runtime schema-write remains 0.
 
-## Official sources checked (2026-09-13)
+## Official sources checked (2026-09-13 / activity archive re-fetch 2026-09-14)
 
 - Contacts `2026-03` create / get / update / search Required Scopes
-- Notes / Tasks / Meetings / Emails `2026-09` create (and get) Required Scopes
+- Notes / Tasks / Meetings / Emails `2026-09` create / get / **delete** Required Scopes (latest OpenAPI named paths)
 - Deals create / get / update Required Scopes (`0-3` on `2026-09`)
 - Deals archive Required Scopes on dated `2026-03` path (`DELETE /crm/objects/2026-03/{objectType}/{objectId}`; Deal `objectType=0-3`)
 - Deals batch archive on dated `2026-03` (`POST /crm/objects/2026-03/0-3/batch/archive`)
-- Properties create Required Scopes (setup-only)
+- Properties create Required Scopes (setup-only; latest OpenAPI `2026-09`)
+
+**Activity archive note (CAY-09):** independent re-review claimed meeting/email latest pages showed 2026-03 templates; builder HubSpotDev re-fetch of the same latest URLs returned OpenAPI 2026-09 named paths — implementation follows retrieved OpenAPI (no silent DOC_CONFLICT).
 
 **Do not change the Service Key until this matrix is accepted and a separate human authorization receipt names the exact scopes.**

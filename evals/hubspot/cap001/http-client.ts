@@ -20,6 +20,7 @@ import {
   CAP001_TASKS_BASE_PATH,
   CAP001_TASK_PROPERTY_NAMES,
   HUBSPOT_API_BASE_URL,
+  HUBSPOT_ASSOC_DEAL_TO_CONTACT,
   HUBSPOT_ASSOC_EMAIL_TO_CONTACT,
   HUBSPOT_ASSOC_MEETING_TO_CONTACT,
   HUBSPOT_ASSOC_NOTE_TO_CONTACT,
@@ -362,10 +363,17 @@ export class Cap001HubSpotHttpClient {
     });
   }
 
-  async createDeal(properties: Record<string, string>): Promise<HubSpotTransportResult<Cap001HubSpotObject>> {
+  async createDeal(input: {
+    properties: Record<string, string>;
+    contactId?: string;
+  }): Promise<HubSpotTransportResult<Cap001HubSpotObject>> {
     const gap = this.requireScopes([SCOPE_DEALS_WRITE]);
     if (gap) return gap;
-    return this.request<Cap001HubSpotObject>("POST", CAP001_DEALS_CRUD_BASE_PATH, { properties });
+    const body: Record<string, unknown> = { properties: input.properties };
+    if (input.contactId) {
+      body.associations = [associationSpec(input.contactId, HUBSPOT_ASSOC_DEAL_TO_CONTACT)];
+    }
+    return this.request<Cap001HubSpotObject>("POST", CAP001_DEALS_CRUD_BASE_PATH, body);
   }
 
   async getDeal(dealId: string): Promise<HubSpotTransportResult<Cap001HubSpotObject>> {
@@ -404,6 +412,7 @@ export class Cap001HubSpotHttpClient {
     if (gap) return gap;
     return this.listAll(CAP001_DEALS_CRUD_BASE_PATH, {
       properties: CAP001_DEAL_PROPERTY_NAMES.join(","),
+      associations: "contacts",
       ...query,
     });
   }

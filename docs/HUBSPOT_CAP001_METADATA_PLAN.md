@@ -40,8 +40,8 @@ Embedding `runId` in the contact email local-part can isolate contacts, but CAP-
 
 ## Official create-property pointer
 
-Independent review requires:
+Setup-only (latest OpenAPI, retrieval 2026-09-14):
 
-`POST /crm/properties/2026-03/{objectType}` — setup-only.
+`POST /crm/properties/2026-09/{objectType}`
 
-**Conflict note (2026-09-14):** HubSpotDev `fetch-doc` of latest create-property returned OpenAPI `POST /crm/properties/2026-09/{objectType}`. Plan pins to review-required **2026-03**. See CAY-08/CAY-10 scope plan.
+CAY-09: current official docs outrank prior review-forced 2026-03 pins. Runtime schema-write remains 0. See CAY-08/CAY-10 scope plan.

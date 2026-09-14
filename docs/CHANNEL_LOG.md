@@ -2,6 +2,14 @@
 
 Short scan log. Newest first.
 
+## CAY-20260914-10 — HubSpot CAP-001 live adapter (re-review CHANGES_REQUESTED)
+
+STATUS: READY_FOR_REVIEW  
+What: Re-review fixes — (1) activity archive + create-property follow latest OpenAPI `2026-09` per-operation paths (CAY-09: official docs outrank prior 2026-03 pin; Deal archive stays `2026-03`); (2) Deal→Contact association type `3` on create/list/read (fail closed vs `cay_contact_email`); (3) cross-run scenario cleanup archives CanAIYet-tagged non-baseline leftovers across all `cay_run_id`s. No Service Key change; no live HubSpot; no model; no hs auth; no remote CRM MCP.  
+Branch: `feature/cay-20260914-10-hubspot-cap001-live-adapter-dry`  
+Tip: _(pending commit)_ · Draft PR: https://github.com/heyitschien/can-ai-yet/pull/27  
+Base: `dbbeabd`
+
 ## CAY-20260914-10 — HubSpot CAP-001 live adapter (CHANGES_REQUESTED fixes)
 
 STATUS: READY_FOR_REVIEW  
@@ -17,6 +25,7 @@ What: Real `LiveHubSpotCap001Adapter` + `Cap001HubSpotHttpClient` with injected 
 Branch: `feature/cay-20260914-10-hubspot-cap001-live-adapter-dry`  
 Tip: `b4584df` · Draft PR: https://github.com/heyitschien/can-ai-yet/pull/27  
 Base: `99fd43d` (main after CAY-09)
+
 
 ## CAY-20260913-09 — Vendor documentation authority + HubSpot Developer MCP
 

@@ -2,9 +2,8 @@
  * CAP-001 HubSpot metadata plan (machine-readable companion to docs/HUBSPOT_CAP001_METADATA_PLAN.md).
  * Custom properties are one-time UI/setup provisioning — runtime Service Key only writes values.
  *
- * Property create path conflict (2026-09-14): HubSpotDev fetch-doc of latest create-property
- * returned OpenAPI `POST /crm/properties/2026-09/{objectType}`; independent review requires
- * `POST /crm/properties/2026-03/{objectType}`. Plan pins to review-required 2026-03.
+ * Create-property path (2026-09-14): HubSpotDev fetch-doc of latest create-property returned
+ * OpenAPI `POST /crm/properties/2026-09/{objectType}` (CAY-09: current official docs win).
  * Runtime schema-write remains 0.
  */
 
@@ -14,8 +13,8 @@ export const CAP001_METADATA_PLAN = {
     "crm.schemas.contacts.write",
     "crm.schemas.deals.write",
   ] as const,
-  createPropertyEndpoint: "POST /crm/properties/2026-03/{objectType}",
-  createPropertyApiVersion: "2026-03",
+  createPropertyEndpoint: "POST /crm/properties/2026-09/{objectType}",
+  createPropertyApiVersion: "2026-09",
   objectFamilies: [
     "contacts",
     "deals",

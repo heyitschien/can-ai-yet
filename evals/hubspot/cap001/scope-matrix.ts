@@ -41,13 +41,12 @@ export const HUBSPOT_GRANTED_SCOPES = [
 /**
  * Per-object-family API version *summary* (not authority for every operation).
  * Contacts stay on proven `2026-03` (CAY-06).
- * Activity create/list use `2026-09`; activity archive is operation-level `2026-03`.
+ * Activity create/list/archive use `2026-09` (per-operation OpenAPI from latest delete-* pages).
  * Deals are **operation-level**: create/read/update use `2026-09`; archive uses `2026-03`.
  * Exact operation matrix is the authority — see `HUBSPOT_CAP001_API_VERSIONS_BY_OPERATION`.
  */
 export const HUBSPOT_CAP001_API_VERSIONS_BY_FAMILY = {
   contacts: "2026-03",
-  /** Summary only — activity archive is 2026-03; do not treat this as archive authority. */
   notes: "2026-09",
   tasks: "2026-09",
   meetings: "2026-09",
@@ -55,15 +54,17 @@ export const HUBSPOT_CAP001_API_VERSIONS_BY_FAMILY = {
   /** Summary only — Deal archive is 2026-03; do not treat this as archive authority. */
   deals: "mixed-operation-level",
   /**
-   * Properties create is setup-only (review-required 2026-03). Runtime Service Key must not
-   * hold schema-write. Conflict: fetch-doc latest create-property returned 2026-09 on 2026-09-14.
+   * Properties create is setup-only (latest OpenAPI 2026-09). Runtime Service Key must not
+   * hold schema-write.
    */
-  properties: "2026-03",
+  properties: "2026-09",
 } as const;
 
 /**
  * Operation-level HubSpot dated API pins for CAP-001.
  * Never infer a destructive/reset path version from create/read/update of the same object family.
+ * Activity archive follows current official latest OpenAPI (2026-09 named paths); Deal archive
+ * stays operation-level 2026-03 (CAY-08).
  */
 export const HUBSPOT_CAP001_API_VERSIONS_BY_OPERATION = {
   "contacts.search": "2026-03",
@@ -71,23 +72,23 @@ export const HUBSPOT_CAP001_API_VERSIONS_BY_OPERATION = {
   "contacts.write": "2026-03",
   "notes.create": "2026-09",
   "notes.list": "2026-09",
-  "notes.archive": "2026-03",
+  "notes.archive": "2026-09",
   "tasks.create": "2026-09",
   "tasks.list": "2026-09",
-  "tasks.archive": "2026-03",
+  "tasks.archive": "2026-09",
   "meetings.create": "2026-09",
   "meetings.read": "2026-09",
   "meetings.list": "2026-09",
-  "meetings.archive": "2026-03",
+  "meetings.archive": "2026-09",
   "emails.create": "2026-09",
   "emails.list": "2026-09",
-  "emails.archive": "2026-03",
+  "emails.archive": "2026-09",
   "deals.create": "2026-09",
   "deals.read": "2026-09",
   "deals.update": "2026-09",
   "deals.archive": "2026-03",
   "deals.batch_archive": "2026-03",
-  "properties.create": "2026-03",
+  "properties.create": "2026-09",
 } as const;
 
 /** Official Deal object type ID (object definition). */
@@ -376,11 +377,10 @@ export const CAP001_HUBSPOT_METADATA_PROVISIONING = {
     "flag codes (if not encoded as notes)",
   ] as const,
   /**
-   * Review-required pin: POST /crm/properties/2026-03/{objectType}.
-   * Conflict (2026-09-14): HubSpotDev fetch-doc of latest create-property returned
-   * OpenAPI POST /crm/properties/2026-09/{objectType}. Runtime schema-write remains 0.
+   * Setup-only: POST /crm/properties/2026-09/{objectType} from latest create-property OpenAPI
+   * (HubSpotDev fetch-doc 2026-09-14). Runtime schema-write remains 0.
    */
-  createPropertyEndpoint: "POST /crm/properties/2026-03/{objectType}",
+  createPropertyEndpoint: "POST /crm/properties/2026-09/{objectType}",
   createPropertyDoc:
     "https://developers.hubspot.com/docs/api-reference/latest/crm/properties/create-property",
   createPropertyScopeFamily: "crm.schemas.contacts.write (among OR alternatives on the create-property page)",

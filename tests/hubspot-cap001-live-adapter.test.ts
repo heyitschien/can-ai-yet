@@ -12,6 +12,7 @@ import {
   SCOPE_DEALS_READ,
   SCOPE_DEALS_WRITE,
   HUBSPOT_API_BASE_URL,
+  HUBSPOT_ASSOC_DEAL_TO_CONTACT,
   HUBSPOT_ASSOC_EMAIL_TO_CONTACT,
   HUBSPOT_ASSOC_MEETING_TO_CONTACT,
   HUBSPOT_ASSOC_NOTE_TO_CONTACT,
@@ -33,7 +34,6 @@ import {
   CAP001_MEETINGS_BASE_PATH,
   CAP001_EMAILS_BASE_PATH,
   CAP001_DEALS_CRUD_BASE_PATH,
-  CAP001_ACTIVITIES_ARCHIVE_API_VERSION,
   cap001NoteArchivePath,
   cap001TaskArchivePath,
   cap001MeetingArchivePath,
@@ -380,7 +380,7 @@ describe("Cap001HubSpotHttpClient (injected fetch)", () => {
       fetchImpl: fake.fetchImpl,
       grantedScopes: CONTACT_SCOPES,
     });
-    const created = await client.createDeal({ dealname: "x" });
+    const created = await client.createDeal({ properties: { dealname: "x" } });
     expect(created.ok).toBe(false);
     if (!created.ok) {
       expect(created.failureClass).toBe("PERMISSION_FAILURE");
@@ -389,7 +389,7 @@ describe("Cap001HubSpotHttpClient (injected fetch)", () => {
     expect(fake.fetchMock).not.toHaveBeenCalled();
   });
 
-  it("archives activities on operation-level 2026-03 paths", async () => {
+  it("archives activities on per-operation 2026-09 named paths", async () => {
     const fake = createFakeCrm();
     const client = new Cap001HubSpotHttpClient({
       accessToken: "t",
@@ -418,26 +418,26 @@ describe("Cap001HubSpotHttpClient (injected fetch)", () => {
       ]),
     );
     for (const url of deleteUrls) {
-      expect(url).toContain(`/crm/objects/${CAP001_ACTIVITIES_ARCHIVE_API_VERSION}/`);
-      expect(url).toMatch(/\/crm\/objects\/2026-03\/(notes|tasks|meetings|emails)\//);
-      expect(url).not.toContain("/crm/objects/2026-09/notes/");
-      expect(url).not.toContain("/crm/objects/2026-09/tasks/");
-      expect(url).not.toContain("/crm/objects/2026-09/meetings/");
-      expect(url).not.toContain("/crm/objects/2026-09/emails/");
+      expect(url).toMatch(/\/crm\/objects\/2026-09\/(notes|tasks|meetings|emails)\//);
+      expect(url).not.toContain("/crm/objects/2026-03/notes/");
+      expect(url).not.toContain("/crm/objects/2026-03/tasks/");
+      expect(url).not.toContain("/crm/objects/2026-03/meetings/");
+      expect(url).not.toContain("/crm/objects/2026-03/emails/");
     }
   });
 
-  it("lists activities with associations=contacts query", async () => {
+  it("lists activities and deals with associations=contacts query", async () => {
     const fake = createFakeCrm();
     const client = new Cap001HubSpotHttpClient({
       accessToken: "t",
       fetchImpl: fake.fetchImpl,
-      grantedScopes: CONTACT_SCOPES,
+      grantedScopes: FULL_SCOPES,
     });
     await client.listNotes();
     await client.listTasks();
     await client.listMeetings();
     await client.listEmails();
+    await client.listDeals();
     const listUrls = fake.fetchMock.mock.calls.map((call) => String(call[0]));
     expect(listUrls.some((url) => url.includes("associations=contacts") && url.includes("/notes"))).toBe(
       true,
@@ -451,6 +451,41 @@ describe("Cap001HubSpotHttpClient (injected fetch)", () => {
     expect(listUrls.some((url) => url.includes("associations=contacts") && url.includes("/emails"))).toBe(
       true,
     );
+    expect(listUrls.some((url) => url.includes("associations=contacts") && url.includes("/0-3"))).toBe(
+      true,
+    );
+  });
+
+  it("creates deals with Deal→Contact association type 3", async () => {
+    const fake = createFakeCrm();
+    const client = new Cap001HubSpotHttpClient({
+      accessToken: "t",
+      fetchImpl: fake.fetchImpl,
+      grantedScopes: FULL_SCOPES,
+    });
+    const contact = await client.createContact({
+      email: "deal.owner@example.com",
+      [CAP001_PROP_FIXTURE_ID]: "c-deal",
+      [CAP001_PROP_RUN_ID]: "r",
+    });
+    expect(contact.ok).toBe(true);
+    if (!contact.ok) return;
+    const deal = await client.createDeal({
+      contactId: contact.data.id,
+      properties: {
+        dealname: "Pipeline",
+        [CAP001_PROP_CONTACT_EMAIL]: "deal.owner@example.com",
+        [CAP001_PROP_RUN_ID]: "r",
+      },
+    });
+    expect(deal.ok).toBe(true);
+    const dealCall = fake.fetchMock.mock.calls.find(
+      (call) => String(call[0]).includes(CAP001_DEALS_CRUD_BASE_PATH) && call[1]?.method === "POST",
+    );
+    expect(JSON.parse(String(dealCall?.[1]?.body)).associations[0].types[0].associationTypeId).toBe(
+      HUBSPOT_ASSOC_DEAL_TO_CONTACT,
+    );
+    expect(HUBSPOT_ASSOC_DEAL_TO_CONTACT).toBe(3);
   });
 });
 
@@ -653,6 +688,168 @@ describe("LiveHubSpotCap001Adapter (dry)", () => {
     }
   });
 
+  it("fails closed when deal association mismatches cay_contact_email", async () => {
+    const fake = createFakeCrm();
+    const adapter = new LiveHubSpotCap001Adapter({
+      accessToken: "t",
+      fetchImpl: fake.fetchImpl,
+      grantedScopes: FULL_SCOPES,
+    });
+    expect((await adapter.seedBaseline("deal-assoc-mismatch")).ok).toBe(true);
+
+    const deal = [...fake.deals.values()].find(
+      (row) => row.properties[CAP001_PROP_FIXTURE_ID] === CAP001_SEED_DEALS[0].cayFixtureId,
+    );
+    expect(deal).toBeTruthy();
+    const wrongContact = [...fake.contacts.values()].find(
+      (row) => row.properties.email !== deal!.properties[CAP001_PROP_CONTACT_EMAIL],
+    );
+    expect(wrongContact).toBeTruthy();
+    deal!.associations = { contacts: { results: [{ id: wrongContact!.id }] } };
+
+    const state = await adapter.readAuthoritativeState();
+    expect(state.ok).toBe(false);
+    if (!state.ok) {
+      expect(state.failureClass).toBe("INTEGRATION_FAILURE");
+      expect(state.family).toBe("deals");
+      expect(state.message).toMatch(/association mismatch/i);
+    }
+  });
+
+  it("fails closed when deal associations are missing despite cay_contact_email", async () => {
+    const fake = createFakeCrm();
+    const adapter = new LiveHubSpotCap001Adapter({
+      accessToken: "t",
+      fetchImpl: fake.fetchImpl,
+      grantedScopes: FULL_SCOPES,
+    });
+    expect((await adapter.seedBaseline("deal-assoc-missing")).ok).toBe(true);
+    const deal = [...fake.deals.values()][0];
+    deal.associations = undefined;
+    const state = await adapter.readAuthoritativeState();
+    expect(state.ok).toBe(false);
+    if (!state.ok) {
+      expect(state.failureClass).toBe("INTEGRATION_FAILURE");
+      expect(state.family).toBe("deals");
+      expect(state.message).toMatch(/Missing contact association/i);
+    }
+  });
+
+  it("archives run-A scenario leftovers on reset/seed run-B", async () => {
+    const fake = createFakeCrm();
+    const adapter = new LiveHubSpotCap001Adapter({
+      accessToken: "t",
+      fetchImpl: fake.fetchImpl,
+      grantedScopes: FULL_SCOPES,
+    });
+    expect((await adapter.seedBaseline("run-A")).ok).toBe(true);
+
+    const contactId = [...fake.contacts.values()][0].id;
+    const client = new Cap001HubSpotHttpClient({
+      accessToken: "t",
+      fetchImpl: fake.fetchImpl,
+      grantedScopes: FULL_SCOPES,
+    });
+    await client.createNote({
+      contactId,
+      properties: {
+        hs_note_body: "A leftover",
+        [CAP001_PROP_FIXTURE_ID]: "note-run-a",
+        [CAP001_PROP_RUN_ID]: "run-A",
+        [CAP001_PROP_SCENARIO_ID]: "LEAD-001",
+        [CAP001_PROP_CONTACT_EMAIL]: [...fake.contacts.values()][0].properties.email,
+        [CAP001_PROP_KIND]: "note",
+      },
+    });
+    await client.createTask({
+      contactId,
+      properties: {
+        hs_task_subject: "A task",
+        [CAP001_PROP_FIXTURE_ID]: "task-run-a",
+        [CAP001_PROP_RUN_ID]: "run-A",
+        [CAP001_PROP_SCENARIO_ID]: "LEAD-001",
+        [CAP001_PROP_CONTACT_EMAIL]: [...fake.contacts.values()][0].properties.email,
+        [CAP001_PROP_KIND]: "task",
+      },
+    });
+    await client.createEmail({
+      contactId,
+      properties: {
+        hs_email_text: "A email",
+        [CAP001_PROP_FIXTURE_ID]: "email-run-a",
+        [CAP001_PROP_RUN_ID]: "run-A",
+        [CAP001_PROP_SCENARIO_ID]: "LEAD-001",
+        [CAP001_PROP_CONTACT_EMAIL]: [...fake.contacts.values()][0].properties.email,
+        [CAP001_PROP_KIND]: "outbound",
+      },
+    });
+    await client.createMeeting({
+      contactId,
+      properties: {
+        hs_meeting_title: "A meeting",
+        [CAP001_PROP_FIXTURE_ID]: "meeting-run-a",
+        [CAP001_PROP_RUN_ID]: "run-A",
+        [CAP001_PROP_SCENARIO_ID]: "LEAD-001",
+        [CAP001_PROP_CONTACT_EMAIL]: [...fake.contacts.values()][0].properties.email,
+        [CAP001_PROP_KIND]: "appointment",
+      },
+    });
+    await client.createDeal({
+      contactId,
+      properties: {
+        dealname: "A scenario deal",
+        [CAP001_PROP_FIXTURE_ID]: "deal-run-a-scenario",
+        [CAP001_PROP_RUN_ID]: "run-A",
+        [CAP001_PROP_SCENARIO_ID]: "LEAD-001",
+        [CAP001_PROP_CONTACT_EMAIL]: [...fake.contacts.values()][0].properties.email,
+      },
+    });
+
+    expect([...fake.notes.values()].some((row) => !row.archived)).toBe(true);
+
+    const reset = await adapter.reset("run-B");
+    expect(reset.ok).toBe(true);
+
+    expect(
+      [...fake.notes.values()]
+        .filter((row) => row.properties[CAP001_PROP_FIXTURE_ID] === "note-run-a")
+        .every((row) => row.archived),
+    ).toBe(true);
+    expect(
+      [...fake.tasks.values()]
+        .filter((row) => row.properties[CAP001_PROP_FIXTURE_ID] === "task-run-a")
+        .every((row) => row.archived),
+    ).toBe(true);
+    expect(
+      [...fake.emails.values()]
+        .filter((row) => row.properties[CAP001_PROP_FIXTURE_ID] === "email-run-a")
+        .every((row) => row.archived),
+    ).toBe(true);
+    expect(
+      [...fake.meetings.values()]
+        .filter((row) => row.properties[CAP001_PROP_FIXTURE_ID] === "meeting-run-a")
+        .every((row) => row.archived),
+    ).toBe(true);
+    expect(
+      [...fake.deals.values()]
+        .filter((row) => row.properties[CAP001_PROP_FIXTURE_ID] === "deal-run-a-scenario")
+        .every((row) => row.archived),
+    ).toBe(true);
+
+    const state = await adapter.readAuthoritativeState();
+    expect(state.ok).toBe(true);
+    if (state.ok) {
+      expect(state.data.runId).toBe("run-B");
+      expect(state.data.deals).toHaveLength(CAP001_SEED_DEALS.length);
+      expect(state.data.deals.every((row) => row.cayRunId === "run-B")).toBe(true);
+      expect(state.data.notes).toHaveLength(0);
+      expect(state.data.tasks).toHaveLength(0);
+      expect(state.data.outbounds).toHaveLength(0);
+      expect(state.data.appointments.every((row) => row.cayRunId === "run-B")).toBe(true);
+      expect(state.data.appointments.some((row) => row.cayFixtureId === "appt-busy-lead007")).toBe(true);
+    }
+  });
+
   it("rebinds baseline meeting cay_run_id across contact-scoped seeds", async () => {
     const fake = createFakeCrm();
     const adapter = new LiveHubSpotCap001Adapter({
@@ -708,6 +905,6 @@ describe("LiveHubSpotCap001Adapter (dry)", () => {
       .filter((call) => call[1]?.method === "DELETE")
       .map((call) => String(call[0]));
     expect(deleteUrls.some((url) => url.includes(CAP001_CONTACTS_BASE_PATH))).toBe(true);
-    expect(deleteUrls.some((url) => url.includes("/crm/objects/2026-03/meetings/"))).toBe(true);
+    expect(deleteUrls.some((url) => url.includes("/crm/objects/2026-09/meetings/"))).toBe(true);
   });
 });

@@ -256,18 +256,18 @@ function withCleanupFailures(primary: string, cleanupFailures: string[]): string
  * Authoritative ownership = HubSpot association, not cay_contact_email alone.
  * Require exactly one associated contact whose email matches the auxiliary label.
  */
-function verifyActivityContactAssociation(
-  activity: Cap001HubSpotObject,
+function verifyContactAssociation(
+  record: Cap001HubSpotObject,
   contactIdToEmail: Map<string, string>,
   family: Cap001ObjectFamily,
 ): HubSpotCap001EnvResult<string> {
-  const labeledEmail = prop(activity, CAP001_PROP_CONTACT_EMAIL).trim();
-  const assocResults = activity.associations?.contacts?.results ?? [];
+  const labeledEmail = prop(record, CAP001_PROP_CONTACT_EMAIL).trim();
+  const assocResults = record.associations?.contacts?.results ?? [];
   if (assocResults.length === 0) {
     return {
       ok: false,
       failureClass: "INTEGRATION_FAILURE",
-      message: `Missing contact association on activity ${activity.id} (cay_contact_email is auxiliary only)`,
+      message: `Missing contact association on ${family} ${record.id} (cay_contact_email is auxiliary only)`,
       family,
     };
   }
@@ -286,7 +286,7 @@ function verifyActivityContactAssociation(
     return {
       ok: false,
       failureClass: "INTEGRATION_FAILURE",
-      message: `Ambiguous contact associations on activity ${activity.id} matching cay_contact_email`,
+      message: `Ambiguous contact associations on ${family} ${record.id} matching cay_contact_email`,
       family,
     };
   }
@@ -297,9 +297,42 @@ function verifyActivityContactAssociation(
   return {
     ok: false,
     failureClass: "INTEGRATION_FAILURE",
-    message: `Contact association mismatch on activity ${activity.id}: cay_contact_email=${labeledEmail || "(empty)"} associations=[${associatedEmails}]`,
+    message: `Contact association mismatch on ${family} ${record.id}: cay_contact_email=${labeledEmail || "(empty)"} associations=[${associatedEmails}]`,
     family,
   };
+}
+
+/**
+ * Cross-run scenario cleanup ownership (test-account-only, least-authority).
+ * Archive any non-baseline CanAIYet-tagged object (cay_fixture_id OR cay_run_id OR
+ * cay_scenario_id set) that is NOT a baseline fixture ID, regardless of runId.
+ * Cleanup is bounded to objects carrying CanAIYet `cay_*` namespace properties; never
+ * archive HubSpot objects lacking those tags.
+ */
+function isCanAiYetTagged(obj: Cap001HubSpotObject): boolean {
+  return Boolean(
+    prop(obj, CAP001_PROP_FIXTURE_ID) ||
+      prop(obj, CAP001_PROP_RUN_ID) ||
+      prop(obj, CAP001_PROP_SCENARIO_ID),
+  );
+}
+
+function isPreservedBaseline(
+  obj: Cap001HubSpotObject,
+  baselineIds: ReadonlySet<string>,
+): boolean {
+  const fixtureId = prop(obj, CAP001_PROP_FIXTURE_ID);
+  const scenarioId = prop(obj, CAP001_PROP_SCENARIO_ID);
+  return Boolean(fixtureId) && baselineIds.has(fixtureId) && !scenarioId;
+}
+
+function shouldArchiveScenarioTagged(
+  obj: Cap001HubSpotObject,
+  baselineIds: ReadonlySet<string>,
+): boolean {
+  if (!isCanAiYetTagged(obj)) return false;
+  if (isPreservedBaseline(obj, baselineIds)) return false;
+  return true;
 }
 
 function failFromClient<T>(
@@ -590,6 +623,27 @@ export class LiveHubSpotCap001Adapter implements HubSpotCap001EnvironmentPort {
     if (!contactSeed.ok) return contactSeed;
 
     for (const spec of CAP001_SEED_DEALS) {
+      const contact = await this.findContactByEmail(client, spec.contactEmail);
+      if (!contact.ok) {
+        const cleanupFailures = await this.cleanupSeedAttempt(client, tracker, {
+          includeDeals: true,
+        });
+        return failFromClient(contact, "deals", cleanupFailures);
+      }
+      if (!contact.data) {
+        const cleanupFailures = await this.cleanupSeedAttempt(client, tracker, {
+          includeDeals: true,
+        });
+        return failFromClient(
+          {
+            ok: false,
+            failureClass: "INTEGRATION_FAILURE",
+            message: `Missing contact for deal seed ${spec.cayFixtureId}`,
+          },
+          "deals",
+          cleanupFailures,
+        );
+      }
       const existing = await this.findDealByFixtureId(client, spec.cayFixtureId);
       if (!existing.ok) {
         const cleanupFailures = await this.cleanupSeedAttempt(client, tracker, {
@@ -614,8 +668,23 @@ export class LiveHubSpotCap001Adapter implements HubSpotCap001EnvironmentPort {
           });
           return failFromClient(updated, "deals", cleanupFailures);
         }
+        // Prefer create-with-association; for existing deals verify association or fail closed.
+        const verified = verifyContactAssociation(
+          existing.data,
+          new Map([[contact.data.id, spec.contactEmail]]),
+          "deals",
+        );
+        if (!verified.ok) {
+          const cleanupFailures = await this.cleanupSeedAttempt(client, tracker, {
+            includeDeals: true,
+          });
+          return failFromClient(verified, "deals", cleanupFailures);
+        }
       } else {
-        const created = await client.createDeal(properties);
+        const created = await client.createDeal({
+          contactId: contact.data.id,
+          properties,
+        });
         if (!created.ok) {
           const cleanupFailures = await this.cleanupSeedAttempt(client, tracker, {
             includeDeals: true,
@@ -634,10 +703,13 @@ export class LiveHubSpotCap001Adapter implements HubSpotCap001EnvironmentPort {
     runId: string,
     options: { includeDeals: boolean },
   ): Promise<HubSpotCap001EnvResult<{ runId: string }>> {
+    // Cross-run: archive scenario leftovers for any cay_run_id, not only current runId.
+    // Bounded to CanAIYet-tagged objects (cay_fixture_id | cay_run_id | cay_scenario_id);
+    // never archive HubSpot objects lacking those tags. Baseline fixture IDs are preserved.
     const notes = await client.listNotes();
     if (!notes.ok) return failFromClient(notes, "notes");
     for (const row of notes.data) {
-      if (prop(row, CAP001_PROP_RUN_ID) !== runId) continue;
+      if (!shouldArchiveScenarioTagged(row, new Set())) continue;
       const archived = await client.archiveNote(row.id);
       if (!archived.ok && !archived.notFound) return failFromClient(archived, "notes");
     }
@@ -645,7 +717,7 @@ export class LiveHubSpotCap001Adapter implements HubSpotCap001EnvironmentPort {
     const tasks = await client.listTasks();
     if (!tasks.ok) return failFromClient(tasks, "tasks");
     for (const row of tasks.data) {
-      if (prop(row, CAP001_PROP_RUN_ID) !== runId) continue;
+      if (!shouldArchiveScenarioTagged(row, new Set())) continue;
       const archived = await client.archiveTask(row.id);
       if (!archived.ok && !archived.notFound) return failFromClient(archived, "tasks");
     }
@@ -653,7 +725,7 @@ export class LiveHubSpotCap001Adapter implements HubSpotCap001EnvironmentPort {
     const emails = await client.listEmails();
     if (!emails.ok) return failFromClient(emails, "outbounds");
     for (const row of emails.data) {
-      if (prop(row, CAP001_PROP_RUN_ID) !== runId) continue;
+      if (!shouldArchiveScenarioTagged(row, new Set())) continue;
       const archived = await client.archiveEmail(row.id);
       if (!archived.ok && !archived.notFound) return failFromClient(archived, "outbounds");
     }
@@ -661,11 +733,7 @@ export class LiveHubSpotCap001Adapter implements HubSpotCap001EnvironmentPort {
     const meetings = await client.listMeetings();
     if (!meetings.ok) return failFromClient(meetings, "appointments");
     for (const row of meetings.data) {
-      if (prop(row, CAP001_PROP_RUN_ID) !== runId) continue;
-      const fixtureId = prop(row, CAP001_PROP_FIXTURE_ID);
-      const scenarioId = prop(row, CAP001_PROP_SCENARIO_ID);
-      const isBaseline = BASELINE_APPT_IDS.has(fixtureId) && !scenarioId;
-      if (isBaseline) continue;
+      if (!shouldArchiveScenarioTagged(row, BASELINE_APPT_IDS)) continue;
       const archived = await client.archiveMeeting(row.id);
       if (!archived.ok && !archived.notFound) return failFromClient(archived, "appointments");
     }
@@ -674,9 +742,7 @@ export class LiveHubSpotCap001Adapter implements HubSpotCap001EnvironmentPort {
       const deals = await client.listDeals();
       if (!deals.ok) return failFromClient(deals, "deals");
       for (const row of deals.data) {
-        if (prop(row, CAP001_PROP_RUN_ID) !== runId) continue;
-        const fixtureId = prop(row, CAP001_PROP_FIXTURE_ID);
-        if (BASELINE_DEAL_IDS.has(fixtureId)) continue;
+        if (!shouldArchiveScenarioTagged(row, BASELINE_DEAL_IDS)) continue;
         const archived = await client.archiveDeal(row.id);
         if (!archived.ok && !archived.notFound) return failFromClient(archived, "deals");
       }
@@ -734,19 +800,19 @@ export class LiveHubSpotCap001Adapter implements HubSpotCap001EnvironmentPort {
     const runMeetings = forRun(meetingsList.data);
 
     for (const row of runNotes) {
-      const verified = verifyActivityContactAssociation(row, contactIdToEmail, "notes");
+      const verified = verifyContactAssociation(row, contactIdToEmail, "notes");
       if (!verified.ok) return verified;
     }
     for (const row of runTasks) {
-      const verified = verifyActivityContactAssociation(row, contactIdToEmail, "tasks");
+      const verified = verifyContactAssociation(row, contactIdToEmail, "tasks");
       if (!verified.ok) return verified;
     }
     for (const row of runEmails) {
-      const verified = verifyActivityContactAssociation(row, contactIdToEmail, "outbounds");
+      const verified = verifyContactAssociation(row, contactIdToEmail, "outbounds");
       if (!verified.ok) return verified;
     }
     for (const row of runMeetings) {
-      const verified = verifyActivityContactAssociation(row, contactIdToEmail, "appointments");
+      const verified = verifyContactAssociation(row, contactIdToEmail, "appointments");
       if (!verified.ok) return verified;
     }
 
@@ -802,9 +868,34 @@ export class LiveHubSpotCap001Adapter implements HubSpotCap001EnvironmentPort {
     const dealsList = await client.listDeals();
     if (!dealsList.ok) return failFromClient(dealsList, "deals");
 
-    const deals = dealsList.data
+    const activeDeals = dealsList.data.filter((row) => !row.archived && prop(row, CAP001_PROP_FIXTURE_ID));
+
+    const runIdGuess =
+      activeDeals.find((row) => BASELINE_DEAL_IDS.has(prop(row, CAP001_PROP_FIXTURE_ID)))
+        ?.properties?.[CAP001_PROP_RUN_ID] ??
+      activeDeals[0]?.properties?.[CAP001_PROP_RUN_ID] ??
+      "unknown";
+    const runId = runIdGuess == null ? "unknown" : String(runIdGuess);
+
+    const scoped = await this.readContactScoped(client, runId);
+    if (!scoped.ok) return scoped;
+
+    const contactIdToEmail = new Map<string, string>();
+    const contactsResult = await this.listContactsForRun(client, runId);
+    if (!contactsResult.ok) return contactsResult;
+    for (const obj of contactsResult.data) {
+      const email = prop(obj, "email").trim();
+      if (email) contactIdToEmail.set(obj.id, email);
+    }
+
+    for (const row of activeDeals) {
+      const verified = verifyContactAssociation(row, contactIdToEmail, "deals");
+      if (!verified.ok) return verified;
+    }
+
+    const deals = activeDeals
       .map(mapDeal)
-      .filter((row): row is HubSpotCap001Deal => row !== null && !row.archived);
+      .filter((row): row is HubSpotCap001Deal => row !== null);
 
     for (const id of BASELINE_DEAL_IDS) {
       if (!deals.some((row) => row.cayFixtureId === id)) {
@@ -816,14 +907,6 @@ export class LiveHubSpotCap001Adapter implements HubSpotCap001EnvironmentPort {
         };
       }
     }
-
-    const runId =
-      deals.find((row) => BASELINE_DEAL_IDS.has(row.cayFixtureId))?.cayRunId ??
-      deals[0]?.cayRunId ??
-      "unknown";
-
-    const scoped = await this.readContactScoped(client, runId);
-    if (!scoped.ok) return scoped;
 
     return {
       ok: true,

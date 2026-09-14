@@ -1,17 +1,18 @@
 /**
  * Vendor evidence rows for CAP-001 live adapter operations implemented in CAY-10.
- * Retrieval date: 2026-09-14. Paths/scopes from accepted CAY-08 scope-matrix provenance.
+ * Retrieval date: 2026-09-14. Paths/scopes from accepted CAY-08 scope-matrix provenance,
+ * with CAY-09/CAY-10 activity-archive + create-property correction to current official OpenAPI.
  *
- * Conflict note (activity archive, 2026-09-14): HubSpotDev `fetch-doc` of
- * `latest/.../delete-task` returned OpenAPI path `DELETE /crm/objects/2026-09/tasks/{taskId}`,
- * while independent review required operation-level `2026-03` (guide/template) matching Deal
- * archive. Correction pins notes/tasks/meetings/emails archive to review-required `2026-03`.
- * Create/list remain `2026-09` from latest operation refs.
+ * Activity archive (CAY-09 rule): current official docs outrank prior reviewer instruction that
+ * forced family-wide 2026-03. HubSpotDev `fetch-doc` of latest delete-note/task/meeting/email
+ * pages (2026-09-14) returned OpenAPI `DELETE /crm/objects/2026-09/{notes|tasks|meetings|emails}/{id}`.
+ * Note: independent re-review claimed meeting/email latest pages showed 2026-03 templates; builder
+ * HubSpotDev re-fetch of the same latest URLs returned OpenAPI 2026-09 named paths — implementation
+ * follows retrieved OpenAPI from those pages (no silent DOC_CONFLICT; primary source consistent
+ * within our fetch). Create/list remain 2026-09. Deal archive stays operation-level 2026-03 (CAY-08).
  *
- * Conflict note (create-property, 2026-09-14): HubSpotDev `fetch-doc` of latest create-property
- * returned OpenAPI `POST /crm/properties/2026-09/{objectType}`; independent review requires
- * `POST /crm/properties/2026-03/{objectType}`. Plan pins to review-required `2026-03`.
- * Runtime schema-write remains 0.
+ * Create-property (setup-only): HubSpotDev `fetch-doc` of latest create-property (2026-09-14)
+ * returned OpenAPI `POST /crm/properties/2026-09/{objectType}`. Runtime schema-write remains 0.
  */
 
 export type VendorEvidenceRow = {
@@ -106,12 +107,12 @@ export const CAP001_LIVE_ADAPTER_PROVENANCE: readonly VendorEvidenceRow[] = [
   {
     operation: "notes.archive",
     method: "DELETE",
-    path: "/crm/objects/2026-03/notes/{noteId}",
-    apiVersion: "2026-03",
+    path: "/crm/objects/2026-09/notes/{noteId}",
+    apiVersion: "2026-09",
     requiredScopes: ["crm.objects.contacts.write"],
     scopeLogic: "all",
     sourceUrl:
-      "https://developers.hubspot.com/docs/api-reference/2026-03/crm/objects/basic/delete-object",
+      "https://developers.hubspot.com/docs/api-reference/latest/crm/activities/notes/delete-note",
     retrievalDate: "2026-09-14",
   },
   {
@@ -139,12 +140,12 @@ export const CAP001_LIVE_ADAPTER_PROVENANCE: readonly VendorEvidenceRow[] = [
   {
     operation: "tasks.archive",
     method: "DELETE",
-    path: "/crm/objects/2026-03/tasks/{taskId}",
-    apiVersion: "2026-03",
+    path: "/crm/objects/2026-09/tasks/{taskId}",
+    apiVersion: "2026-09",
     requiredScopes: ["crm.objects.contacts.write"],
     scopeLogic: "all",
     sourceUrl:
-      "https://developers.hubspot.com/docs/api-reference/2026-03/crm/objects/basic/delete-object",
+      "https://developers.hubspot.com/docs/api-reference/latest/crm/activities/tasks/delete-task",
     retrievalDate: "2026-09-14",
   },
   {
@@ -172,12 +173,12 @@ export const CAP001_LIVE_ADAPTER_PROVENANCE: readonly VendorEvidenceRow[] = [
   {
     operation: "meetings.archive",
     method: "DELETE",
-    path: "/crm/objects/2026-03/meetings/{meetingId}",
-    apiVersion: "2026-03",
+    path: "/crm/objects/2026-09/meetings/{meetingId}",
+    apiVersion: "2026-09",
     requiredScopes: ["crm.objects.contacts.write"],
     scopeLogic: "all",
     sourceUrl:
-      "https://developers.hubspot.com/docs/api-reference/2026-03/crm/objects/basic/delete-object",
+      "https://developers.hubspot.com/docs/api-reference/latest/crm/activities/meetings/delete-meeting",
     retrievalDate: "2026-09-14",
   },
   {
@@ -205,12 +206,12 @@ export const CAP001_LIVE_ADAPTER_PROVENANCE: readonly VendorEvidenceRow[] = [
   {
     operation: "emails.archive",
     method: "DELETE",
-    path: "/crm/objects/2026-03/emails/{emailId}",
-    apiVersion: "2026-03",
+    path: "/crm/objects/2026-09/emails/{emailId}",
+    apiVersion: "2026-09",
     requiredScopes: ["crm.objects.contacts.write"],
     scopeLogic: "all",
     sourceUrl:
-      "https://developers.hubspot.com/docs/api-reference/2026-03/crm/objects/basic/delete-object",
+      "https://developers.hubspot.com/docs/api-reference/latest/crm/activities/emails/delete-email",
     retrievalDate: "2026-09-14",
   },
   {
@@ -255,9 +256,20 @@ export const CAP001_LIVE_ADAPTER_PROVENANCE: readonly VendorEvidenceRow[] = [
     retrievalDate: "2026-09-14",
   },
   {
+    operation: "properties.create",
+    method: "POST",
+    path: "/crm/properties/2026-09/{objectType}",
+    apiVersion: "2026-09",
+    requiredScopes: ["crm.schemas.contacts.write"],
+    scopeLogic: "all",
+    sourceUrl:
+      "https://developers.hubspot.com/docs/api-reference/latest/crm/properties/create-property",
+    retrievalDate: "2026-09-14",
+  },
+  {
     operation: "associations.default_type_ids",
     method: "GET",
-    path: "(reference) note→contact=202, task→contact=204, meeting→contact=200, email→contact=198",
+    path: "(reference) note→contact=202, task→contact=204, meeting→contact=200, email→contact=198, deal→contact=3",
     apiVersion: "n/a",
     requiredScopes: [],
     scopeLogic: "all",
