@@ -2,6 +2,14 @@
 
 Short scan log. Newest first.
 
+## CAY-20260914-10 — HubSpot CAP-001 live adapter (independent re-review blockers)
+
+STATUS: READY_FOR_REVIEW  
+What: Independent re-review fixes — (1) `meetings.archive` / `emails.archive` marked `DOC_CONFLICT` (OpenAPI 2026-09 vs rendered/dated 2026-03, both sides recorded); `archiveMeeting`/`archiveEmail` + cleanup fail closed (`ADAPTER_GAP` + DOC_CONFLICT); notes/tasks archive stay settled 2026-09; (2) contact association uniqueness — exactly one contact association required (multi-contact fail closed even if one matches `cay_contact_email`). No Service Key change; no live HubSpot; no model; no hs auth; no remote CRM MCP. All 12 scenarios remain environment `BLOCKED_SCOPE`.  
+Branch: `feature/cay-20260914-10-hubspot-cap001-live-adapter-dry`  
+Tip: `35a20276ff8ebf7cd249973f3b8e25e66c6826a8` · Draft PR: https://github.com/heyitschien/can-ai-yet/pull/27  
+Base: `6373b7f`
+
 ## CAY-20260914-10 — HubSpot CAP-001 live adapter (re-review CHANGES_REQUESTED)
 
 STATUS: READY_FOR_REVIEW  
