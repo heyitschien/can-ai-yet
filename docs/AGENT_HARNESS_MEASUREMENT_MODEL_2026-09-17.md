@@ -473,7 +473,20 @@ Or in plain English:
 
 That is more precise than “Can model X do task Y?” and closer to the actual deployment question enterprises face.
 
-## 12. No authorization created by this note
+## 12. Current-source alignment
+
+This instrumentation direction matches current practical agent-engineering guidance:
+
+- OpenAI’s 2026 Agents API explicitly treats context management, tool use, long-running sessions, sandboxes, artifacts, and subagents as harness responsibilities around the model.
+- Anthropic’s context-engineering guidance treats context as a finite attention budget and recommends minimal high-signal context, just-in-time retrieval, structured external notes, compaction, and selective subagents.
+- Microsoft’s distributed-skills work reinforces that another competence does not necessarily require another model loop; skill/procedure + tools may be sufficient.
+
+Sources:
+- https://openai.com/index/introducing-the-agents-api/
+- https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents
+- https://devblogs.microsoft.com/agent-framework/from-specialist-agents-to-distributed-skills-over-mcp/
+
+## 13. No authorization created by this note
 
 This document does **not**:
 - alter `canonical-build-doc.md`;
