@@ -2,7 +2,7 @@
 
 > **Status:** STRATEGY / RESEARCH — not canonical build authority, not a work order, and not permission to change CAP-001 or current Mission Control priority.
 > **Canonical authority remains:** `../canonical-build-doc.md`
-> **Companion:** `AGENT_SKILL_TOOL_ADAPTER_LAW_TAXONOMY_2026-09-17.md`
+> **Companions:** `AGENT_SKILL_TOOL_ADAPTER_LAW_TAXONOMY_2026-09-17.md`, `AGENT_HARNESS_MEASUREMENT_MODEL_2026-09-17.md`
 > **Purpose:** Preserve a current cross-vendor synthesis of practical agent-system architecture and translate it into testable CanAIYet questions.
 
 ## Executive finding
@@ -40,6 +40,8 @@ model
 × environment
 × task
 ```
+
+For how this maps onto current CAP-001 / HubSpot instrumentation, see `AGENT_HARNESS_MEASUREMENT_MODEL_2026-09-17.md`.
 
 ## Evidence base consulted
 
