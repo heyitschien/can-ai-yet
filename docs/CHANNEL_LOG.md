@@ -2,6 +2,14 @@
 
 Short scan log. Newest first.
 
+## CAY-20260917-RUNS-HYGIENE — Ignore local evals/runs scratch
+
+STATUS: READY_FOR_REVIEW
+What: Align repo `.gitignore` with REAL_MODEL_RUNBOOK — `/evals/runs/` is local scratch; durable paid-run JSON stays under `docs/reviews/runs/`. Four local scratch files inventoried; all byte-identical to durable copies (no unique evidence). Laptop synced to main `bb98940`. No evidence deleted; no HubSpot/AgentSystemManifest work.
+Branch: `chore/ignore-evals-runs-scratch`
+Tip: `c1aa044ace279500fc0f2f239cefdd39234a22f6` · PR: https://github.com/heyitschien/can-ai-yet/pull/30
+Base: `bb989405ed630b0279b0d951ce30a382084d641f`
+
 ## CAY-20260917-DOC-CONSOLIDATION — Durable architecture + startup thesis set
 
 STATUS: READY_FOR_REVIEW
