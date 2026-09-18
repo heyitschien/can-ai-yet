@@ -7,7 +7,7 @@ Short scan log. Newest first.
 STATUS: READY_FOR_REVIEW
 What: Preserve lesson API≠auth≠environment≠live; protocol rule; PR #33 12-scope packet SUPERSEDED; six-family evidence matrix (BLOCKED_AUTH_SURFACE not premature UNMAPPED); regression guard. Mutations/scopes/models = 0.
 Branch: `feature/cay-20260917-api-auth-environment-evidence-gap`
-Tip: *(pending commit)* · PR: *(pending)*
+Tip: `27b0ccaac9d976654cc539c7069a8abdd83eb80a` · PR: *(pending)*
 Base: `58317ab393856cf92692a158c33326f3a73dfe16`
 
 ## CAY-20260917-HUBSPOT-METADATA-GROUP-READINESS — Setup credential read∪write envelope
