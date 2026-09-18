@@ -1,7 +1,7 @@
 # CanAIYet — Recommended Next Missions
 
 **Status:** CURRENT EXECUTION RECOMMENDATION  
-**Date:** 2026-09-17 (CAY-20260917-HUBSPOT-METADATA-GROUP-READINESS)
+**Date:** 2026-09-17 (CAY-20260917-HUBSPOT-METADATA-SCOPE-CATALOG-CORRECTION)
 **Operational channel:** GitHub Issue #1 / Linear project CanAIYet  
 **Who does the work:** see `docs/FOUR_AGENT_SYSTEM.md`. This file says what happens next. It does not reassign roles.
 
@@ -24,8 +24,9 @@ Milestone 1 remains complete: first independently reviewed real-model CAP-001 fi
 | Current-platform readiness refresh (PR #31) | ✅ merged/accepted `main` @ `8c70693…` |
 | Mission Control shared-desk protocol (PR #32) | ✅ merged/accepted `main` @ `39b33fa…` |
 | Portal identity validation (new lab Service Key) | ✅ resolved — HubSpot **`247381023`** / CanAIYet CAP-001 Lab (old key was `247380908`) |
-| Metadata **group** readiness (per-family `cay_cap001`) | ◀ CURRENT — dry design gate; setup credential envelope = schema-read∪write (PR #33) |
-| One-time required `cay_*` metadata provisioning (live) | **not authorized yet** |
+| Metadata **group** readiness (per-family `cay_cap001`) | ✅ PR #33 merged — then **corrected**: Service Key catalog lacks activity schema scopes |
+| Service Key scope catalog correction | ◀ CURRENT — dry falsification of six-family Service Key metadata assumption (#5724957946) |
+| One-time required `cay_*` metadata provisioning (live) | **not authorized yet** — contacts+deals only if/when authorized; activity cay_* blocked |
 | Minimum Deals scopes grant | **not authorized yet** |
 | Live CAP-001 adapters against real portal + no-model complete-graph commissioning | **not authorized yet** |
 | 12-scenario no-model live HubSpot calibration | **not authorized yet** |
@@ -47,13 +48,14 @@ Mirrors Linear project command channel / Issue #1. Do not invent a competing hie
 
 1. **CAY-11** — Meeting/Email archive reconciliation: ✅ merged/accepted.
 2. **Current-platform readiness refresh** (PR #31): ✅ merged/accepted.
-3. **Metadata group readiness** (CAY-20260917-HUBSPOT-METADATA-GROUP-READINESS) — prove per-family `cay_cap001` dry model + provenance; **no HubSpot mutations**.
-4. **One-time required `cay_*` metadata provisioning** — groups then properties per `docs/HUBSPOT_CAP001_METADATA_PLAN.md` / setup credential packet. Human/setup path; no permanent runtime schema-write.
-5. **Current-doc Deals scope grant** if still minimal (`crm.objects.deals.read` + `crm.objects.deals.write`) — human approval only.
-6. **No-model complete-graph commissioning** (seed / preflight / authoritative snapshot with deals).
-7. **Full 12-scenario no-model calibration** (prove the environment — not a model).
-8. **Freeze EnvironmentManifest** / env head.
-9. **Same-model Synthetic ↔ HubSpot transfer** — ask **what changed?**
+3. **Metadata group readiness** (CAY-20260917-HUBSPOT-METADATA-GROUP-READINESS / PR #33): ✅ merged — **then corrected** by Service Key catalog evidence (#5724957946).
+4. **Service Key scope catalog correction** (current) — record live catalog; classify families; remove false six-family Service Key claim; propose faithful identity path; dry-only.
+5. **One-time required `cay_*` metadata provisioning** — contacts+deals only when authorized; activity families fail closed / UNMAPPED until proven alternative. No permanent runtime schema-write.
+6. **Current-doc Deals scope grant** if still minimal (`crm.objects.deals.read` + `crm.objects.deals.write`) — human approval only.
+7. **No-model complete-graph commissioning** (seed / preflight / authoritative snapshot with deals).
+8. **Full 12-scenario no-model calibration** (prove the environment — not a model).
+9. **Freeze EnvironmentManifest** / env head.
+10. **Same-model Synthetic ↔ HubSpot transfer** — ask **what changed?**
 
 ## Parked / later
 

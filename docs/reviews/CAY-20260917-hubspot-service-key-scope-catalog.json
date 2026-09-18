@@ -1,0 +1,33 @@
+{
+  "receiptId": "CAY-20260917-HUBSPOT-SERVICE-KEY-SCOPE-CATALOG",
+  "portalId": "247381023",
+  "accountName": "CanAIYet CAP-001 Lab",
+  "observedAt": "2026-09-17",
+  "observer": "human-owner",
+  "missionControlCommentId": "5724957946",
+  "mode": "human_ui_observation_recorded_dry",
+  "mutations": 0,
+  "scopeChanges": 0,
+  "modelCalls": 0,
+  "schemaScopesExposed": [
+    "crm.schemas.contacts.read",
+    "crm.schemas.contacts.write",
+    "crm.schemas.deals.read",
+    "crm.schemas.deals.write"
+  ],
+  "schemaScopesNotExposed": [
+    "crm.schemas.notes.read",
+    "crm.schemas.notes.write",
+    "crm.schemas.tasks.read",
+    "crm.schemas.tasks.write",
+    "crm.schemas.meetings.read",
+    "crm.schemas.meetings.write",
+    "crm.schemas.emails.read",
+    "crm.schemas.emails.write"
+  ],
+  "scientificClassification": "environment_permission_or_representation_mismatch_not_model_failure",
+  "pr33TwelveScopePacketExecutableInThisPortal": false,
+  "kbActivityPropertiesUrl": "https://knowledge.hubspot.com/properties/hubspots-default-activity-properties",
+  "kbNote": "activity properties, excluding calls, meetings, and tasks (BETA), are stored separately from CRM object properties, and cannot be edited from the property settings",
+  "relatedPreflight": "docs/reviews/CAY-20260917-hubspot-portal-identity-validation.json"
+}

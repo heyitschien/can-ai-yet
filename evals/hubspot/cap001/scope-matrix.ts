@@ -394,12 +394,15 @@ export const CAP001_HUBSPOT_METADATA_PROVISIONING = {
   /**
    * Setup-only: POST /crm/properties/2026-09/{objectType} from latest create-property OpenAPI
    * (HubSpotDev fetch-doc 2026-09-14). Runtime schema-write remains 0.
+   * Service Key executability is contacts+deals only in portal 247381023 — see
+   * metadata-family-support.ts (activity families NOT Service Key–provisionable).
    */
   createPropertyEndpoint: "POST /crm/properties/2026-09/{objectType}",
   createPropertyDoc:
     "https://developers.hubspot.com/docs/api-reference/latest/crm/properties/create-property",
   createPropertyScopeFamily: "crm.schemas.contacts.write (among OR alternatives on the create-property page)",
   engagementObjectTypes: ["notes", "tasks", "meetings", "emails"] as const,
+  /** Historical inventory — not a claim that all six are Service Key–executable. */
   objectTypesNeedingCayProperties: [
     "contacts",
     "deals",
@@ -408,8 +411,10 @@ export const CAP001_HUBSPOT_METADATA_PROVISIONING = {
     "meetings",
     "emails",
   ] as const,
+  /** Families whose cay_* schema create is grantable via Service Key in portal 247381023. */
+  objectTypesServiceKeyExecutableCayProperties: ["contacts", "deals"] as const,
   rationale:
-    "Prefer provisioning custom test metadata once in the HubSpot test portal (UI or a short-lived setup credential). Runtime Service Key keeps contacts.read/write (+ deals only if accepted later) without permanent schema-write authority. Activity cay_* properties are required for this adapter (not optional).",
+    "Prefer provisioning custom test metadata once for Service Key–supported families (contacts+deals) via UI or a short-lived 4-scope setup credential. Activity cay_* remain in inventory but are UNMAPPED / UI_ONLY_OR_BETA for Service Key provisioning after live catalog evidence (#5724957946). Runtime Service Key keeps contacts.read/write (+ deals only if accepted later) without permanent schema-write authority.",
 };
 
 /** Environment-level truth: full CAP-001 live seed/snapshot needs deals even when a scenario never mutates them. */
