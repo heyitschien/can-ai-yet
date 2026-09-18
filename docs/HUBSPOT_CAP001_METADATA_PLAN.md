@@ -61,6 +61,8 @@ Per-object setup schema scopes (OR on the create-property page; **not** runtime 
 | meetings | `crm.schemas.meetings.write` |
 | emails | `crm.schemas.emails.write` |
 
-Dry package uses property group `cay_cap001`, `type=string`, `fieldType=text`. Idempotence: existing compatible property = no-op; incompatible definition = fail closed.
+Dry package uses property group name `cay_cap001` with label `CanAIYet CAP-001` and `displayOrder=10000`, **once per object family** (contacts/deals/notes/tasks/meetings/emails) — not once portal-global. Official create-group path: `POST /crm/properties/2026-09/{objectType}/groups` (retrieval 2026-09-17). See `docs/HUBSPOT_PROPERTY_GROUP_PROVENANCE.md`.
 
-CAY-09: current official docs outrank prior review-forced 2026-03 pins. Runtime schema-write remains 0. See CAY-08/CAY-10 scope plan + `docs/HUBSPOT_DEALS_SCOPE_APPROVAL_PACKET.md`.
+Property payloads use `type=string`, `fieldType=text`, `groupName=cay_cap001`. Idempotence: existing compatible property/group = no-op; incompatible or archived definition = fail closed. Property creates are blocked in the dry plan until that family's group is READY (MATCH).
+
+CAY-09: current official docs outrank prior review-forced 2026-03 pins. Runtime schema-write remains 0. See CAY-08/CAY-10 scope plan + `docs/HUBSPOT_DEALS_SCOPE_APPROVAL_PACKET.md` + `docs/HUBSPOT_METADATA_SETUP_CREDENTIAL_PACKET.md`.

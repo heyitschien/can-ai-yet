@@ -2,6 +2,22 @@
 
 Short scan log. Newest first.
 
+## CAY-20260917-HUBSPOT-METADATA-GROUP-READINESS — Setup credential read∪write envelope
+
+STATUS: READY_FOR_REVIEW
+What: PR #33 CHANGES_REQUESTED #5724812365 — temporary setup key must include official schema-read + schema-write for all six families (write≠read); operation→scope matrix + `evaluateSetupCredentialEnvelopeCoverage` covering futureSetupOrder; docs packet updated. HubSpot mutations/scopes/models = 0.
+Branch: `feature/cay-20260917-hubspot-metadata-group-readiness`
+Tip: `eb00b2f4a0d74ecc7895b3ebe445153ba08f400c` · PR: https://github.com/heyitschien/can-ai-yet/pull/33
+Base: `39b33fa19981add7fe779f99f5bd5d55ee25f6fe`
+
+## CAY-20260917-HUBSPOT-METADATA-GROUP-READINESS — Per-family cay_cap001 groups
+
+STATUS: READY_FOR_REVIEW
+What: Official-doc prove property groups are per objectType; pin create to 2026-09 (coexists with 2026-03); dry plan requires six `cay_cap001` groups before property creates; setup credential packet (schema-write temporary only). NEXT_MISSIONS: PR #31/#32 merged; this gate current. HubSpot mutations/scopes/models = 0.
+Branch: `feature/cay-20260917-hubspot-metadata-group-readiness`
+Tip: `2825b068789e43204890b151bfed4288347b98e3` · PR: https://github.com/heyitschien/can-ai-yet/pull/33
+Base: `39b33fa19981add7fe779f99f5bd5d55ee25f6fe`
+
 ## CAY-20260917-MISSION-CONTROL-SHARED-DESK — Protocol clarification
 
 STATUS: READY_FOR_REVIEW
