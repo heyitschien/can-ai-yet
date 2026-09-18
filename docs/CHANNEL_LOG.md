@@ -7,7 +7,7 @@ Short scan log. Newest first.
 STATUS: READY_FOR_REVIEW
 What: Refresh NEXT_MISSIONS (CAY-11 merged); re-verify Deals scopes/properties/version pins (2026-09-17); preserve deals archive 2026-03 pin under coexistence with latest 2026-09 DELETE; add write-validation attribution + dry 31-property cay_* provisioning package + Deals approval packet; optional read-only preflight (mutations/scopes/models = 0). Portal ID drift noted (docs 247381023 vs API errors 247380908).
 Branch: `feature/cay-20260917-hubspot-readiness-refresh`
-Tip: `62b7b1ca2f31bda06d8561c65d641309f957355a` · PR: https://github.com/heyitschien/can-ai-yet/pull/31
+Tip: `57da51d048308962097bc998be1fc4a51f1c6dae` · PR: https://github.com/heyitschien/can-ai-yet/pull/31
 Base: `77b922a82b6158da6f1d8b22ba5a9c693221c1eb`
 
 ## CAY-20260917-RUNS-HYGIENE — Ignore local evals/runs scratch
