@@ -19,8 +19,8 @@ HubSpot guidance: parse the `400` message; re-check portal configuration; retry 
 
 | Event | Failure class | Attribution | May appear as model failure? |
 | --- | --- | --- | --- |
-| HTTP `400`/`422` matching write-validation message patterns | `INTEGRATION_FAILURE` | `HUBSPOT_PORTAL_WRITE_VALIDATION` | **No** |
-| HTTP `400`/`422` without an evidenced portal-rule message | `INTEGRATION_FAILURE` | `OTHER` (unknown client validation) | **No** |
+| HTTP `400`/`422` matching **evidenced** write-validation message patterns (conditional required / explicit Create Record / Edit Associations) | `INTEGRATION_FAILURE` | `HUBSPOT_PORTAL_WRITE_VALIDATION` | **No** |
+| HTTP `400`/`422` without that evidence (incl. generic `Missing required field: …`) | `INTEGRATION_FAILURE` | `OTHER` (unknown client validation) | **No** |
 | Missing/incompatible `cay_*` property definition before write | `INTEGRATION_FAILURE` | `HUBSPOT_METADATA_GAP` | **No** |
 | Missing Deals scopes | `SCOPE_GAP` / `BLOCKED_SCOPE` | scope matrix | **No** |
 | Auth 401/403 | `PERMISSION_FAILURE` | — | **No** |

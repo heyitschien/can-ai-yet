@@ -43,8 +43,12 @@ export type HubSpotWriteValidationClassification = {
 
 const CONDITIONAL_REQUIRED =
   /is required when|conditionally required|conditional(ly)? required/i;
+/**
+ * Create Record portal rules only — requires explicit Create Record evidence.
+ * Do NOT match bare "missing required field/property" (payload/schema errors).
+ */
 const CREATE_RECORD_REQUIRED =
-  /required (?:property|field|association)|missing required|create record/i;
+  /create\s*record(?:\s+settings)?/i;
 const EDIT_ASSOCIATIONS =
   /edit associations|CRM_ASSOCIATIONS_WRITE_ACCESS|missing ['"]?edit associations/i;
 

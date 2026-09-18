@@ -137,6 +137,15 @@ describe("2026-09 write validation attribution", () => {
     expect(malformed.attribution).toBe("OTHER");
     expect(malformed.kind).toBe("GENERIC_VALIDATION");
     expect(malformed.neverModelFailure).toBe(true);
+
+    const genericRequired = classifyHubSpotWriteValidation({
+      status: 400,
+      message: "Missing required field: properties",
+    });
+    expect(genericRequired.failureClass).toBe("INTEGRATION_FAILURE");
+    expect(genericRequired.attribution).toBe("OTHER");
+    expect(genericRequired.kind).toBe("GENERIC_VALIDATION");
+    expect(genericRequired.neverModelFailure).toBe(true);
   });
 
   it("keeps UI checklist and detects metadata gaps from property catalogs", () => {

@@ -2,6 +2,14 @@
 
 Short scan log. Newest first.
 
+## CAY-20260917-HUBSPOT-READINESS-REFRESH — Create-Record attribution narrow fix
+
+STATUS: READY_FOR_REVIEW
+What: PR #31 single blocker from #5724622171 — Create Record portal attribution only when message evidences Create Record; `Missing required field: properties` stays OTHER. No HubSpot live work.
+Branch: `feature/cay-20260917-hubspot-readiness-refresh`
+Tip: (pending) · PR: https://github.com/heyitschien/can-ai-yet/pull/31
+Base: `3f70dd809b2dabadbebc42dc208a8ad9f42289f8`
+
 ## CAY-20260917-HUBSPOT-READINESS-REFRESH — CHANGES_REQUESTED cleanup
 
 STATUS: READY_FOR_REVIEW
