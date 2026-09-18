@@ -375,7 +375,14 @@ export const CAP001_HUBSPOT_SCOPE_MATRIX_WITH_ENV: readonly Cap001HubSpotScopeRo
 /** One-time test-account provisioning — not a runtime Service Key grant. */
 export const CAP001_HUBSPOT_METADATA_PROVISIONING = {
   strategy: "one_time_human_or_setup_path" as const,
-  avoidRuntimeScopes: ["crm.schemas.contacts.write"] as const,
+  avoidRuntimeScopes: [
+    "crm.schemas.contacts.write",
+    "crm.schemas.deals.write",
+    "crm.schemas.notes.write",
+    "crm.schemas.tasks.write",
+    "crm.schemas.meetings.write",
+    "crm.schemas.emails.write",
+  ] as const,
   properties: [
     "cay_fixture_id",
     "cay_run_id",

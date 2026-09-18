@@ -18,6 +18,9 @@
  * OpenAPI embed (not MCP-only). Versioning:
  * https://developers.hubspot.com/docs/developer-tooling/platform/versioning
  * Notes/tasks archive stay settled 2026-09. Deal archive stays operation-level 2026-03 (CAY-08).
+ * CAY-20260917 readiness recheck: latest delete-deal.md also documents DELETE
+ * `/crm/objects/2026-09/0-3/{dealId}` (coexistence). CAP-001 archive pin remains 2026-03 —
+ * intentionally not silently migrated. 2026-03 delete-deal.md still HTTP 200 / supported.
  */
 
 export type VendorEvidenceDisposition =

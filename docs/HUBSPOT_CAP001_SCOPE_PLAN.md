@@ -86,6 +86,21 @@ See also `docs/HUBSPOT_CAP001_METADATA_PLAN.md` (CAY-10): prefer one-time provis
 
 Create-property docs (setup-only): HubSpotDev `fetch-doc` of latest create-property (2026-09-14) returned OpenAPI `POST /crm/properties/2026-09/{objectType}` (CAY-09: current official docs win). That is a **setup** authority, not a steady-state CAP-001 runtime authority. Runtime schema-write remains 0.
 
+## Official sources re-checked (2026-09-17 readiness refresh)
+
+| Operation | Result | Source |
+| --- | --- | --- |
+| Deals create | `POST /crm/objects/2026-09/0-3` · scope `crm.objects.deals.write` | [create-deal.md](https://developers.hubspot.com/docs/api-reference/latest/crm/objects/deals/create-deal.md) |
+| Deals read | `GET /crm/objects/2026-09/0-3/{dealId}` · scope `crm.objects.deals.read` | [get-deal.md](https://developers.hubspot.com/docs/api-reference/latest/crm/objects/deals/get-deal.md) |
+| Deals update | `PATCH /crm/objects/2026-09/0-3/{dealId}` · scope `crm.objects.deals.write` | [update-deal.md](https://developers.hubspot.com/docs/api-reference/latest/crm/objects/deals/update-deal.md) |
+| Deals archive | **CAP-001 pin unchanged:** `DELETE /crm/objects/2026-03/0-3/{dealId}` · `crm.objects.deals.write`. Newer Current also documents `DELETE /crm/objects/2026-09/0-3/{dealId}` — coexistence; **do not silently migrate**. | [2026-03 delete-deal.md](https://developers.hubspot.com/docs/api-reference/2026-03/crm/objects/deals/delete-deal.md) + [latest delete-deal.md](https://developers.hubspot.com/docs/api-reference/latest/crm/objects/deals/delete-deal.md) |
+| Deals batch archive | **CAP-001 pin unchanged:** `POST /crm/objects/2026-03/0-3/batch/archive`. Latest also documents `2026-09` batch archive — coexistence. | [2026-03 batch/delete-deals.md](https://developers.hubspot.com/docs/api-reference/2026-03/crm/objects/deals/batch/delete-deals.md) + latest batch delete |
+| Create property | `POST /crm/properties/2026-09/{objectType}` · setup schema scopes (contacts/deals/notes/tasks/meetings/emails) | [create-property.md](https://developers.hubspot.com/docs/api-reference/latest/crm/properties/create-property.md) |
+| List properties | `GET /crm/properties/2026-09/{objectType}` · includes `crm.objects.contacts.read` among OR scopes | [get-properties.md](https://developers.hubspot.com/docs/api-reference/latest/crm/properties/get-properties.md) |
+| Write validation | Enforced on `/2026-09/` since 2026-09-08 | [changelog](https://developers.hubspot.com/changelog/crm-api-write-validation-enforcement) |
+
+Direct `/docs/specs/2026-09/*.json` URLs still return Asset not found; authority remains the public `.md` OpenAPI embeds (same pattern as CAY-11).
+
 ## Official sources checked (2026-09-13 / activity archive re-fetch 2026-09-14)
 
 - Contacts `2026-03` create / get / update / search Required Scopes
