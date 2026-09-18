@@ -41,7 +41,25 @@ type ReadAttempt = {
   failureClass?: "PERMISSION_FAILURE" | "INTEGRATION_FAILURE" | "RUNTIME/API_FAILURE" | "BLOCKED_SCOPE";
   message?: string;
   requestId?: string;
+  /** Non-secret portal ID extracted from HubSpot response/error body when present. */
+  observedPortalId?: string;
 };
+
+const PORTAL_ID_IN_TEXT = /portal\s+(\d{6,})/i;
+
+function extractPortalIdFromText(text: string | undefined): string | undefined {
+  if (!text) return undefined;
+  const match = text.match(PORTAL_ID_IN_TEXT);
+  return match?.[1];
+}
+
+function collectObservedPortalIds(attempts: readonly ReadAttempt[]): string[] {
+  const ids = new Set<string>();
+  for (const attempt of attempts) {
+    if (attempt.observedPortalId) ids.add(attempt.observedPortalId);
+  }
+  return [...ids].sort();
+}
 
 function assertReadonlyAuthorized(): void {
   if (process.env.CAY_HUBSPOT_READONLY_PREFLIGHT !== "AUTHORIZED") {
@@ -98,6 +116,7 @@ async function getJson(
   }
 
   if (response.status === 401 || response.status === 403) {
+    const message = redactSecrets(text.slice(0, 300) || `HTTP ${response.status}`);
     return {
       attempt: {
         operation,
@@ -106,13 +125,15 @@ async function getJson(
         ok: false,
         status: response.status,
         failureClass: "BLOCKED_SCOPE",
-        message: redactSecrets(text.slice(0, 300) || `HTTP ${response.status}`),
+        message,
         requestId,
+        observedPortalId: extractPortalIdFromText(message),
       },
     };
   }
 
   if (!response.ok) {
+    const message = redactSecrets(text.slice(0, 300) || `HTTP ${response.status}`);
     return {
       attempt: {
         operation,
@@ -124,11 +145,17 @@ async function getJson(
           response.status >= 500 || response.status === 429
             ? "RUNTIME/API_FAILURE"
             : "INTEGRATION_FAILURE",
-        message: redactSecrets(text.slice(0, 300) || `HTTP ${response.status}`),
+        message,
         requestId,
+        observedPortalId: extractPortalIdFromText(message),
       },
     };
   }
+
+  const bodyPortal =
+    body && typeof body === "object" && "portalId" in body
+      ? String((body as { portalId: unknown }).portalId)
+      : undefined;
 
   return {
     attempt: {
@@ -138,6 +165,7 @@ async function getJson(
       ok: true,
       status: response.status,
       requestId,
+      observedPortalId: bodyPortal ?? extractPortalIdFromText(text),
     },
     body,
   };
@@ -171,6 +199,15 @@ async function main(): Promise<void> {
 
   const token = process.env[HUBSPOT_SERVICE_KEY_ENV]!;
   const attempts: ReadAttempt[] = [];
+  const expectedPortalId = HUBSPOT_LAB_PORTAL_ID;
+
+  // Authoritative non-secret portal identity (read-only).
+  const accountInfo = await getJson(
+    token,
+    "/account-info/v3/details",
+    "account_info.details",
+  );
+  attempts.push(accountInfo.attempt);
 
   // Connectivity: list one contact page (read-only).
   const contactsList = await getJson(
@@ -207,11 +244,36 @@ async function main(): Promise<void> {
     requiredCayNames: CAP001_METADATA_PLAN.contactProperties.map((p) => p.name),
   });
 
+  const observedPortalIds = collectObservedPortalIds(attempts);
+  const accountInfoPortalId =
+    accountInfo.attempt.observedPortalId ??
+    (accountInfo.body &&
+    typeof accountInfo.body === "object" &&
+    "portalId" in accountInfo.body
+      ? String((accountInfo.body as { portalId: unknown }).portalId)
+      : undefined);
+  const authoritativePortalId = accountInfoPortalId ?? observedPortalIds[0];
+  const portalIdentityResolved =
+    authoritativePortalId === expectedPortalId &&
+    observedPortalIds.every((id) => id === expectedPortalId);
+
+  const accountType =
+    accountInfo.body &&
+    typeof accountInfo.body === "object" &&
+    "accountType" in accountInfo.body
+      ? String((accountInfo.body as { accountType: unknown }).accountType)
+      : undefined;
+
   const receipt = {
-    receiptId: "CAY-20260917-HUBSPOT-READINESS-REFRESH",
+    receiptId: "CAY-20260917-HUBSPOT-PORTAL-IDENTITY-VALIDATION",
     mode: "read_only_preflight",
     timestamp: new Date().toISOString(),
-    portalId: HUBSPOT_LAB_PORTAL_ID,
+    expectedPortalId,
+    expectedAccountName: "CanAIYet CAP-001 Lab",
+    authoritativePortalId: authoritativePortalId ?? null,
+    accountType: accountType ?? null,
+    observedPortalIds,
+    portalIdentityResolved,
     serviceKeyName: HUBSPOT_SERVICE_KEY_NAME,
     grantedScopes: [...HUBSPOT_GRANTED_SCOPES],
     mutations: 0,
@@ -239,7 +301,9 @@ async function main(): Promise<void> {
   assertNoSecrets(receipt);
   console.log(JSON.stringify(receipt, null, 2));
 
-  if (!contactsList.attempt.ok) process.exitCode = 1;
+  if (!contactsList.attempt.ok || !accountInfo.attempt.ok || !portalIdentityResolved) {
+    process.exitCode = 1;
+  }
 }
 
 main().catch((error: unknown) => {

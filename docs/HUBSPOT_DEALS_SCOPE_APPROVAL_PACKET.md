@@ -5,6 +5,7 @@
 **Retrieval date:** 2026-09-17  
 **Portal (non-secret):** `247381023` / `CanAIYet CAP-001 Lab`  
 **Service Key name (non-secret):** `CanAIYet CAP-001 Commissioning`
+**Portal identity (2026-09-17):** validated with the **new** local Service Key via read-only preflight — HubSpot `account-info` + blocked-scope error bodies all name **`247381023`**. Prior readiness preflight that saw `247380908` was the **old** wrong-portal key (credential mismatch, not model failure). Evidence: `docs/reviews/CAY-20260917-hubspot-portal-identity-validation.md`.
 
 ## Current granted scopes
 

@@ -6,6 +6,19 @@
 
 This repository uses one persistent GitHub issue as the cross-agent coordination channel, in the same spirit as the communication issues used across the other projects. Code belongs in commits/PRs. Durable coordination, handoffs, evidence, review verdicts, and blockers belong in Issue #1.
 
+## 0. Shared desk rule (local development — mandatory)
+
+**Mission Control Issue #1 is the shared workplace** where the human, ChatGPT/Solace (coordinator), Cursor (builder), and other agents talk to each other.
+
+When the human says they “sent a work order from GPT,” “authorized on Mission Control,” or names an Issue #1 comment ID:
+
+1. **Fetch and read that exact Issue #1 comment** (or the latest work order on #1) before acting.
+2. Do **not** treat a chat paraphrase as complete authority — the Issue #1 text is the live work order.
+3. ACK on Issue #1, do only what that comment authorizes, post evidence/receipts back on Issue #1, then STOP at `READY_FOR_REVIEW` unless the order says otherwise.
+4. Chat is for clarification with the human. **Chat is not the record.** Issue #1 + commits/PRs + `docs/CHANNEL_LOG.md` are.
+
+If chat and Issue #1 disagree, **Issue #1 wins** for operational handoffs (see authority order below). If Issue #1 and `canonical-build-doc.md` / this protocol disagree, surface the conflict on Issue #1 and STOP.
+
 ## 1. Authority order
 
 When instructions disagree, use this order:

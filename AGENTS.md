@@ -13,10 +13,14 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 Before material work, use `docs/AGENT_SYSTEM_INDEX.md` as the map, then read in this order:
 
 1. `canonical-build-doc.md` as BUILD AUTHORITY. Do not silently change it.
-2. `docs/COMMUNICATION_PROTOCOL.md` — how work is handed off and accepted.
+2. `docs/COMMUNICATION_PROTOCOL.md` — how work is handed off and accepted (includes **§0 Shared desk rule**).
 3. `docs/FOUR_AGENT_SYSTEM.md` — who does what. Logical lab roles are Scout, Test Runner, Judge, and Publisher. Current engines and the human owner are assigned there, not here.
 4. `docs/NEXT_MISSIONS.md` for current execution priorities.
 5. GitHub Issue **#1 — Agent Communication Channel — CanAIYet Mission Control** for the live work order. Issue comments do not outrank the documents above.
+
+## Mission Control is the agent shared desk
+
+GitHub Issue **#1** is where ChatGPT/Solace, Cursor, the human, and other agents coordinate. When the human says a work order was posted from GPT / Mission Control (often with a comment ID), **fetch and read that exact Issue #1 comment before acting**. Chat paraphrases are not complete authority. ACK, evidence, blockers, and `READY_FOR_REVIEW` go back on Issue #1. Chat is not the record.
 
 `docs/ORIGIN_AND_DECISION_TRAIL.md` and `docs/EXPLAINED_LIKE_IM_FIVE.md` explain why the product exists. They are not build authority.
 

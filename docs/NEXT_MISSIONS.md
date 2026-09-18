@@ -21,7 +21,8 @@ Milestone 1 remains complete: first independently reviewed real-model CAP-001 fi
 | Real CAP-001 live adapter + injected-HTTP dry certification (CAY-10) | ✅ merged `main` @ `842c421f…` |
 | Meeting/Email archive reconciliation (CAY-11) | ✅ merged `main` (PR #28 / `b18e550…`) |
 | Docs + run-hygiene consolidation (PR #29 / #30) | ✅ merged `main` @ `77b922a…` |
-| Current-platform readiness refresh (this mission) | ◀ READY_FOR_REVIEW — docs/provenance + dry metadata + write-validation attribution + read-only preflight; **HubSpot mutations = 0** |
+| Current-platform readiness refresh (this mission) | ◀ READY_FOR_REVIEW on PR #31 — docs/provenance + dry metadata + write-validation attribution + read-only preflight; **HubSpot mutations = 0** |
+| Portal identity validation (new lab Service Key) | ✅ resolved 2026-09-17 — HubSpot names **`247381023`** / CanAIYet CAP-001 Lab (old key was `247380908`; credential mismatch, not model failure) |
 | One-time required `cay_*` metadata provisioning | **not authorized yet** |
 | Minimum Deals scopes grant | **not authorized yet** |
 | Live CAP-001 adapters against real portal + no-model complete-graph commissioning | **not authorized yet** |

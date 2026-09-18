@@ -23,8 +23,8 @@ Contact write-risk attribution if blocked: `HUBSPOT_METADATA_GAP` (missing cay_*
 
 ## Findings to carry forward
 
-1. **Portal ID drift:** frozen non-secret constant `HUBSPOT_LAB_PORTAL_ID=247381023` but HubSpot error bodies name portal **`247380908`**. Do not silently rewrite the constant in this mission — human should confirm which portal the current Service Key is bound to before Deals grant / metadata create.
-2. **Email property schema read** may need an extra scope beyond contacts for `view_schema` on EMAIL — separate from activity create under contacts.write. Recorded as preflight `BLOCKED_SCOPE`; do not expand scopes in this mission.
+1. **Portal ID drift (historical — RESOLVED 2026-09-17):** This receipt was captured with an **old** local Service Key. HubSpot error bodies named portal **`247380908`**, while the intended lab constant is `HUBSPOT_LAB_PORTAL_ID=247381023`. Later validation with the replaced key proved the intended portal: see `docs/reviews/CAY-20260917-hubspot-portal-identity-validation.md`. Do **not** rewrite this JSON receipt.
+2. **Email property schema read** may need an extra scope beyond contacts for `view_schema` on EMAIL — separate from activity create under contacts.write. Recorded as preflight `BLOCKED_SCOPE`; do not expand scopes until separately authorized.
 3. **All family-specific `cay_*` properties still absent** — ready for a later authorized one-time provisioning step using the dry package.
 
 ## UI checklist still required

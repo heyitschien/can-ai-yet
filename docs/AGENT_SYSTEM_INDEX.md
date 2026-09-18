@@ -9,7 +9,8 @@ Two lists. Do not treat them as the same thing.
 | Need | Read |
 | --- | --- |
 | **Build authority** | `../canonical-build-doc.md` |
-| **Next authorized work** | `NEXT_MISSIONS.md` + GitHub Issue #1 |
+| **Next authorized work** | `NEXT_MISSIONS.md` + **GitHub Issue #1 (Mission Control)** — always open the exact work-order comment |
+| **How agents hand off (ChatGPT ↔ Cursor ↔ human)** | `COMMUNICATION_PROTOCOL.md` §0 Shared desk rule |
 | **Agent-system architecture / measurement** | `AGENT_SYSTEM_ARCHITECTURE.md` (strategy — not build law) |
 | **Startup thesis / falsification of configured AI** | `STARTUP_THESIS_CONFIGURED_AI_DELEGATION.md` (strategy — not build law) |
 | **How work is handed off** | `COMMUNICATION_PROTOCOL.md` |
@@ -98,7 +99,7 @@ The canonical lab roles are **Scout, Test Runner, Judge, and Publisher**. The op
 
 ## Operational memory
 
-GitHub Issue #1 — **Agent Communication Channel — CanAIYet Mission Control** — is the live cross-agent ledger for current work orders, ACKs, evidence, review verdicts, blockers, and accepted handoffs.
+GitHub Issue #1 — **Agent Communication Channel — CanAIYet Mission Control** — is the live cross-agent ledger for current work orders, ACKs, evidence, review verdicts, blockers, and accepted handoffs. It is the **shared desk** between ChatGPT/Solace, Cursor, the human owner, and other agents. For local development: when a work order is announced in chat, open the named Issue #1 comment (or the latest work order on #1) and treat that text as the operational order. See `COMMUNICATION_PROTOCOL.md` §0.
 
 `CHANNEL_LOG.md` is the short scan log. Newest entry first. It does not replace Issue #1.
 

@@ -22,7 +22,7 @@
 - Live smoke script is **fail-closed** unless `CAY_HUBSPOT_LIVE_SMOKE=AUTHORIZED`
 - `pnpm hubspot:commissioning-smoke` loads repo-local `.env.local` for `HUBSPOT_SERVICE_KEY` (never prints the key)
 
-## Frozen non-secret environment (2026-09-13)
+## Frozen non-secret environment (2026-09-13; portal identity re-validated 2026-09-17)
 
 | Field | Value |
 | --- | --- |
@@ -34,6 +34,8 @@
 | Adapter version | `hubspot-commissioning-live-v1` |
 | Hubs (creation snapshot) | Sales Enterprise; other hubs Free |
 | Trial note | 90-day Enterprise window refreshes on API activity (dynamic) |
+
+**Portal binding proof (2026-09-17):** after the human replaced local `.env.local` `HUBSPOT_SERVICE_KEY`, read-only validation observed HubSpot `portalId=247381023` (`DEVELOPER_TEST`) via `GET /account-info/v3/details` and matching portal IDs on deals/emails schema `403` bodies. An earlier readiness preflight that reported `247380908` used the **previous** local key — treat as credential/environment mismatch, not HubSpot instability or model failure. See `docs/reviews/CAY-20260917-hubspot-portal-identity-validation.md`.
 
 Secrets stay in local `.env.local` as `HUBSPOT_SERVICE_KEY` only — never paste into Linear/GitHub/chat.
 
