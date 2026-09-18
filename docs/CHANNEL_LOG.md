@@ -7,7 +7,7 @@ Short scan log. Newest first.
 STATUS: READY_FOR_REVIEW
 What: PR #31 review fixes only — Service Key name → `CanAIYet CAP-001 Lab Commissioning`; unmatched 400/422 attribution → OTHER; shared-desk protocol removed from this PR (follow-up PR); PR body updated for resolved portal identity. No HubSpot live work.
 Branch: `feature/cay-20260917-hubspot-readiness-refresh`
-Tip: (pending) · PR: https://github.com/heyitschien/can-ai-yet/pull/31
+Tip: `8f9e159eb1aaeae0fb65e1c6254c4c0462768d2f` · PR: https://github.com/heyitschien/can-ai-yet/pull/31
 Base: `afe3fd9b738b7b4b27362b8d77cee46ef35b5197`
 
 ## CAY-20260917-HUBSPOT-PORTAL-IDENTITY-VALIDATION — New lab key binds to 247381023
