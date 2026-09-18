@@ -1,9 +1,11 @@
 import { describe, expect, it } from "vitest";
 import { CAP001_METADATA_PLAN } from "@/evals/hubspot/cap001/metadata-plan";
 import {
+  buildCap001PropertyGroupSpecs,
   buildCap001PropertySpecs,
   buildDryMetadataProvisioningPlan,
   countSpecsByObjectType,
+  createPropertyGroupRequestBody,
   createPropertyRequestBody,
   evaluatePropertyIdempotence,
 } from "@/evals/hubspot/cap001/metadata-provisioning";
@@ -65,7 +67,29 @@ describe("CAP-001 dry metadata provisioning package", () => {
     });
   });
 
-  it("is idempotent: MATCH no-op, MISSING enqueue, INCOMPATIBLE fail closed", () => {
+  it("models cay_cap001 property groups per object family (not portal-global)", () => {
+    const groups = buildCap001PropertyGroupSpecs();
+    expect(groups).toHaveLength(6);
+    expect(groups.map((g) => g.objectType).sort()).toEqual([
+      "contacts",
+      "deals",
+      "emails",
+      "meetings",
+      "notes",
+      "tasks",
+    ].sort());
+    for (const group of groups) {
+      expect(group.payload).toEqual({
+        name: "cay_cap001",
+        label: "CanAIYet CAP-001",
+        displayOrder: 10_000,
+      });
+      expect(group.createEndpoint).toBe("POST /crm/properties/2026-09/{objectType}/groups");
+      expect(createPropertyGroupRequestBody(group)).toEqual(group.payload);
+    }
+  });
+
+  it("blocks property creates until the same-family group is READY; fail-closed on conflicts", () => {
     const specs = buildCap001PropertySpecs();
     const contactFixture = specs.find(
       (s) => s.objectType === "contacts" && s.payload.name === "cay_fixture_id",
@@ -87,8 +111,30 @@ describe("CAP-001 dry metadata provisioning package", () => {
     expect(bad.status).toBe("INCOMPATIBLE");
 
     const emptyPlan = buildDryMetadataProvisioningPlan();
-    expect(emptyPlan.toCreate).toHaveLength(specs.length);
+    expect(emptyPlan.groupsToCreate).toHaveLength(6);
+    expect(emptyPlan.familiesWithGroupReady).toHaveLength(0);
+    expect(emptyPlan.toCreate).toHaveLength(0);
+    expect(emptyPlan.propertiesBlockedUntilGroupReady).toHaveLength(specs.length);
     expect(emptyPlan.ok).toBe(true);
+
+    const readyGroups = new Map(
+      CAP001_METADATA_PLAN.objectFamilies.map((objectType) => [
+        objectType,
+        [
+          {
+            name: "cay_cap001",
+            label: "CanAIYet CAP-001",
+            displayOrder: 10_000,
+            archived: false,
+          },
+        ],
+      ] as const),
+    );
+    const groupsReadyPlan = buildDryMetadataProvisioningPlan(new Map(), readyGroups);
+    expect(groupsReadyPlan.groupsToCreate).toHaveLength(0);
+    expect(groupsReadyPlan.familiesWithGroupReady).toHaveLength(6);
+    expect(groupsReadyPlan.toCreate).toHaveLength(specs.length);
+    expect(groupsReadyPlan.propertiesBlockedUntilGroupReady).toHaveLength(0);
 
     const conflictPlan = buildDryMetadataProvisioningPlan(
       new Map([
@@ -97,9 +143,25 @@ describe("CAP-001 dry metadata provisioning package", () => {
           [{ name: "cay_fixture_id", type: "number", fieldType: "number" }],
         ],
       ]),
+      readyGroups,
     );
     expect(conflictPlan.ok).toBe(false);
     expect(conflictPlan.incompatible.length).toBeGreaterThan(0);
+
+    const archivedGroupPlan = buildDryMetadataProvisioningPlan(
+      new Map(),
+      new Map([
+        [
+          "contacts",
+          [{ name: "cay_cap001", label: "CanAIYet CAP-001", archived: true }],
+        ],
+      ]),
+    );
+    expect(archivedGroupPlan.ok).toBe(false);
+    expect(archivedGroupPlan.groupsIncompatible[0]?.spec.objectType).toBe("contacts");
+    expect(
+      archivedGroupPlan.propertiesBlockedUntilGroupReady.some((s) => s.objectType === "contacts"),
+    ).toBe(true);
   });
 });
 
