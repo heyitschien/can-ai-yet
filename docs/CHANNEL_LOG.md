@@ -7,7 +7,7 @@ Short scan log. Newest first.
 STATUS: READY_FOR_REVIEW
 What: STOP/correction #5724957946 — live portal Service Key UI lacks schemas.{notes|tasks|meetings|emails}.*; PR #33 12-scope packet not executable here. Classify families; 4-scope contacts+deals envelope only; reject association-only/body-encoding activity identity (false positives); propose seed-time ID ledger candidate. Mutations/scopes/models = 0.
 Branch: `feature/cay-20260917-hubspot-metadata-scope-catalog-correction`
-Tip: *(pending commit)* · PR: *(pending)*
+Tip: `84edf91f1d22207db00b6ef02c3500190de41be6` · PR: *(pending)*
 Base: `58317ab393856cf92692a158c33326f3a73dfe16`
 
 ## CAY-20260917-HUBSPOT-METADATA-GROUP-READINESS — Setup credential read∪write envelope
