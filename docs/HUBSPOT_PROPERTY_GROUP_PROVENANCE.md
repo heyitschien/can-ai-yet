@@ -16,7 +16,7 @@ HubSpot property groups are **object-type scoped**. Paths include `{objectType}`
 | Update group | `PATCH /crm/properties/2026-09/{objectType}/groups/{groupName}` | latest property-groups update |
 | Archive group | `DELETE /crm/properties/2026-09/{objectType}/groups/{groupName}` | latest property-groups delete |
 
-Therefore `cay_cap001` must exist **separately** for each CAP-001 family: contacts, deals, notes, tasks, meetings, emails. **Not** once portal-global.
+Therefore `cay_cap001` must exist **separately** for each **Service Key–supported** CAP-001 family that we provision via schema API: contacts and deals. Activity families (notes/tasks/meetings/emails) are **not** Service Key schema-provisionable in portal 247381023 — see catalog correction. Do **not** treat a single portal-global group as sufficient for contacts+deals.
 
 ## Version coexistence (not a conflict)
 
@@ -43,29 +43,30 @@ CAP-001 dry payload:
 
 ## Setup scopes
 
-### Create / update / archive groups (write)
+### Create / update / archive groups (write) — Service Key–executable
 
-OR among schema-write scopes. Per family:
+Live portal `247381023` Service Key catalog exposes schema scopes for **contacts** and **deals** only (human observation 2026-09-17). Activity family schema scopes are **not** in the catalog.
 
-| objectType | setup write scope |
-| --- | --- |
-| contacts | `crm.schemas.contacts.write` |
-| deals | `crm.schemas.deals.write` |
-| notes | `crm.schemas.notes.write` |
-| tasks | `crm.schemas.tasks.write` |
-| meetings | `crm.schemas.meetings.write` |
-| emails | `crm.schemas.emails.write` |
+| objectType | setup write scope | Service Key grantable here? |
+| --- | --- | --- |
+| contacts | `crm.schemas.contacts.write` | yes |
+| deals | `crm.schemas.deals.write` | yes |
+| notes | `crm.schemas.notes.write` (Properties API docs only) | **no** |
+| tasks | `crm.schemas.tasks.write` (Properties API docs only) | **no** |
+| meetings | `crm.schemas.meetings.write` (Properties API docs only) | **no** |
+| emails | `crm.schemas.emails.write` (Properties API docs only) | **no** |
 
 ### List / get groups (read) — separate from write
 
 Official GET pages list OR scopes including **object-read** and **schema-read**.  
-**Write does not imply read.** Temporary setup key must include explicit read authority.
+**Write does not imply read.** Temporary setup key for contacts/deals must include explicit `crm.schemas.{family}.read`.
 
-Chosen least-authority read for setup: `crm.schemas.{family}.read` for each of the six families (see `docs/HUBSPOT_METADATA_SETUP_CREDENTIAL_PACKET.md`).
+Evidence: `docs/reviews/CAY-20260917-hubspot-service-key-scope-catalog.md`.
 
 ## Temporary setup credential packet (future — not granted now)
 
-Prefer a **short-lived setup Service Key** with the **12-scope** schema read∪write envelope in `docs/HUBSPOT_METADATA_SETUP_CREDENTIAL_PACKET.md`, or HubSpot UI.  
-**Do not** add these to `CanAIYet CAP-001 Lab Commissioning` (runtime contacts.read/write only).
+Prefer a **short-lived setup Service Key** with the **4-scope** contacts+deals schema read∪write envelope in `docs/HUBSPOT_METADATA_SETUP_CREDENTIAL_PACKET.md`, or HubSpot UI.  
+**Do not** add these to `CanAIYet CAP-001 Lab Commissioning`.  
+**Do not** invent activity schema scopes absent from the live catalog.
 
 After authoritative re-read + independent review: human retires/rotates the temporary setup credential.

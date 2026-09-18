@@ -12,6 +12,12 @@
  */
 
 import { CAP001_METADATA_PLAN } from "@/evals/hubspot/cap001/metadata-plan";
+import {
+  CAP001_DOCUMENTED_BUT_NOT_SERVICE_KEY_CATALOG_SCOPES,
+  CAP001_SERVICE_KEY_EXECUTABLE_SETUP_SCOPES,
+  metadataFamilySupport,
+  serviceKeySchemaSupportedFamilies,
+} from "@/evals/hubspot/cap001/metadata-family-support";
 
 export const METADATA_PROVISIONING_RETRIEVAL_DATE = "2026-09-17";
 
@@ -372,23 +378,26 @@ export function buildDryMetadataProvisioningPlan(
 
   const checklist = [
     `Verify portal identity = 247381023 (CanAIYet CAP-001 Lab) before any setup write.`,
-    `For each of contacts/deals/notes/tasks/meetings/emails: ensure property group \`${CAP001_PROPERTY_GROUP_NAME}\` (\`${CAP001_PROPERTY_GROUP_LABEL}\`) exists on **that objectType** — not once portal-global.`,
-    `Create missing groups via ${METADATA_CREATE_PROPERTY_GROUP_ENDPOINT} (setup schema scope only).`,
-    `Only after a family's group is READY (MATCH), create MISSING cay_* properties via ${METADATA_CREATE_PROPERTY_ENDPOINT}.`,
+    `Service Key catalog evidence: schemas.contacts.* + schemas.deals.* only — NOT notes/tasks/meetings/emails (see docs/reviews/CAY-20260917-hubspot-service-key-scope-catalog.md).`,
+    `For contacts + deals only: ensure property group \`${CAP001_PROPERTY_GROUP_NAME}\` exists on **that objectType**.`,
+    `Create missing contacts/deals groups via ${METADATA_CREATE_PROPERTY_GROUP_ENDPOINT} (setup schema scope only).`,
+    `Only after a family's group is READY (MATCH), create MISSING cay_* properties via ${METADATA_CREATE_PROPERTY_ENDPOINT} for Service Key–supported families.`,
     "MATCH groups/properties are no-ops (idempotent).",
     "INCOMPATIBLE or archived groups/properties fail closed — do not overwrite.",
     "Do not put crm.schemas.*.read or crm.schemas.*.write on the steady-state runtime Service Key.",
-    "Temporary setup key needs schema-read ∪ schema-write (write does not imply read).",
+    "Do not invent a temporary Service Key with schemas.{notes|tasks|meetings|emails}.* — absent from live catalog.",
+    "Activity families: notes/emails UNMAPPED for per-activity cay_*; tasks/meetings UI_ONLY_OR_BETA (unverified) — fail closed for Service Key provisioning.",
     "This package is dry-only until a separate human authorization creates groups/properties.",
   ];
 
   const futureSetupOrder = [
     "1. Verify portal identity = 247381023 (account-info + blocked-scope error bodies if needed).",
-    "2. For each object family: GET group cay_cap001 (schema-read); create if MISSING (schema-write); STOP if INCOMPATIBLE/archived.",
-    "3. For each object family with group READY: GET properties (schema-read); create MISSING cay_* (schema-write) — 31 total across families.",
-    "4. Authoritative re-read of groups + properties (schema-read); prove dry-plan parity (all MATCH).",
-    "5. STOP — no Deals scope grant, no seed/mutation suite in the metadata mission.",
-    "6. After independent review: retire/rotate any temporary schema read+write credential (human).",
+    "2. CONTACTS+DEALS only: GET group cay_cap001 (schema-read); create if MISSING (schema-write); STOP if INCOMPATIBLE/archived.",
+    "3. CONTACTS+DEALS only: GET properties (schema-read); create MISSING cay_* (schema-write).",
+    "4. Authoritative re-read of contacts+deals groups + properties (schema-read); prove dry-plan parity (all MATCH).",
+    "5. STOP for notes/emails (UNMAPPED) and tasks/meetings (UI_ONLY_OR_BETA unverified) — do not Service Key–provision activity cay_*.",
+    "6. STOP — no Deals object-scope grant, no activity privilege substitution, no seed/mutation suite in the metadata mission.",
+    "7. After independent review: retire/rotate any temporary contacts+deals schema read+write credential (human).",
   ];
 
   return {
@@ -445,37 +454,38 @@ export function createPropertyGroupRequestBody(
 }
 
 /**
- * Temporary setup credential — least-authority envelope for pre-read + write + post-read.
- * Do **not** assume schema write implies schema read (official GET pages list separate OR scopes).
- * Retrieval 2026-09-17: property + property-group OpenAPI embeds on latest 2026-09 docs.
+ * Temporary setup credential — **Service Key catalog–executable** envelope only.
  *
- * Chosen read authority: `crm.schemas.{family}.read` (not object-read) for all six families,
- * so the setup key does not pull in deals/notes/tasks/meetings/emails object scopes.
- * Official GET OR lists also include object-read alternatives; we deliberately pick schema-read.
+ * Correction (CAY-20260917-HUBSPOT-METADATA-SCOPE-CATALOG-CORRECTION / #5724957946):
+ * Portal 247381023 Service Key selector exposes schemas.contacts.* and schemas.deals.* only.
+ * It does **not** expose schemas.{notes|tasks|meetings|emails}.* — so the prior 12-scope
+ * packet from PR #33 is not executable as written in this real test account.
+ *
+ * Still: do **not** assume write ⇒ read (official GET pages list separate OR scopes).
+ * Chosen read authority for executable families: `crm.schemas.{family}.read`.
  */
 export const CAP001_METADATA_SETUP_SCHEMA_READ_SCOPES = [
   "crm.schemas.contacts.read",
   "crm.schemas.deals.read",
-  "crm.schemas.notes.read",
-  "crm.schemas.tasks.read",
-  "crm.schemas.meetings.read",
-  "crm.schemas.emails.read",
 ] as const;
 
 export const CAP001_METADATA_SETUP_SCHEMA_WRITE_SCOPES = [
   "crm.schemas.contacts.write",
   "crm.schemas.deals.write",
-  "crm.schemas.notes.write",
-  "crm.schemas.tasks.write",
-  "crm.schemas.meetings.write",
-  "crm.schemas.emails.write",
 ] as const;
 
-/** Exact temporary setup key scope list (read ∪ write). Sorted for stable snapshots. */
+/**
+ * Exact temporary **Service Key** setup scope list (read ∪ write) for portal 247381023.
+ * Sorted for stable snapshots. Does **not** include activity schema scopes that are
+ * documented on Properties API pages but absent from the live Service Key catalog.
+ */
 export const CAP001_METADATA_SETUP_CREDENTIAL_SCOPES = [
-  ...CAP001_METADATA_SETUP_SCHEMA_READ_SCOPES,
-  ...CAP001_METADATA_SETUP_SCHEMA_WRITE_SCOPES,
+  ...CAP001_SERVICE_KEY_EXECUTABLE_SETUP_SCOPES,
 ].slice().sort() as readonly string[];
+
+/** @deprecated alias — use CAP001_DOCUMENTED_BUT_NOT_SERVICE_KEY_CATALOG_SCOPES */
+export const CAP001_METADATA_SETUP_SCOPES_DOCUMENTED_NOT_IN_SERVICE_KEY_CATALOG =
+  CAP001_DOCUMENTED_BUT_NOT_SERVICE_KEY_CATALOG_SCOPES;
 
 export type Cap001MetadataSetupOperation = {
   step: string;
@@ -499,13 +509,22 @@ function schemaWrite(objectType: Cap001MetadataObjectType): string {
 }
 
 /**
- * Operation → endpoint → required-scope → chosen-scope matrix for the future setup sequence.
- * Portal identity verify uses account-info (outside properties API); covered by existing
- * contacts-capable runtime key or any authenticated setup key — recorded as non-schema.
+ * Operation → endpoint → required-scope → chosen-scope matrix for the **Service Key–
+ * executable** future setup sequence (contacts + deals only in portal 247381023).
+ *
+ * Activity families remain in the dry property inventory for adapter design history but
+ * are excluded here — Service Key cannot grant their schema scopes in this portal.
+ * Portal identity verify uses account-info (outside properties API).
  */
-export function buildCap001MetadataSetupOperationMatrix(): Cap001MetadataSetupOperation[] {
+export function buildCap001MetadataSetupOperationMatrix(
+  objectTypes: readonly Cap001MetadataObjectType[] = serviceKeySchemaSupportedFamilies(),
+): Cap001MetadataSetupOperation[] {
   const rows: Cap001MetadataSetupOperation[] = [];
-  for (const objectType of CAP001_METADATA_OBJECT_TYPES) {
+  for (const objectType of objectTypes) {
+    const support = metadataFamilySupport(objectType);
+    if (!support.serviceKeyCanAuthorizeSchemaCreate) {
+      continue;
+    }
     const read = schemaRead(objectType);
     const write = schemaWrite(objectType);
     rows.push(

@@ -5,6 +5,10 @@
  * Create-property path (2026-09-14): HubSpotDev fetch-doc of latest create-property returned
  * OpenAPI `POST /crm/properties/2026-09/{objectType}` (CAY-09: current official docs win).
  * Runtime schema-write remains 0.
+ *
+ * Correction (CAY-20260917-HUBSPOT-METADATA-SCOPE-CATALOG-CORRECTION): activity-family cay_*
+ * remain listed as the prior adapter inventory, but Service Key executability is classified in
+ * `metadata-family-support.ts` — not assumed from Properties API docs alone.
  */
 
 export const CAP001_METADATA_PLAN = {
@@ -25,7 +29,7 @@ export const CAP001_METADATA_PLAN = {
   ] as const,
   engagementObjectTypes: ["notes", "tasks", "meetings", "emails"] as const,
   rationale:
-    "CAP-001 needs stable cay_fixture_id across object types. Provision one-time custom properties on contacts, deals, notes, tasks, meetings, and emails. Runtime keys only write values under contacts.write / deals.write. Searching by email alone is insufficient for fixture identity across deals/activities. Activity cay_* properties are required for this adapter implementation (not optional).",
+    "CAP-001 needs stable cay_fixture_id across object types. Contacts+deals cay_* are Service Key–provisionable in portal 247381023. Activity (notes/tasks/meetings/emails) cay_* remain in the inventory as the prior adapter assumption but are NOT Service Key–executable here (catalog mismatch / KB activity-property limits) — classify and fail closed per metadata-family-support.ts. Runtime keys only write values under contacts.write / deals.write.",
   contactProperties: [
     {
       name: "cay_fixture_id",
@@ -109,28 +113,29 @@ export const CAP001_METADATA_PLAN = {
     },
   ] as const,
   /**
-   * Required for this adapter on every engagement objectType:
-   * notes, tasks, meetings, emails.
+   * Prior adapter inventory for engagement objectTypes.
+   * Service Key executability is NOT assumed — see metadata-family-support.ts
+   * (notes/emails UNMAPPED; tasks/meetings UI_ONLY_OR_BETA unverified).
    */
   engagementProperties: [
     {
       name: "cay_fixture_id",
       type: "string",
-      purpose: "Activity fixture identity",
+      purpose: "Activity fixture identity (representation may be UNMAPPED via Service Key)",
       required: true,
       objectFamilies: ["notes", "tasks", "meetings", "emails"] as const,
     },
     {
       name: "cay_run_id",
       type: "string",
-      purpose: "Run isolation for reset",
+      purpose: "Run isolation for reset (representation may be UNMAPPED via Service Key)",
       required: true,
       objectFamilies: ["notes", "tasks", "meetings", "emails"] as const,
     },
     {
       name: "cay_scenario_id",
       type: "string",
-      purpose: "Scenario ownership",
+      purpose: "Scenario ownership (representation may be UNMAPPED via Service Key)",
       required: true,
       objectFamilies: ["notes", "tasks", "meetings", "emails"] as const,
     },
@@ -151,5 +156,5 @@ export const CAP001_METADATA_PLAN = {
     },
   ] as const,
   alternativeRejected:
-    "Embedding runId only in email local-part works for contacts but cannot stably key deals/notes/tasks/meetings/emails to the same fixture graph.",
+    "Embedding runId only in email local-part works for contacts but cannot stably key deals to the same fixture graph. Association-only activity reset without an ID ledger false-positives on shared baseline contacts.",
 } as const;

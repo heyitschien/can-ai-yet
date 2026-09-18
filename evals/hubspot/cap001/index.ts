@@ -18,6 +18,22 @@ export {
 } from "@/evals/hubspot/cap001/http-client";
 export { CAP001_METADATA_PLAN } from "@/evals/hubspot/cap001/metadata-plan";
 export {
+  CAP001_DOCUMENTED_BUT_NOT_SERVICE_KEY_CATALOG_SCOPES,
+  CAP001_METADATA_FAMILY_SUPPORT,
+  CAP001_SERVICE_KEY_EXECUTABLE_SETUP_SCOPES,
+  HUBSPOT_LAB_SERVICE_KEY_SCOPE_CATALOG_EVIDENCE,
+  cheapestFaithfulIdentityPreservationProposal,
+  evaluateActivityCayPropertyAlternatives,
+  metadataFamilySupport,
+  serviceKeySchemaSupportedFamilies,
+  serviceKeySchemaUnsupportedFamilies,
+} from "@/evals/hubspot/cap001/metadata-family-support";
+export type {
+  ActivityIdentityAlternativeFinding,
+  MetadataFamilySupportClass,
+  MetadataFamilySupportRow,
+} from "@/evals/hubspot/cap001/metadata-family-support";
+export {
   buildCap001MetadataSetupOperationMatrix,
   buildCap001PropertyGroupSpecs,
   buildCap001PropertySpecs,
