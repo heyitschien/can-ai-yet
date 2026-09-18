@@ -7,7 +7,7 @@ Short scan log. Newest first.
 STATUS: READY_FOR_REVIEW
 What: Official-doc prove property groups are per objectType; pin create to 2026-09 (coexists with 2026-03); dry plan requires six `cay_cap001` groups before property creates; setup credential packet (schema-write temporary only). NEXT_MISSIONS: PR #31/#32 merged; this gate current. HubSpot mutations/scopes/models = 0.
 Branch: `feature/cay-20260917-hubspot-metadata-group-readiness`
-Tip: (pending) · PR: (pending)
+Tip: `2825b068789e43204890b151bfed4288347b98e3` · PR: (pending)
 Base: `39b33fa19981add7fe779f99f5bd5d55ee25f6fe`
 
 ## CAY-20260917-MISSION-CONTROL-SHARED-DESK — Protocol clarification
