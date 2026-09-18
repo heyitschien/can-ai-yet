@@ -43,3 +43,7 @@ next-env.d.ts
 
 # Demand Scout local cache
 .cache/
+
+# Local evaluation scratch; durable paid-run evidence is copied to docs/reviews/runs/
+# (see docs/REAL_MODEL_RUNBOOK.md)
+/evals/runs/
