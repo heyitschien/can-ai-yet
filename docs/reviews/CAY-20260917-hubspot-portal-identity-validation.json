@@ -1,0 +1,135 @@
+{
+  "receiptId": "CAY-20260917-HUBSPOT-PORTAL-IDENTITY-VALIDATION",
+  "mode": "read_only_preflight",
+  "timestamp": "2026-09-18T03:06:06.048Z",
+  "expectedPortalId": "247381023",
+  "expectedAccountName": "CanAIYet CAP-001 Lab",
+  "authoritativePortalId": "247381023",
+  "accountType": "DEVELOPER_TEST",
+  "observedPortalIds": [
+    "247381023"
+  ],
+  "portalIdentityResolved": true,
+  "serviceKeyName": "CanAIYet CAP-001 Lab Commissioning",
+  "grantedScopes": [
+    "crm.objects.contacts.read",
+    "crm.objects.contacts.write"
+  ],
+  "mutations": 0,
+  "scopeChanges": 0,
+  "modelCalls": 0,
+  "attempts": [
+    {
+      "operation": "account_info.details",
+      "method": "GET",
+      "path": "/account-info/v3/details",
+      "ok": true,
+      "status": 200,
+      "requestId": "01a0b27a-72eb-7eb3-bfae-b7253314d6bc",
+      "observedPortalId": "247381023"
+    },
+    {
+      "operation": "contacts.list_limit_1",
+      "method": "GET",
+      "path": "/crm/objects/2026-03/contacts?limit=1&properties=email",
+      "ok": true,
+      "status": 200,
+      "requestId": "01a0b27a-7402-7bbd-afc0-5ec38470aaf0"
+    },
+    {
+      "operation": "properties.list.contacts",
+      "method": "GET",
+      "path": "/crm/properties/2026-09/contacts",
+      "ok": true,
+      "status": 200,
+      "requestId": "01a0b27a-7518-7929-90e9-ec82f5545208"
+    },
+    {
+      "operation": "properties.list.deals",
+      "method": "GET",
+      "path": "/crm/properties/2026-09/deals",
+      "ok": false,
+      "status": 403,
+      "failureClass": "BLOCKED_SCOPE",
+      "message": "{\"status\":\"error\",\"message\":\"You do not have permissions to view_schema object type ObjectTypeId{legacyObjectType=DEAL} in portal 247381023 (requires one of [deals-read])\",\"correlationId\":\"01a0b27a-762c-7f71-be36-e4120ddf7849\"}",
+      "requestId": "01a0b27a-762c-7f71-be36-e4120ddf7849",
+      "observedPortalId": "247381023"
+    },
+    {
+      "operation": "properties.list.notes",
+      "method": "GET",
+      "path": "/crm/properties/2026-09/notes",
+      "ok": true,
+      "status": 200,
+      "requestId": "01a0b27a-76ff-728b-ab77-1050d6876486"
+    },
+    {
+      "operation": "properties.list.tasks",
+      "method": "GET",
+      "path": "/crm/properties/2026-09/tasks",
+      "ok": true,
+      "status": 200,
+      "requestId": "01a0b27a-77e1-7f38-b302-3d0cf246b7f0"
+    },
+    {
+      "operation": "properties.list.meetings",
+      "method": "GET",
+      "path": "/crm/properties/2026-09/meetings",
+      "ok": true,
+      "status": 200,
+      "requestId": "01a0b27a-78cb-70e8-a12d-ee54ed72102a"
+    },
+    {
+      "operation": "properties.list.emails",
+      "method": "GET",
+      "path": "/crm/properties/2026-09/emails",
+      "ok": false,
+      "status": 403,
+      "failureClass": "BLOCKED_SCOPE",
+      "message": "{\"status\":\"error\",\"message\":\"You do not have permissions to view_schema object type ObjectTypeId{legacyObjectType=EMAIL} in portal 247381023 (requires one of [connected-email-data-access])\",\"correlationId\":\"01a0b27a-799a-7c28-9043-a81d8986511b\"}",
+      "requestId": "01a0b27a-799a-7c28-9043-a81d8986511b",
+      "observedPortalId": "247381023"
+    }
+  ],
+  "dryMetadata": {
+    "ok": true,
+    "totalSpecs": 31,
+    "toCreate": 31,
+    "matched": 0,
+    "incompatible": [],
+    "catalogsReadable": [
+      "contacts",
+      "notes",
+      "tasks",
+      "meetings"
+    ],
+    "catalogsBlockedScope": [
+      "deals",
+      "emails"
+    ]
+  },
+  "contactWriteRisk": {
+    "objectType": "contacts",
+    "apiObservableRequiredNames": [],
+    "missingCayPropertyNames": [
+      "cay_fixture_id",
+      "cay_run_id",
+      "cay_scenario_id",
+      "cay_status",
+      "cay_do_not_contact",
+      "cay_tags",
+      "cay_owner"
+    ],
+    "incompatibleCayPropertyNames": [],
+    "uiChecklistRequired": true,
+    "attributionIfBlocked": "HUBSPOT_METADATA_GAP"
+  },
+  "uiChecklist": [
+    "Settings \u2192 Properties: review conditional required rules for contacts, deals, notes, tasks, meetings, emails used by CAP-001.",
+    "Settings \u2192 Objects \u2192 [each family] \u2192 Create Record: list required properties and associations; compare to CAP-001 seed payloads.",
+    "Confirm lab portal has no unexpected Create Record associations (e.g. forced company on deal) that seed omits.",
+    "If a portal rule conflicts with CAP-001 seed: fix portal config or authorize a seed-payload change \u2014 never weaken fixtures to hide the rule."
+  ],
+  "redactionStatus": "secrets_scrubbed",
+  "serviceKeyNameCorrection": "Corrected 2026-09-17 after CHANGES_REQUESTED: receipt was captured with the new lab key but stamped the stale constant CanAIYet CAP-001 Commissioning. Display name is CanAIYet CAP-001 Lab Commissioning. Does not rewrite the prior readiness receipt."
+}

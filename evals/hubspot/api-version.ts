@@ -22,7 +22,10 @@ export const HUBSPOT_CONTACTS_URL = `${HUBSPOT_API_HOST}${HUBSPOT_CONTACTS_PATH}
 export const HUBSPOT_LIVE_ADAPTER_VERSION = "hubspot-commissioning-live-v1";
 export const HUBSPOT_LAB_PORTAL_ID = "247381023";
 export const HUBSPOT_LAB_ACCOUNT_NAME = "CanAIYet CAP-001 Lab";
-export const HUBSPOT_SERVICE_KEY_NAME = "CanAIYet CAP-001 Commissioning";
+/** Current lab Service Key display name (HubSpot UI, 2026-09-17). */
+export const HUBSPOT_SERVICE_KEY_NAME = "CanAIYet CAP-001 Lab Commissioning";
+/** Prior Service Key display name (historical receipts / old wrong-portal key era). */
+export const HUBSPOT_SERVICE_KEY_NAME_LEGACY = "CanAIYet CAP-001 Commissioning";
 
 export const HUBSPOT_GRANTED_SCOPES = [
   "crm.objects.contacts.read",

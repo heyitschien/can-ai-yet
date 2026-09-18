@@ -15,7 +15,8 @@
     "demand:discover": "tsx scripts/demand-discover.ts",
     "demand:history": "tsx scripts/demand-history.ts",
     "demand:smoke": "tsx scripts/demand-smoke.ts",
-    "hubspot:commissioning-smoke": "tsx scripts/hubspot-commissioning-smoke.ts"
+    "hubspot:commissioning-smoke": "tsx scripts/hubspot-commissioning-smoke.ts",
+    "hubspot:readonly-preflight": "tsx scripts/hubspot-readonly-preflight.ts"
   },
   "pnpm": {
     "onlyBuiltDependencies": [

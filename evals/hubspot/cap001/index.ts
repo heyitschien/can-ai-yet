@@ -18,6 +18,30 @@ export {
 } from "@/evals/hubspot/cap001/http-client";
 export { CAP001_METADATA_PLAN } from "@/evals/hubspot/cap001/metadata-plan";
 export {
+  buildCap001PropertySpecs,
+  buildDryMetadataProvisioningPlan,
+  countSpecsByObjectType,
+  createPropertyRequestBody,
+  evaluatePropertyIdempotence,
+  METADATA_CREATE_PROPERTY_DOC,
+  METADATA_CREATE_PROPERTY_ENDPOINT,
+} from "@/evals/hubspot/cap001/metadata-provisioning";
+export type {
+  Cap001MetadataObjectType,
+  Cap001PropertySpec,
+  DryMetadataProvisioningPlan,
+} from "@/evals/hubspot/cap001/metadata-provisioning";
+export {
+  classifyHubSpotWriteValidation,
+  evaluatePropertyCatalogForWriteRisk,
+  HUBSPOT_WRITE_VALIDATION_CHANGELOG_URL,
+  HUBSPOT_WRITE_VALIDATION_UI_CHECKLIST,
+} from "@/evals/hubspot/cap001/write-validation";
+export type {
+  HubSpotFailureAttribution,
+  HubSpotWriteValidationClassification,
+} from "@/evals/hubspot/cap001/write-validation";
+export {
   CAP001_HUBSPOT_SCENARIO_MAPPING,
   comparisonScenarioIds,
   contactScopedReadyFamilies,

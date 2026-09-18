@@ -2,6 +2,38 @@
 
 Short scan log. Newest first.
 
+## CAY-20260917-HUBSPOT-READINESS-REFRESH — Create-Record attribution narrow fix
+
+STATUS: READY_FOR_REVIEW
+What: PR #31 single blocker from #5724622171 — Create Record portal attribution only when message evidences Create Record; `Missing required field: properties` stays OTHER. No HubSpot live work.
+Branch: `feature/cay-20260917-hubspot-readiness-refresh`
+Tip: `2d8b5439dd96cafa8c56f8578d3bf09cfc0fd4d0` · PR: https://github.com/heyitschien/can-ai-yet/pull/31
+Base: `3f70dd809b2dabadbebc42dc208a8ad9f42289f8`
+
+## CAY-20260917-HUBSPOT-READINESS-REFRESH — CHANGES_REQUESTED cleanup
+
+STATUS: READY_FOR_REVIEW
+What: PR #31 review fixes only — Service Key name → `CanAIYet CAP-001 Lab Commissioning`; unmatched 400/422 attribution → OTHER; shared-desk protocol removed from this PR (follow-up PR); PR body updated for resolved portal identity. No HubSpot live work.
+Branch: `feature/cay-20260917-hubspot-readiness-refresh`
+Tip: `8f9e159eb1aaeae0fb65e1c6254c4c0462768d2f` · PR: https://github.com/heyitschien/can-ai-yet/pull/31
+Base: `afe3fd9b738b7b4b27362b8d77cee46ef35b5197`
+
+## CAY-20260917-HUBSPOT-PORTAL-IDENTITY-VALIDATION — New lab key binds to 247381023
+
+STATUS: READY_FOR_REVIEW
+What: Read-only validation of replaced local Service Key. HubSpot `account-info` + deals/emails schema 403 bodies all name portal **247381023** (CanAIYet CAP-001 Lab, DEVELOPER_TEST). Prior readiness preflight `247380908` = old wrong-portal key (credential mismatch, not model failure). Original readiness receipt preserved. Mutations/scopes/models = 0.
+Branch: `feature/cay-20260917-hubspot-readiness-refresh`
+Tip: `214153edb7ab614af4018215f797a55b44d7b4e3` · PR: https://github.com/heyitschien/can-ai-yet/pull/31
+Base: `e8fbc747baebc50982fc8a16f415f367f548a427`
+
+## CAY-20260917-HUBSPOT-READINESS-REFRESH — Current-platform HubSpot readiness
+
+STATUS: READY_FOR_REVIEW
+What: Refresh NEXT_MISSIONS (CAY-11 merged); re-verify Deals scopes/properties/version pins (2026-09-17); preserve deals archive 2026-03 pin under coexistence with latest 2026-09 DELETE; add write-validation attribution + dry 31-property cay_* provisioning package + Deals approval packet; optional read-only preflight (mutations/scopes/models = 0). Portal ID drift noted (docs 247381023 vs API errors 247380908).
+Branch: `feature/cay-20260917-hubspot-readiness-refresh`
+Tip: `57da51d048308962097bc998be1fc4a51f1c6dae` · PR: https://github.com/heyitschien/can-ai-yet/pull/31
+Base: `77b922a82b6158da6f1d8b22ba5a9c693221c1eb`
+
 ## CAY-20260917-RUNS-HYGIENE — Ignore local evals/runs scratch
 
 STATUS: READY_FOR_REVIEW
