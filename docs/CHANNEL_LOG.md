@@ -7,7 +7,7 @@ Short scan log. Newest first.
 STATUS: READY_FOR_REVIEW
 What: PR #31 single blocker from #5724622171 — Create Record portal attribution only when message evidences Create Record; `Missing required field: properties` stays OTHER. No HubSpot live work.
 Branch: `feature/cay-20260917-hubspot-readiness-refresh`
-Tip: (pending) · PR: https://github.com/heyitschien/can-ai-yet/pull/31
+Tip: `2d8b5439dd96cafa8c56f8578d3bf09cfc0fd4d0` · PR: https://github.com/heyitschien/can-ai-yet/pull/31
 Base: `3f70dd809b2dabadbebc42dc208a8ad9f42289f8`
 
 ## CAY-20260917-HUBSPOT-READINESS-REFRESH — CHANGES_REQUESTED cleanup
