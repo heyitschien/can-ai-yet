@@ -18,6 +18,23 @@ export {
 } from "@/evals/hubspot/cap001/http-client";
 export { CAP001_METADATA_PLAN } from "@/evals/hubspot/cap001/metadata-plan";
 export {
+  CAP001_FAMILY_ENVIRONMENT_EVIDENCE,
+  CAP001_PR33_HYPOTHESIZED_TWELVE_SCOPE_PACKET,
+  CAP001_SERVICE_KEY_OBSERVED_SETUP_SCOPES,
+  HUBSPOT_LAB_SERVICE_KEY_SCOPE_CATALOG_EVIDENCE,
+  apiDocScopeImpliesServiceKeyGrantable,
+  evaluatePermissionPacketLiveReady,
+  familyEnvironmentEvidence,
+  pr33TwelveScopePacketLiveReadyInLab,
+} from "@/evals/hubspot/cap001/environment-evidence-matrix";
+export type {
+  EvidenceLadderStatus,
+  EvidenceLadderStatusOrPending,
+  FamilyEnvironmentEvidenceRow,
+  PermissionPacketClaim,
+  PermissionPacketLiveReadyResult,
+} from "@/evals/hubspot/cap001/environment-evidence-matrix";
+export {
   buildCap001MetadataSetupOperationMatrix,
   buildCap001PropertyGroupSpecs,
   buildCap001PropertySpecs,

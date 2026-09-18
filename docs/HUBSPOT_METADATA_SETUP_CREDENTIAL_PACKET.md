@@ -1,88 +1,54 @@
 # Temporary HubSpot schema setup credential packet
 
-**Receipt:** CAY-20260917-HUBSPOT-METADATA-GROUP-READINESS  
+**Receipt:** CAY-20260917-API-AUTH-ENVIRONMENT-EVIDENCE-GAP  
 **Status:** design packet only — **do not create or expand any key in this mission**  
-**Retrieval date:** 2026-09-17
+**Correction date:** 2026-09-18  
 
-## Purpose
+## SUPERSEDED claim (preserve as evidence)
 
-One-time creation of per-family `cay_cap001` property groups + 31 `cay_*` properties on portal **247381023**, including **authoritative pre-read and post-read** parity proof.
+PR **#33** hypothesized a **12-scope** temporary Service Key envelope covering all six families’ `crm.schemas.*.{read,write}`.
 
-## Prefer
+**Status: SUPERSEDED / NOT EXECUTABLE AS WRITTEN** in portal `247381023`.
 
-1. HubSpot UI (no API schema scopes), **or**
-2. A **separate short-lived** Service Key used only for setup, then retired.
+Falsifier: live Service Key scope catalog (`#5724957946`). Lesson: `docs/API_AUTH_ENVIRONMENT_EVIDENCE_LADDER.md`.
 
-## Single temporary setup credential (chosen design)
-
-One short-lived setup key holds **both** schema-read and schema-write for all six families.  
-**Do not assume write ⇒ read** — official GET property / property-group pages list separate OR scopes.
-
-### Exact scope envelope (12 scopes)
+## Observed-selectable Service Key envelope (layer 3 — not live-ready)
 
 ```text
 crm.schemas.contacts.read
 crm.schemas.contacts.write
 crm.schemas.deals.read
 crm.schemas.deals.write
-crm.schemas.notes.read
-crm.schemas.notes.write
-crm.schemas.tasks.read
-crm.schemas.tasks.write
-crm.schemas.meetings.read
-crm.schemas.meetings.write
-crm.schemas.emails.read
-crm.schemas.emails.write
 ```
 
-Machine constant: `CAP001_METADATA_SETUP_CREDENTIAL_SCOPES` in `evals/hubspot/cap001/metadata-provisioning.ts`.
+Machine: `CAP001_METADATA_SETUP_CREDENTIAL_SCOPES` / `CAP001_SERVICE_KEY_OBSERVED_SETUP_SCOPES`.
 
-### Why schema-read (not object-read)
+These scopes are **OBSERVED_SELECTABLE** on the Service Key product in CanAIYet CAP-001 Lab. They are **not** `LIVE_PROVEN` until an authorized bounded create + authoritative re-read exists.
 
-Official GET list/get for properties and property groups accept **OR** among object-read and schema-read (and other variants). For a temporary setup key we choose **`crm.schemas.{family}.read`** so we:
+Do **not** assume write ⇒ read.
 
-- satisfy pre-read / post-read for all six families per current official docs;
-- avoid adding `crm.objects.deals.read` / activity object-read scopes to the setup key for convenience;
-- keep runtime key `CanAIYet CAP-001 Lab Commissioning` unchanged (contacts object scopes only).
+## NOT AVAILABLE IN OBSERVED CATALOG (Service Key)
 
-### Emails note
+```text
+crm.schemas.notes.read / write
+crm.schemas.tasks.read / write
+crm.schemas.meetings.read / write
+crm.schemas.emails.read / write
+```
 
-Official GET property/group pages list `crm.schemas.emails.read` and `crm.objects.emails.read` among OR scopes. We choose **`crm.schemas.emails.read`**. A prior contacts-only runtime preflight saw email schema `403` asking for `connected-email-data-access` — that is **not** used here; it is not on the dated property GET Required Scopes list we pin. If a future live setup with `crm.schemas.emails.read` still fails, STOP and treat as a new portal/permission finding (do not silently add connected-email).
+Ladder status for Service Key schema setup on those families: **`BLOCKED_AUTH_SURFACE`**.
 
-## Operation → endpoint → scope matrix (summary)
+Do **not** call them permanently unsupported or `UNMAPPED` from catalog absence alone — next mission is family-by-family representation/auth verification. Do **not** silently substitute object scopes or `connected-email-data-access`.
 
-| Step | Op | Method/path | Chosen setup scope |
-| --- | --- | --- | --- |
-| 2 pre | get/list group | `GET /crm/properties/2026-09/{objectType}/groups[/{groupName}]` | `crm.schemas.{family}.read` |
-| 2 write | create group | `POST /crm/properties/2026-09/{objectType}/groups` | `crm.schemas.{family}.write` |
-| 3 pre | list/get properties | `GET /crm/properties/2026-09/{objectType}` | `crm.schemas.{family}.read` |
-| 3 write | create property | `POST /crm/properties/2026-09/{objectType}` | `crm.schemas.{family}.write` |
-| 4 post | re-read groups+properties | same GETs | `crm.schemas.{family}.read` |
+## Prefer
 
-Full machine matrix: `buildCap001MetadataSetupOperationMatrix()` · coverage check: `evaluateSetupCredentialEnvelopeCoverage()`.
+1. HubSpot UI for contacts/deals custom properties when authorized, **or**
+2. Short-lived Service Key with the **4** observed-selectable scopes above — only after fresh human authorization.
 
-Sources (retrieval 2026-09-17):
+## Live provisioning
 
-- https://developers.hubspot.com/docs/api-reference/latest/crm/properties/create-property.md
-- https://developers.hubspot.com/docs/api-reference/latest/crm/properties/get-properties.md
-- https://developers.hubspot.com/docs/api-reference/latest/crm/properties/property-groups/create-property.md
-- https://developers.hubspot.com/docs/api-reference/latest/crm/properties/property-groups/get-properties.md
-- https://developers.hubspot.com/docs/api-reference/latest/crm/properties/property-groups/get-property.md
+**Blocked.** CAP-001 portable exam unchanged.
 
-## Explicit non-adds
+## Evidence matrix
 
-- Do **not** add any of these scopes to runtime key `CanAIYet CAP-001 Lab Commissioning`
-- Do **not** add `crm.objects.deals.read` / `crm.objects.deals.write` in the metadata mission (separate Deals approval packet)
-- Do **not** add `crm.objects.notes|tasks|meetings|emails.*` for convenience when schema-read is documented
-- Do **not** add `connected-email-data-access` unless a future evidenced blocker requires a new work order
-
-## Future execution order (dry)
-
-1. Verify portal = `247381023` (account-info; any authenticated setup/runtime key)
-2. For each family: GET group `cay_cap001`; POST if MISSING; STOP if INCOMPATIBLE/archived
-3. For each family with group READY: GET properties; POST MISSING `cay_*`
-4. Authoritative re-read of groups + properties; prove dry-plan parity
-5. STOP
-6. Retire temporary setup credential after independent review
-
-Machine model: `evals/hubspot/cap001/metadata-provisioning.ts` · provenance: `docs/HUBSPOT_PROPERTY_GROUP_PROVENANCE.md`
+`evals/hubspot/cap001/environment-evidence-matrix.ts` · catalog receipt: `docs/reviews/CAY-20260917-hubspot-service-key-scope-catalog.md`

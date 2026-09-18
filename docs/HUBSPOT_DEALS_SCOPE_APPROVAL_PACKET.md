@@ -33,7 +33,7 @@ crm.objects.deals.write
 Do **not** add any of the following to the steady-state runtime Service Key for CAP-001 tool use:
 
 - Activity object scopes (`crm.objects.notes.*`, `tasks.*`, `meetings.*`, `emails.*`) — create/list/archive for those families remain authorized under **contacts** scopes already held (matrix + CAY-11).
-- Schema / property-create scopes (`crm.schemas.contacts.write`, `crm.schemas.deals.write`, `crm.schemas.notes.write`, `crm.schemas.tasks.write`, `crm.schemas.meetings.write`, `crm.schemas.emails.write`) — setup-only for one-time `cay_*` provisioning; never permanent runtime authority.
+- Schema / property-create scopes: contacts+deals `crm.schemas.*.{read,write}` are **OBSERVED_SELECTABLE** on Service Key in portal 247381023 (setup-only; never permanent runtime). Activity `crm.schemas.{notes|tasks|meetings|emails}.*` are **NOT AVAILABLE IN OBSERVED CATALOG** (`BLOCKED_AUTH_SURFACE` for Service Key schema setup — not automatically `UNMAPPED`). PR #33 12-scope packet is **SUPERSEDED**. See `docs/API_AUTH_ENVIRONMENT_EVIDENCE_LADDER.md`.
 - HubSpot remote CRM MCP.
 
 ## Exact next human action

@@ -64,7 +64,9 @@ These explain the product and operating method. They do not outrank the authorit
 18a. `HUBSPOT_WRITE_VALIDATION_2026-09.md` — 2026-09 CRM write-validation as environment attribution (never model failure).
 18b. `HUBSPOT_DEALS_SCOPE_APPROVAL_PACKET.md` — human approval packet for deals.read/write only (no key change until accepted).
 18c. `HUBSPOT_PROPERTY_GROUP_PROVENANCE.md` — per-objectType `cay_cap001` group endpoints/scopes (setup-only).
-18d. `HUBSPOT_METADATA_SETUP_CREDENTIAL_PACKET.md` — temporary schema-write credential packet (not granted until authorized).
+18d. `HUBSPOT_METADATA_SETUP_CREDENTIAL_PACKET.md` — temporary schema setup packet (PR #33 12-scope SUPERSEDED; contacts+deals OBSERVED_SELECTABLE only).
+18e. `API_AUTH_ENVIRONMENT_EVIDENCE_LADDER.md` — API ≠ auth product ≠ environment ≠ live evidence (vendor-neutral lesson).
+18f. `reviews/CAY-20260917-hubspot-service-key-scope-catalog.md` — live Service Key catalog evidence.
 19. `VENDOR_DOCUMENTATION_PROTOCOL.md` — when/how to consult official vendor docs; conflict handling; docs MCP vs CRM MCP.
 20. `VENDOR_SOURCE_REGISTRY.md` — HubSpot docs/`llms.txt`/OpenAPI/Developer MCP pointers (no corpus mirror).
 21. `CANAIYET_HUBSPOT_EXPLAINER.md` — plain durable explainer (what/why/how for synthetic→HubSpot); mirrors the Linear document; not build authority.

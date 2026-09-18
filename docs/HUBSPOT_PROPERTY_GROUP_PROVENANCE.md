@@ -45,27 +45,28 @@ CAP-001 dry payload:
 
 ### Create / update / archive groups (write)
 
-OR among schema-write scopes. Per family:
+OR among schema-write scopes on API pages. **Service Key environment surface differs** (portal `247381023`).
 
-| objectType | setup write scope |
-| --- | --- |
-| contacts | `crm.schemas.contacts.write` |
-| deals | `crm.schemas.deals.write` |
-| notes | `crm.schemas.notes.write` |
-| tasks | `crm.schemas.tasks.write` |
-| meetings | `crm.schemas.meetings.write` |
-| emails | `crm.schemas.emails.write` |
+| objectType | documented setup write scope (API) | Service Key observed catalog |
+| --- | --- | --- |
+| contacts | `crm.schemas.contacts.write` | **OBSERVED_SELECTABLE** |
+| deals | `crm.schemas.deals.write` | **OBSERVED_SELECTABLE** |
+| notes | `crm.schemas.notes.write` | **NOT AVAILABLE** → `BLOCKED_AUTH_SURFACE` |
+| tasks | `crm.schemas.tasks.write` | **NOT AVAILABLE** → `BLOCKED_AUTH_SURFACE` |
+| meetings | `crm.schemas.meetings.write` | **NOT AVAILABLE** → `BLOCKED_AUTH_SURFACE` |
+| emails | `crm.schemas.emails.write` | **NOT AVAILABLE** → `BLOCKED_AUTH_SURFACE` |
 
 ### List / get groups (read) — separate from write
 
 Official GET pages list OR scopes including **object-read** and **schema-read**.  
-**Write does not imply read.** Temporary setup key must include explicit read authority.
+**Write does not imply read.** Temporary setup key for contacts/deals must include explicit `crm.schemas.{family}.read`.
 
-Chosen least-authority read for setup: `crm.schemas.{family}.read` for each of the six families (see `docs/HUBSPOT_METADATA_SETUP_CREDENTIAL_PACKET.md`).
+PR #33 12-scope packet: **SUPERSEDED / NOT EXECUTABLE AS WRITTEN**. Ladder: `docs/API_AUTH_ENVIRONMENT_EVIDENCE_LADDER.md`.
 
 ## Temporary setup credential packet (future — not granted now)
 
-Prefer a **short-lived setup Service Key** with the **12-scope** schema read∪write envelope in `docs/HUBSPOT_METADATA_SETUP_CREDENTIAL_PACKET.md`, or HubSpot UI.  
-**Do not** add these to `CanAIYet CAP-001 Lab Commissioning` (runtime contacts.read/write only).
+Prefer a **short-lived setup Service Key** with the **4** observed-selectable contacts+deals schema read∪write scopes, or HubSpot UI.  
+**Do not** add these to `CanAIYet CAP-001 Lab Commissioning`.  
+**Do not** invent activity schema grants; do not label representation `UNMAPPED` from catalog absence alone.
 
 After authoritative re-read + independent review: human retires/rotates the temporary setup credential.

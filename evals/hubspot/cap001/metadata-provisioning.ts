@@ -12,6 +12,10 @@
  */
 
 import { CAP001_METADATA_PLAN } from "@/evals/hubspot/cap001/metadata-plan";
+import {
+  CAP001_SERVICE_KEY_OBSERVED_SETUP_SCOPES,
+  familyEnvironmentEvidence,
+} from "@/evals/hubspot/cap001/environment-evidence-matrix";
 
 export const METADATA_PROVISIONING_RETRIEVAL_DATE = "2026-09-17";
 
@@ -372,23 +376,27 @@ export function buildDryMetadataProvisioningPlan(
 
   const checklist = [
     `Verify portal identity = 247381023 (CanAIYet CAP-001 Lab) before any setup write.`,
-    `For each of contacts/deals/notes/tasks/meetings/emails: ensure property group \`${CAP001_PROPERTY_GROUP_NAME}\` (\`${CAP001_PROPERTY_GROUP_LABEL}\`) exists on **that objectType** — not once portal-global.`,
-    `Create missing groups via ${METADATA_CREATE_PROPERTY_GROUP_ENDPOINT} (setup schema scope only).`,
-    `Only after a family's group is READY (MATCH), create MISSING cay_* properties via ${METADATA_CREATE_PROPERTY_ENDPOINT}.`,
+    "PR #33 12-scope Service Key packet is SUPERSEDED / NOT EXECUTABLE AS WRITTEN (live catalog #5724957946; ladder #5725051934).",
+    "Service Key observed-selectable schema scopes: contacts + deals only. notes/tasks/meetings/emails = BLOCKED_AUTH_SURFACE (not UNMAPPED from catalog alone).",
+    `For contacts+deals only (when authorized): ensure property group \`${CAP001_PROPERTY_GROUP_NAME}\` exists per objectType.`,
+    `Create missing contacts/deals groups via ${METADATA_CREATE_PROPERTY_GROUP_ENDPOINT} (setup schema scope only).`,
+    `Only after a family's group is READY (MATCH), create MISSING cay_* via ${METADATA_CREATE_PROPERTY_ENDPOINT} for OBSERVED_SELECTABLE families.`,
     "MATCH groups/properties are no-ops (idempotent).",
     "INCOMPATIBLE or archived groups/properties fail closed — do not overwrite.",
     "Do not put crm.schemas.*.read or crm.schemas.*.write on the steady-state runtime Service Key.",
-    "Temporary setup key needs schema-read ∪ schema-write (write does not imply read).",
+    "Do not invent Service Key grants for scopes absent from the observed catalog; no silent permission substitution.",
+    "Live provisioning remains blocked until a fresh human authorization after family-by-family evidence settles.",
     "This package is dry-only until a separate human authorization creates groups/properties.",
   ];
 
   const futureSetupOrder = [
     "1. Verify portal identity = 247381023 (account-info + blocked-scope error bodies if needed).",
-    "2. For each object family: GET group cay_cap001 (schema-read); create if MISSING (schema-write); STOP if INCOMPATIBLE/archived.",
-    "3. For each object family with group READY: GET properties (schema-read); create MISSING cay_* (schema-write) — 31 total across families.",
-    "4. Authoritative re-read of groups + properties (schema-read); prove dry-plan parity (all MATCH).",
-    "5. STOP — no Deals scope grant, no seed/mutation suite in the metadata mission.",
-    "6. After independent review: retire/rotate any temporary schema read+write credential (human).",
+    "2. CONTACTS+DEALS only (OBSERVED_SELECTABLE): GET group cay_cap001 (schema-read); create if MISSING (schema-write); STOP if INCOMPATIBLE/archived.",
+    "3. CONTACTS+DEALS only: GET properties (schema-read); create MISSING cay_* (schema-write).",
+    "4. Authoritative re-read contacts+deals (schema-read); prove dry-plan parity — still not LIVE_PROVEN until that authorized run exists.",
+    "5. STOP for notes/tasks/meetings/emails Service Key schema setup — BLOCKED_AUTH_SURFACE; next mission = family-by-family representation/auth verification (do not label UNMAPPED from catalog alone).",
+    "6. STOP — no Deals object-scope grant, no privilege substitution, no seed/mutation suite in this mission.",
+    "7. After independent review: retire/rotate any temporary contacts+deals schema credential (human).",
   ];
 
   return {
@@ -445,36 +453,29 @@ export function createPropertyGroupRequestBody(
 }
 
 /**
- * Temporary setup credential — least-authority envelope for pre-read + write + post-read.
- * Do **not** assume schema write implies schema read (official GET pages list separate OR scopes).
- * Retrieval 2026-09-17: property + property-group OpenAPI embeds on latest 2026-09 docs.
+ * Temporary setup credential — **observed-selectable Service Key envelope only**
+ * (portal 247381023).
  *
- * Chosen read authority: `crm.schemas.{family}.read` (not object-read) for all six families,
- * so the setup key does not pull in deals/notes/tasks/meetings/emails object scopes.
- * Official GET OR lists also include object-read alternatives; we deliberately pick schema-read.
+ * PR #33 12-scope packet is SUPERSEDED / NOT EXECUTABLE AS WRITTEN
+ * (catalog #5724957946; evidence ladder #5725051934).
+ * See docs/API_AUTH_ENVIRONMENT_EVIDENCE_LADDER.md.
+ *
+ * Do **not** assume write ⇒ read. Chosen read: crm.schemas.{family}.read for
+ * families that are OBSERVED_SELECTABLE on the Service Key product here.
  */
 export const CAP001_METADATA_SETUP_SCHEMA_READ_SCOPES = [
   "crm.schemas.contacts.read",
   "crm.schemas.deals.read",
-  "crm.schemas.notes.read",
-  "crm.schemas.tasks.read",
-  "crm.schemas.meetings.read",
-  "crm.schemas.emails.read",
 ] as const;
 
 export const CAP001_METADATA_SETUP_SCHEMA_WRITE_SCOPES = [
   "crm.schemas.contacts.write",
   "crm.schemas.deals.write",
-  "crm.schemas.notes.write",
-  "crm.schemas.tasks.write",
-  "crm.schemas.meetings.write",
-  "crm.schemas.emails.write",
 ] as const;
 
-/** Exact temporary setup key scope list (read ∪ write). Sorted for stable snapshots. */
+/** Observed-selectable temporary Service Key setup scopes (sorted). Not live-ready until layer-4 receipt. */
 export const CAP001_METADATA_SETUP_CREDENTIAL_SCOPES = [
-  ...CAP001_METADATA_SETUP_SCHEMA_READ_SCOPES,
-  ...CAP001_METADATA_SETUP_SCHEMA_WRITE_SCOPES,
+  ...CAP001_SERVICE_KEY_OBSERVED_SETUP_SCOPES,
 ].slice().sort() as readonly string[];
 
 export type Cap001MetadataSetupOperation = {
@@ -499,13 +500,23 @@ function schemaWrite(objectType: Cap001MetadataObjectType): string {
 }
 
 /**
- * Operation → endpoint → required-scope → chosen-scope matrix for the future setup sequence.
- * Portal identity verify uses account-info (outside properties API); covered by existing
- * contacts-capable runtime key or any authenticated setup key — recorded as non-schema.
+ * Operation → endpoint → scope matrix for **Service Key OBSERVED_SELECTABLE** families only
+ * (contacts + deals in portal 247381023). Activity families stay out of the executable
+ * matrix while serviceKeyScopeObservedSelectable === BLOCKED_AUTH_SURFACE.
  */
-export function buildCap001MetadataSetupOperationMatrix(): Cap001MetadataSetupOperation[] {
+export function buildCap001MetadataSetupOperationMatrix(
+  objectTypes: readonly Cap001MetadataObjectType[] = CAP001_METADATA_OBJECT_TYPES.filter(
+    (objectType) =>
+      familyEnvironmentEvidence(objectType).serviceKeyScopeObservedSelectable ===
+      "OBSERVED_SELECTABLE",
+  ),
+): Cap001MetadataSetupOperation[] {
   const rows: Cap001MetadataSetupOperation[] = [];
-  for (const objectType of CAP001_METADATA_OBJECT_TYPES) {
+  for (const objectType of objectTypes) {
+    const evidence = familyEnvironmentEvidence(objectType);
+    if (evidence.serviceKeyScopeObservedSelectable !== "OBSERVED_SELECTABLE") {
+      continue;
+    }
     const read = schemaRead(objectType);
     const write = schemaWrite(objectType);
     rows.push(

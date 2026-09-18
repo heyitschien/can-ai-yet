@@ -1,0 +1,32 @@
+{
+  "receiptId": "CAY-20260917-HUBSPOT-SERVICE-KEY-SCOPE-CATALOG",
+  "portalId": "247381023",
+  "accountName": "CanAIYet CAP-001 Lab",
+  "observedAt": "2026-09-17",
+  "observer": "human-owner",
+  "missionControlCommentIds": ["5724957946", "5725051934"],
+  "mode": "human_ui_observation_recorded_dry",
+  "mutations": 0,
+  "scopeChanges": 0,
+  "modelCalls": 0,
+  "schemaScopesObservedSelectable": [
+    "crm.schemas.contacts.read",
+    "crm.schemas.contacts.write",
+    "crm.schemas.deals.read",
+    "crm.schemas.deals.write"
+  ],
+  "schemaScopesNotInObservedCatalog": [
+    "crm.schemas.notes.read",
+    "crm.schemas.notes.write",
+    "crm.schemas.tasks.read",
+    "crm.schemas.tasks.write",
+    "crm.schemas.meetings.read",
+    "crm.schemas.meetings.write",
+    "crm.schemas.emails.read",
+    "crm.schemas.emails.write"
+  ],
+  "pr33TwelveScopePacketStatus": "SUPERSEDED_NOT_EXECUTABLE_AS_WRITTEN",
+  "activityFamilyRepresentationFromCatalogAlone": "not_UNMAPPED_pending_representation_evidence",
+  "serviceKeySchemaSetupStatusForActivityFamilies": "BLOCKED_AUTH_SURFACE",
+  "ladderDoc": "docs/API_AUTH_ENVIRONMENT_EVIDENCE_LADDER.md"
+}
