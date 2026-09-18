@@ -7,7 +7,7 @@ Short scan log. Newest first.
 STATUS: READY_FOR_REVIEW
 What: Separate from HubSpot PR #31. Document Mission Control Issue #1 as the ChatGPT↔Cursor shared desk; require fetching the exact work-order comment; clarify that a newer explicit human-owner pause/cancel/override stops work and must be reconciled onto Issue #1 (stale Issue comments do not overrule a human stop). Rebased onto post-#31 main.
 Branch: `docs/mission-control-shared-desk-protocol`
-Tip: (pending) · PR: https://github.com/heyitschien/can-ai-yet/pull/32
+Tip: `5d1b4fd8d3b5377997013919eec1bce4da874deb` · PR: https://github.com/heyitschien/can-ai-yet/pull/32
 Base: `8c70693068117bb433667e57d9e276cf7ff3934e`
 
 ## CAY-20260917-HUBSPOT-READINESS-REFRESH — Create-Record attribution narrow fix
