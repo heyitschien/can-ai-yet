@@ -1,13 +1,16 @@
 import { describe, expect, it } from "vitest";
 import { CAP001_METADATA_PLAN } from "@/evals/hubspot/cap001/metadata-plan";
 import {
+  buildCap001MetadataSetupOperationMatrix,
   buildCap001PropertyGroupSpecs,
   buildCap001PropertySpecs,
   buildDryMetadataProvisioningPlan,
+  CAP001_METADATA_SETUP_CREDENTIAL_SCOPES,
   countSpecsByObjectType,
   createPropertyGroupRequestBody,
   createPropertyRequestBody,
   evaluatePropertyIdempotence,
+  evaluateSetupCredentialEnvelopeCoverage,
 } from "@/evals/hubspot/cap001/metadata-provisioning";
 import {
   CAP001_HUBSPOT_METADATA_PROVISIONING,
@@ -162,6 +165,91 @@ describe("CAP-001 dry metadata provisioning package", () => {
     expect(
       archivedGroupPlan.propertiesBlockedUntilGroupReady.some((s) => s.objectType === "contacts"),
     ).toBe(true);
+  });
+
+  it("declares a setup credential envelope that covers pre-read, write, and post-read for all six families", () => {
+    expect(CAP001_METADATA_SETUP_CREDENTIAL_SCOPES).toEqual([
+      "crm.schemas.contacts.read",
+      "crm.schemas.contacts.write",
+      "crm.schemas.deals.read",
+      "crm.schemas.deals.write",
+      "crm.schemas.emails.read",
+      "crm.schemas.emails.write",
+      "crm.schemas.meetings.read",
+      "crm.schemas.meetings.write",
+      "crm.schemas.notes.read",
+      "crm.schemas.notes.write",
+      "crm.schemas.tasks.read",
+      "crm.schemas.tasks.write",
+    ]);
+
+    const matrix = buildCap001MetadataSetupOperationMatrix();
+    expect(matrix.length).toBe(6 * 5); // pre group, write group, pre props, write props, post-read
+    for (const objectType of CAP001_METADATA_PLAN.objectFamilies) {
+      const rows = matrix.filter((row) => row.objectType === objectType);
+      expect(rows.some((r) => r.method === "GET" && r.operation.includes("group"))).toBe(true);
+      expect(rows.some((r) => r.method === "POST" && r.operation === "groups.create")).toBe(true);
+      expect(rows.some((r) => r.method === "GET" && r.operation.includes("properties"))).toBe(true);
+      expect(rows.some((r) => r.method === "POST" && r.operation === "properties.create")).toBe(true);
+      expect(rows.some((r) => r.step === "4.post_read_parity")).toBe(true);
+    }
+
+    const coverage = evaluateSetupCredentialEnvelopeCoverage();
+    expect(coverage.ok).toBe(true);
+    expect(coverage.missingByOperation).toEqual([]);
+
+    const dry = buildDryMetadataProvisioningPlan();
+    expect(dry.futureSetupOrder.join("\n")).toMatch(/schema-read/i);
+    expect(dry.futureSetupOrder.join("\n")).toMatch(/schema-write/i);
+    expect(dry.futureSetupOrder.join("\n")).toMatch(/retire\/rotate.*read\+write/i);
+    // Envelope covers every family step referenced by futureSetupOrder (2–4).
+    for (const objectType of CAP001_METADATA_PLAN.objectFamilies) {
+      expect(
+        matrix.some(
+          (r) =>
+            r.objectType === objectType &&
+            r.step.startsWith("2.") &&
+            r.chosenSetupScopes.includes(`crm.schemas.${objectType}.read`),
+        ),
+      ).toBe(true);
+      expect(
+        matrix.some(
+          (r) =>
+            r.objectType === objectType &&
+            r.step.startsWith("2.") &&
+            r.chosenSetupScopes.includes(`crm.schemas.${objectType}.write`),
+        ),
+      ).toBe(true);
+      expect(
+        matrix.some(
+          (r) =>
+            r.objectType === objectType &&
+            r.step.startsWith("3.") &&
+            r.chosenSetupScopes.includes(`crm.schemas.${objectType}.read`),
+        ),
+      ).toBe(true);
+      expect(
+        matrix.some(
+          (r) =>
+            r.objectType === objectType &&
+            r.step.startsWith("3.") &&
+            r.chosenSetupScopes.includes(`crm.schemas.${objectType}.write`),
+        ),
+      ).toBe(true);
+      expect(
+        matrix.some(
+          (r) =>
+            r.objectType === objectType &&
+            r.step === "4.post_read_parity" &&
+            r.chosenSetupScopes.includes(`crm.schemas.${objectType}.read`),
+        ),
+      ).toBe(true);
+    }
+
+    const writeOnly = CAP001_METADATA_SETUP_CREDENTIAL_SCOPES.filter((s) => s.endsWith(".write"));
+    const writeOnlyCoverage = evaluateSetupCredentialEnvelopeCoverage(writeOnly);
+    expect(writeOnlyCoverage.ok).toBe(false);
+    expect(writeOnlyCoverage.missingByOperation.length).toBeGreaterThan(0);
   });
 });
 

@@ -377,17 +377,18 @@ export function buildDryMetadataProvisioningPlan(
     `Only after a family's group is READY (MATCH), create MISSING cay_* properties via ${METADATA_CREATE_PROPERTY_ENDPOINT}.`,
     "MATCH groups/properties are no-ops (idempotent).",
     "INCOMPATIBLE or archived groups/properties fail closed — do not overwrite.",
-    "Do not put crm.schemas.*.write on the steady-state runtime Service Key.",
+    "Do not put crm.schemas.*.read or crm.schemas.*.write on the steady-state runtime Service Key.",
+    "Temporary setup key needs schema-read ∪ schema-write (write does not imply read).",
     "This package is dry-only until a separate human authorization creates groups/properties.",
   ];
 
   const futureSetupOrder = [
     "1. Verify portal identity = 247381023 (account-info + blocked-scope error bodies if needed).",
-    "2. For each object family: GET group cay_cap001; create if MISSING; STOP if INCOMPATIBLE/archived.",
-    "3. For each object family with group READY: create MISSING cay_* properties (31 total across families).",
-    "4. Authoritative re-read of groups + properties; prove dry-plan parity (all MATCH).",
+    "2. For each object family: GET group cay_cap001 (schema-read); create if MISSING (schema-write); STOP if INCOMPATIBLE/archived.",
+    "3. For each object family with group READY: GET properties (schema-read); create MISSING cay_* (schema-write) — 31 total across families.",
+    "4. Authoritative re-read of groups + properties (schema-read); prove dry-plan parity (all MATCH).",
     "5. STOP — no Deals scope grant, no seed/mutation suite in the metadata mission.",
-    "6. After independent review: retire/rotate any temporary schema-write credential (human).",
+    "6. After independent review: retire/rotate any temporary schema read+write credential (human).",
   ];
 
   return {
@@ -441,4 +442,169 @@ export function createPropertyGroupRequestBody(
   spec: Cap001PropertyGroupSpec,
 ): Cap001PropertyGroupCreatePayload {
   return { ...spec.payload };
+}
+
+/**
+ * Temporary setup credential — least-authority envelope for pre-read + write + post-read.
+ * Do **not** assume schema write implies schema read (official GET pages list separate OR scopes).
+ * Retrieval 2026-09-17: property + property-group OpenAPI embeds on latest 2026-09 docs.
+ *
+ * Chosen read authority: `crm.schemas.{family}.read` (not object-read) for all six families,
+ * so the setup key does not pull in deals/notes/tasks/meetings/emails object scopes.
+ * Official GET OR lists also include object-read alternatives; we deliberately pick schema-read.
+ */
+export const CAP001_METADATA_SETUP_SCHEMA_READ_SCOPES = [
+  "crm.schemas.contacts.read",
+  "crm.schemas.deals.read",
+  "crm.schemas.notes.read",
+  "crm.schemas.tasks.read",
+  "crm.schemas.meetings.read",
+  "crm.schemas.emails.read",
+] as const;
+
+export const CAP001_METADATA_SETUP_SCHEMA_WRITE_SCOPES = [
+  "crm.schemas.contacts.write",
+  "crm.schemas.deals.write",
+  "crm.schemas.notes.write",
+  "crm.schemas.tasks.write",
+  "crm.schemas.meetings.write",
+  "crm.schemas.emails.write",
+] as const;
+
+/** Exact temporary setup key scope list (read ∪ write). Sorted for stable snapshots. */
+export const CAP001_METADATA_SETUP_CREDENTIAL_SCOPES = [
+  ...CAP001_METADATA_SETUP_SCHEMA_READ_SCOPES,
+  ...CAP001_METADATA_SETUP_SCHEMA_WRITE_SCOPES,
+].slice().sort() as readonly string[];
+
+export type Cap001MetadataSetupOperation = {
+  step: string;
+  operation: string;
+  method: "GET" | "POST";
+  endpoint: string;
+  objectType: Cap001MetadataObjectType | "portal";
+  /** Official OR scopes that satisfy this operation for the objectType (least-authority choice first). */
+  requiredScopesAnyOf: readonly string[];
+  /** Scope(s) we place on the temporary setup key for this operation. */
+  chosenSetupScopes: readonly string[];
+  docSource: string;
+};
+
+function schemaRead(objectType: Cap001MetadataObjectType): string {
+  return `crm.schemas.${objectType}.read`;
+}
+
+function schemaWrite(objectType: Cap001MetadataObjectType): string {
+  return `crm.schemas.${objectType}.write`;
+}
+
+/**
+ * Operation → endpoint → required-scope → chosen-scope matrix for the future setup sequence.
+ * Portal identity verify uses account-info (outside properties API); covered by existing
+ * contacts-capable runtime key or any authenticated setup key — recorded as non-schema.
+ */
+export function buildCap001MetadataSetupOperationMatrix(): Cap001MetadataSetupOperation[] {
+  const rows: Cap001MetadataSetupOperation[] = [];
+  for (const objectType of CAP001_METADATA_OBJECT_TYPES) {
+    const read = schemaRead(objectType);
+    const write = schemaWrite(objectType);
+    rows.push(
+      {
+        step: "2.pre_read_group",
+        operation: "groups.get_or_list",
+        method: "GET",
+        endpoint: METADATA_GET_PROPERTY_GROUP_ENDPOINT,
+        objectType,
+        requiredScopesAnyOf: [read],
+        chosenSetupScopes: [read],
+        docSource: METADATA_CREATE_PROPERTY_GROUP_DOC.replace(
+          "create-property.md",
+          "get-property.md",
+        ),
+      },
+      {
+        step: "2.write_group_if_missing",
+        operation: "groups.create",
+        method: "POST",
+        endpoint: METADATA_CREATE_PROPERTY_GROUP_ENDPOINT,
+        objectType,
+        requiredScopesAnyOf: [write],
+        chosenSetupScopes: [write],
+        docSource: METADATA_CREATE_PROPERTY_GROUP_DOC,
+      },
+      {
+        step: "3.pre_read_properties",
+        operation: "properties.list_or_get",
+        method: "GET",
+        endpoint: "/crm/properties/2026-09/{objectType}",
+        objectType,
+        requiredScopesAnyOf: [read],
+        chosenSetupScopes: [read],
+        docSource: METADATA_CREATE_PROPERTY_DOC.replace(
+          "create-property.md",
+          "get-properties.md",
+        ),
+      },
+      {
+        step: "3.write_property_if_missing",
+        operation: "properties.create",
+        method: "POST",
+        endpoint: METADATA_CREATE_PROPERTY_ENDPOINT,
+        objectType,
+        requiredScopesAnyOf: [write],
+        chosenSetupScopes: [write],
+        docSource: METADATA_CREATE_PROPERTY_DOC,
+      },
+      {
+        step: "4.post_read_parity",
+        operation: "groups_and_properties.re_read",
+        method: "GET",
+        endpoint: `${METADATA_GET_PROPERTY_GROUP_ENDPOINT} + /crm/properties/2026-09/{objectType}`,
+        objectType,
+        requiredScopesAnyOf: [read],
+        chosenSetupScopes: [read],
+        docSource: METADATA_CREATE_PROPERTY_DOC.replace(
+          "create-property.md",
+          "get-properties.md",
+        ),
+      },
+    );
+  }
+  return rows;
+}
+
+export type SetupEnvelopeCoverage = {
+  ok: boolean;
+  envelope: readonly string[];
+  missingByOperation: Array<{
+    operation: string;
+    objectType: string;
+    missing: string[];
+  }>;
+};
+
+/**
+ * Deterministic check: declared temporary setup envelope covers every matrix operation.
+ * Does not call HubSpot.
+ */
+export function evaluateSetupCredentialEnvelopeCoverage(
+  envelope: readonly string[] = CAP001_METADATA_SETUP_CREDENTIAL_SCOPES,
+): SetupEnvelopeCoverage {
+  const have = new Set(envelope);
+  const missingByOperation: SetupEnvelopeCoverage["missingByOperation"] = [];
+  for (const row of buildCap001MetadataSetupOperationMatrix()) {
+    const missing = row.chosenSetupScopes.filter((scope) => !have.has(scope));
+    if (missing.length > 0) {
+      missingByOperation.push({
+        operation: `${row.step}:${row.operation}`,
+        objectType: row.objectType,
+        missing,
+      });
+    }
+  }
+  return {
+    ok: missingByOperation.length === 0,
+    envelope: [...envelope].sort(),
+    missingByOperation,
+  };
 }

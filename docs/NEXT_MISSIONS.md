@@ -24,7 +24,7 @@ Milestone 1 remains complete: first independently reviewed real-model CAP-001 fi
 | Current-platform readiness refresh (PR #31) | ✅ merged/accepted `main` @ `8c70693…` |
 | Mission Control shared-desk protocol (PR #32) | ✅ merged/accepted `main` @ `39b33fa…` |
 | Portal identity validation (new lab Service Key) | ✅ resolved — HubSpot **`247381023`** / CanAIYet CAP-001 Lab (old key was `247380908`) |
-| Metadata **group** readiness (per-family `cay_cap001`) | ◀ CURRENT — dry design gate before any live group/property create |
+| Metadata **group** readiness (per-family `cay_cap001`) | ◀ CURRENT — dry design gate; setup credential envelope = schema-read∪write (PR #33) |
 | One-time required `cay_*` metadata provisioning (live) | **not authorized yet** |
 | Minimum Deals scopes grant | **not authorized yet** |
 | Live CAP-001 adapters against real portal + no-model complete-graph commissioning | **not authorized yet** |

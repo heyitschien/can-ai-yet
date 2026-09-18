@@ -41,11 +41,13 @@ CAP-001 dry payload:
 }
 ```
 
-## Setup scopes (create/update/archive groups)
+## Setup scopes
 
-OR among schema-write scopes on the create-group page. Per family we need:
+### Create / update / archive groups (write)
 
-| objectType | setup scope (not runtime Service Key) |
+OR among schema-write scopes. Per family:
+
+| objectType | setup write scope |
 | --- | --- |
 | contacts | `crm.schemas.contacts.write` |
 | deals | `crm.schemas.deals.write` |
@@ -54,11 +56,16 @@ OR among schema-write scopes on the create-group page. Per family we need:
 | meetings | `crm.schemas.meetings.write` |
 | emails | `crm.schemas.emails.write` |
 
-List/get groups include broader OR scopes (object read and/or schema read). Runtime key may read some catalogs under contacts scopes; schema-write remains setup-only.
+### List / get groups (read) — separate from write
+
+Official GET pages list OR scopes including **object-read** and **schema-read**.  
+**Write does not imply read.** Temporary setup key must include explicit read authority.
+
+Chosen least-authority read for setup: `crm.schemas.{family}.read` for each of the six families (see `docs/HUBSPOT_METADATA_SETUP_CREDENTIAL_PACKET.md`).
 
 ## Temporary setup credential packet (future — not granted now)
 
-Prefer a **short-lived setup Service Key** (or HubSpot UI) with **only** the six `crm.schemas.*.write` scopes above for the duration of one-time metadata provisioning.  
+Prefer a **short-lived setup Service Key** with the **12-scope** schema read∪write envelope in `docs/HUBSPOT_METADATA_SETUP_CREDENTIAL_PACKET.md`, or HubSpot UI.  
 **Do not** add these to `CanAIYet CAP-001 Lab Commissioning` (runtime contacts.read/write only).
 
-After authoritative re-read + independent review: human retires/rotates the temporary schema-write credential.
+After authoritative re-read + independent review: human retires/rotates the temporary setup credential.

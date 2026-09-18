@@ -18,14 +18,17 @@ export {
 } from "@/evals/hubspot/cap001/http-client";
 export { CAP001_METADATA_PLAN } from "@/evals/hubspot/cap001/metadata-plan";
 export {
+  buildCap001MetadataSetupOperationMatrix,
   buildCap001PropertyGroupSpecs,
   buildCap001PropertySpecs,
   buildDryMetadataProvisioningPlan,
+  CAP001_METADATA_SETUP_CREDENTIAL_SCOPES,
   countSpecsByObjectType,
   createPropertyGroupRequestBody,
   createPropertyRequestBody,
   evaluatePropertyGroupIdempotence,
   evaluatePropertyIdempotence,
+  evaluateSetupCredentialEnvelopeCoverage,
   METADATA_CREATE_PROPERTY_DOC,
   METADATA_CREATE_PROPERTY_ENDPOINT,
   METADATA_CREATE_PROPERTY_GROUP_DOC,
@@ -33,6 +36,7 @@ export {
 } from "@/evals/hubspot/cap001/metadata-provisioning";
 export type {
   Cap001MetadataObjectType,
+  Cap001MetadataSetupOperation,
   Cap001PropertyGroupSpec,
   Cap001PropertySpec,
   DryMetadataProvisioningPlan,
