@@ -7,7 +7,7 @@ Short scan log. Newest first.
 STATUS: READY_FOR_REVIEW
 What: Read-only validation of replaced local Service Key. HubSpot `account-info` + deals/emails schema 403 bodies all name portal **247381023** (CanAIYet CAP-001 Lab, DEVELOPER_TEST). Prior readiness preflight `247380908` = old wrong-portal key (credential mismatch, not model failure). Original readiness receipt preserved. Mission Control shared-desk rule strengthened in AGENTS.md / COMMUNICATION_PROTOCOL §0 / AGENT_SYSTEM_INDEX. Mutations/scopes/models = 0.
 Branch: `feature/cay-20260917-hubspot-readiness-refresh`
-Tip: (pending) · PR: https://github.com/heyitschien/can-ai-yet/pull/31
+Tip: `214153edb7ab614af4018215f797a55b44d7b4e3` · PR: https://github.com/heyitschien/can-ai-yet/pull/31
 Base: `e8fbc747baebc50982fc8a16f415f367f548a427`
 
 ## CAY-20260917-HUBSPOT-READINESS-REFRESH — Current-platform HubSpot readiness
