@@ -4,6 +4,16 @@ This index exists so a fresh human or agent can quickly understand which documen
 
 Two lists. Do not treat them as the same thing.
 
+## Quick map (read this first)
+
+| Need | Read |
+| --- | --- |
+| **Build authority** | `../canonical-build-doc.md` |
+| **Next authorized work** | `NEXT_MISSIONS.md` + GitHub Issue #1 |
+| **Agent-system architecture / measurement** | `AGENT_SYSTEM_ARCHITECTURE.md` (strategy — not build law) |
+| **Startup thesis / falsification of configured AI** | `STARTUP_THESIS_CONFIGURED_AI_DELEGATION.md` (strategy — not build law) |
+| **How work is handed off** | `COMMUNICATION_PROTOCOL.md` |
+
 ## If documents disagree, this order wins
 
 1. `../canonical-build-doc.md` — what CanAIYet is and what must be built.
@@ -14,6 +24,8 @@ Two lists. Do not treat them as the same thing.
 6. GitHub Issue #1 — the live work order.
 
 `FALSIFICATION_OPERATING_METHOD.md` is the default learning/decision method for material hypotheses, but it does not independently authorize implementation, spend, deployment, or public claims.
+
+`AGENT_SYSTEM_ARCHITECTURE.md` and `STARTUP_THESIS_CONFIGURED_AI_DELEGATION.md` are durable strategy/instrumentation design (consolidated from 2026-09-17 PR #29 research). They are **not** build authority and do **not** reorder HubSpot or CAP-001 work.
 
 `ORIGIN_AND_DECISION_TRAIL.md`, `EXPLAINED_LIKE_IM_FIVE.md`, `CANAIYET_HUBSPOT_EXPLAINER.md`, `DECISION_RECORD_2026-09-11.md`, `EOD_2026-09-11.md`, `CAPABILITY_INTELLIGENCE_THESIS.md`, `PRODUCT_DISCOVERY_BY_FALSIFICATION.md`, `THREE_YEAR_ENTERPRISE_AI_CAPABILITY_TRAJECTORY.md`, `FALSIFICATION_AND_PHASE_THRESHOLDS.md`, `ENTERPRISE_ENVIRONMENT_VALIDATION.md`, `HUBSPOT_TRANSFER_PREDICTION_2026-09-11.md`, and `CAPABILITY_CONTROL_PLANE_HORIZON.md` are explanation/strategy, not build authority. `FOUR_AGENT_SYSTEM_SUMMARY.md` is a refresher, not a second architecture. `can-ai-yet-status.pdf` is a dated human snapshot, not a work order.
 
@@ -37,23 +49,25 @@ These explain the product and operating method. They do not outrank the authorit
 5. `EVIDENCE_SOURCE_OF_TRUTH_PLAN.md` — why headline and detail must come from the same accepted run.
 6. `REAL_MODEL_RUNBOOK.md` — how a human runs or refuses a CAP-001 OpenRouter test.
 7. `FALSIFICATION_OPERATING_METHOD.md` — reusable operating discipline: form falsifiable hypotheses, design the cheapest serious test, preserve evidence, then continue/narrow/pivot/stop.
-8. `CAPABILITY_INTELLIGENCE_THESIS.md` — strategic thesis: economics, moat hypotheses, demand loop, falsification.
-9. `PRODUCT_DISCOVERY_BY_FALSIFICATION.md` — product-discovery doctrine: keep the measurement mission stable while letting falsification reshape the product, architecture, market hypothesis, and eventual company form.
-10. `THREE_YEAR_ENTERPRISE_AI_CAPABILITY_TRAJECTORY.md` — human-capability projection: how portable contracts, enterprise transfer, agent assurance, experimental design, and failure attribution could compound into enterprise-grade professional capability even if the startup thesis changes or fails.
-11. `ENTERPRISE_ENVIRONMENT_VALIDATION.md` — why the synthetic lab is a wind tunnel, how capability packs could progress into real vendor sandboxes/customer staging, and the HubSpot transfer experiment hypothesis.
-12. `HUBSPOT_TRANSFER_PREDICTION_2026-09-11.md` — pre-registered expectations for the CAP-001 HubSpot transfer; compare the eventual result against this record rather than rewriting the story afterward.
-13. `HUBSPOT_TRANSFER_DESIGN_2026-09-13.md` — design-only HubSpot transfer spec (Issue #14); consolidated Service Key + portable-v2 direction; not build authority until independently accepted.
-14. `HUBSPOT_COMMISSIONING_SETUP.md` — concise human setup runbook for no-model commissioning (Service Key; no secrets in chat); live smoke still separately authorized.
-15. `HUBSPOT_CAP001_ENV.md` — CAY-08 CAP-001 HubSpot seed/reset/snapshot/mapping versions (no-model calibration; not live suite auth).
-16. `HUBSPOT_CAP001_SCOPE_PLAN.md` — exact least-authority tool→endpoint→scope matrix (deals new; activities under contacts scopes; no key expansion).
-17. `VENDOR_DOCUMENTATION_PROTOCOL.md` — when/how to consult official vendor docs; conflict handling; docs MCP vs CRM MCP.
-18. `VENDOR_SOURCE_REGISTRY.md` — HubSpot docs/`llms.txt`/OpenAPI/Developer MCP pointers (no corpus mirror).
-19. `CANAIYET_HUBSPOT_EXPLAINER.md` — plain durable explainer (what/why/how for synthetic→HubSpot); mirrors the Linear document; not build authority.
-20. `CAP_001_INSTRUMENT_SCIENCE.md` — execution vs construct validity, v1 certification matrix pointers, CapabilityContract + EnvironmentManifest discipline (CAY-20260913-03/04; not build authority).
-21. `FALSIFICATION_AND_PHASE_THRESHOLDS.md` — CanAIYet-specific stage gates and stop/narrow/pivot logic.
-22. `CAPABILITY_CONTROL_PLANE_HORIZON.md` — long-horizon hypothesis: capability graph, longitudinal evidence, and possible `measure → qualify → recommend → route → monitor → govern` progression; not a roadmap.
-23. `FOUR_AGENT_SYSTEM.md` — who scouts, runs, judges, and publishes.
-24. `NEXT_MISSIONS.md` — what should happen next.
+8. `STARTUP_THESIS_CONFIGURED_AI_DELEGATION.md` — durable startup clarification: agent engineering as measurement apparatus; five falsifiable beliefs (measurement, portability, configuration, decision utility, economics); configured-AI delegation question.
+9. `AGENT_SYSTEM_ARCHITECTURE.md` — durable agent/harness/skill/tool/adapter/law taxonomy, `AgentSystemManifest` measurement model, HubSpot hold-fixed transfer rule, frontier provenance.
+10. `CAPABILITY_INTELLIGENCE_THESIS.md` — strategic thesis: economics, moat hypotheses, demand loop, falsification.
+11. `PRODUCT_DISCOVERY_BY_FALSIFICATION.md` — product-discovery doctrine: keep the measurement mission stable while letting falsification reshape the product, architecture, market hypothesis, and eventual company form.
+12. `THREE_YEAR_ENTERPRISE_AI_CAPABILITY_TRAJECTORY.md` — human-capability projection: how portable contracts, enterprise transfer, agent assurance, experimental design, and failure attribution could compound into enterprise-grade professional capability even if the startup thesis changes or fails.
+13. `ENTERPRISE_ENVIRONMENT_VALIDATION.md` — why the synthetic lab is a wind tunnel, how capability packs could progress into real vendor sandboxes/customer staging, and the HubSpot transfer experiment hypothesis.
+14. `HUBSPOT_TRANSFER_PREDICTION_2026-09-11.md` — pre-registered expectations for the CAP-001 HubSpot transfer; compare the eventual result against this record rather than rewriting the story afterward.
+15. `HUBSPOT_TRANSFER_DESIGN_2026-09-13.md` — design-only HubSpot transfer spec (Issue #14); consolidated Service Key + portable-v2 direction; not build authority until independently accepted.
+16. `HUBSPOT_COMMISSIONING_SETUP.md` — concise human setup runbook for no-model commissioning (Service Key; no secrets in chat); live smoke still separately authorized.
+17. `HUBSPOT_CAP001_ENV.md` — CAY-08 CAP-001 HubSpot seed/reset/snapshot/mapping versions (no-model calibration; not live suite auth).
+18. `HUBSPOT_CAP001_SCOPE_PLAN.md` — exact least-authority tool→endpoint→scope matrix (deals new; activities under contacts scopes; no key expansion).
+19. `VENDOR_DOCUMENTATION_PROTOCOL.md` — when/how to consult official vendor docs; conflict handling; docs MCP vs CRM MCP.
+20. `VENDOR_SOURCE_REGISTRY.md` — HubSpot docs/`llms.txt`/OpenAPI/Developer MCP pointers (no corpus mirror).
+21. `CANAIYET_HUBSPOT_EXPLAINER.md` — plain durable explainer (what/why/how for synthetic→HubSpot); mirrors the Linear document; not build authority.
+22. `CAP_001_INSTRUMENT_SCIENCE.md` — execution vs construct validity, v1 certification matrix pointers, CapabilityContract + EnvironmentManifest discipline (CAY-20260913-03/04; not build authority).
+23. `FALSIFICATION_AND_PHASE_THRESHOLDS.md` — CanAIYet-specific stage gates and stop/narrow/pivot logic.
+24. `CAPABILITY_CONTROL_PLANE_HORIZON.md` — long-horizon hypothesis: capability graph, longitudinal evidence, and possible `measure → qualify → recommend → route → monitor → govern` progression; not a roadmap.
+25. `FOUR_AGENT_SYSTEM.md` — who scouts, runs, judges, and publishes.
+26. `NEXT_MISSIONS.md` — what should happen next.
 
 Demand Scout docs (sensor, not benchmark authority):
 
@@ -70,10 +84,11 @@ Demand Scout docs (sensor, not benchmark authority):
 5. `FOUR_AGENT_SYSTEM.md`.
 6. `NEXT_MISSIONS.md`.
 7. Issue #1, including the latest receipt.
-8. `CAPABILITY_INTELLIGENCE_THESIS.md`, `PRODUCT_DISCOVERY_BY_FALSIFICATION.md`, `THREE_YEAR_ENTERPRISE_AI_CAPABILITY_TRAJECTORY.md`, `ENTERPRISE_ENVIRONMENT_VALIDATION.md`, `HUBSPOT_TRANSFER_PREDICTION_2026-09-11.md`, `FALSIFICATION_AND_PHASE_THRESHOLDS.md`, and `CAPABILITY_CONTROL_PLANE_HORIZON.md` when strategic/economic/enterprise-validation direction is needed.
-9. `DEMAND_SCOUT_ARCHITECTURE.md` / `DEMAND_SCOUT_OPERATIONS.md` when working Issue #6 (currently PARKED_UNCOMMISSIONED — no live Google calls without a fresh work order).
-10. `HUBSPOT_TRANSFER_DESIGN_2026-09-13.md` / `HUBSPOT_COMMISSIONING_SETUP.md` when reviewing Issue #14 design or human HubSpot setup (design/setup only until live smoke authorized).
-11. `ORIGIN_AND_DECISION_TRAIL.md`, `EXPLAINED_LIKE_IM_FIVE.md`, and `CANAIYET_HUBSPOT_EXPLAINER.md` when the why or the plain HubSpot-transfer explanation is needed.
+8. `STARTUP_THESIS_CONFIGURED_AI_DELEGATION.md` and `AGENT_SYSTEM_ARCHITECTURE.md` when configured-AI / harness / AgentSystemManifest strategy is needed (not build law; do not reorder HubSpot work).
+9. `CAPABILITY_INTELLIGENCE_THESIS.md`, `PRODUCT_DISCOVERY_BY_FALSIFICATION.md`, `THREE_YEAR_ENTERPRISE_AI_CAPABILITY_TRAJECTORY.md`, `ENTERPRISE_ENVIRONMENT_VALIDATION.md`, `HUBSPOT_TRANSFER_PREDICTION_2026-09-11.md`, `FALSIFICATION_AND_PHASE_THRESHOLDS.md`, and `CAPABILITY_CONTROL_PLANE_HORIZON.md` when broader strategic/economic/enterprise-validation direction is needed.
+10. `DEMAND_SCOUT_ARCHITECTURE.md` / `DEMAND_SCOUT_OPERATIONS.md` when working Issue #6 (currently PARKED_UNCOMMISSIONED — no live Google calls without a fresh work order).
+11. `HUBSPOT_TRANSFER_DESIGN_2026-09-13.md` / `HUBSPOT_COMMISSIONING_SETUP.md` when reviewing Issue #14 design or human HubSpot setup (design/setup only until live smoke authorized).
+12. `ORIGIN_AND_DECISION_TRAIL.md`, `EXPLAINED_LIKE_IM_FIVE.md`, and `CANAIYET_HUBSPOT_EXPLAINER.md` when the why or the plain HubSpot-transfer explanation is needed.
 
 ## Name map
 
@@ -102,6 +117,8 @@ Official sequence is in `NEXT_MISSIONS.md`. Human override: Demand Scout live co
 - `FALSIFICATION_OPERATING_METHOD.md` — Sep 13 operating method for falsifiable hypothesis work across research/product/market/architecture decisions.
 - `CAPABILITY_INTELLIGENCE_THESIS.md` — Sep 11 capability-intelligence/economic thesis.
 - `PRODUCT_DISCOVERY_BY_FALSIFICATION.md` — Sep 14 doctrine preserving the idea that falsification should shape the product while the measurement mission remains stable.
+- `STARTUP_THESIS_CONFIGURED_AI_DELEGATION.md` — durable Sep-17 clarification: measurement apparatus vs product; five falsifiable beliefs; configured-AI delegation question (consolidated from PR #29).
+- `AGENT_SYSTEM_ARCHITECTURE.md` — durable Sep-17 architecture/measurement model: taxonomy, AgentSystemManifest, HubSpot hold-fixed rule, frontier provenance (consolidated from PR #29).
 - `THREE_YEAR_ENTERPRISE_AI_CAPABILITY_TRAJECTORY.md` — Sep 14 projection of the enterprise AI systems / assurance capability that the experimental program can develop in its human operator under both startup-success and startup-failure outcomes.
 - `ENTERPRISE_ENVIRONMENT_VALIDATION.md` — Sep 11 insight record for synthetic→real-stack→customer-staging validation and portable capability packs.
 - `reviews/CAY-20260913-01-gpt-cap001-comparator.md` — unpublished GPT-5.5 vs Sonnet 4.6 CAP-001 comparator (N=1; not public evidence).

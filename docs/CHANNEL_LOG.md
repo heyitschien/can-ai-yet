@@ -2,6 +2,14 @@
 
 Short scan log. Newest first.
 
+## CAY-20260917-DOC-CONSOLIDATION — Durable architecture + startup thesis set
+
+STATUS: READY_FOR_REVIEW  
+What: Folded five PR #29 Sep-17 date-stamped research drafts into two durable strategy docs: `AGENT_SYSTEM_ARCHITECTURE.md` (taxonomy + AgentSystemManifest measurement model + HubSpot hold-fixed rule + frontier provenance) and `STARTUP_THESIS_CONFIGURED_AI_DELEGATION.md` (measurement apparatus vs product; five falsifiable beliefs; configured-AI delegation question). Updated `AGENT_SYSTEM_INDEX.md` reading order/quick map. No canonical-build-doc edit; NEXT_MISSIONS unchanged; no CAP-001/HubSpot/runtime/permission/MCP/model code.  
+Branch: `docs/mcp-distributed-skills-note-2026-09-17`  
+Tip: _(pending commit)_ · PR: https://github.com/heyitschien/can-ai-yet/pull/29  
+Base: `8eb50192622f5f0242d97327bade9e5fbba1bfe7`
+
 ## CAY-20260914-11 — Meeting/Email archive evidence sufficiency
 
 STATUS: READY_FOR_REVIEW  
