@@ -107,13 +107,15 @@ export function classifyHubSpotWriteValidation(input: {
     };
   }
 
+  // Unmatched 400/422: integration failure, but do NOT claim portal write-validation
+  // without a matching HubSpot rule message. Malformed payloads stay OTHER.
   return {
     failureClass: "INTEGRATION_FAILURE",
-    attribution: "HUBSPOT_PORTAL_WRITE_VALIDATION",
+    attribution: "OTHER",
     kind: "GENERIC_VALIDATION",
     neverModelFailure: true,
     reason:
-      "Client validation 4xx on a write path — treat as portal/integration configuration until proven otherwise; never as model failure.",
+      "Client validation 4xx without an evidenced HubSpot write-validation message pattern — integration/adapter or unknown client validation until proven as a portal rule; never as model failure.",
   };
 }
 

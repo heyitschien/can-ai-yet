@@ -10,7 +10,7 @@
     "247381023"
   ],
   "portalIdentityResolved": true,
-  "serviceKeyName": "CanAIYet CAP-001 Commissioning",
+  "serviceKeyName": "CanAIYet CAP-001 Lab Commissioning",
   "grantedScopes": [
     "crm.objects.contacts.read",
     "crm.objects.contacts.write"
@@ -130,5 +130,6 @@
     "Confirm lab portal has no unexpected Create Record associations (e.g. forced company on deal) that seed omits.",
     "If a portal rule conflicts with CAP-001 seed: fix portal config or authorize a seed-payload change \u2014 never weaken fixtures to hide the rule."
   ],
-  "redactionStatus": "secrets_scrubbed"
+  "redactionStatus": "secrets_scrubbed",
+  "serviceKeyNameCorrection": "Corrected 2026-09-17 after CHANGES_REQUESTED: receipt was captured with the new lab key but stamped the stale constant CanAIYet CAP-001 Commissioning. Display name is CanAIYet CAP-001 Lab Commissioning. Does not rewrite the prior readiness receipt."
 }

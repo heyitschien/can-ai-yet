@@ -128,6 +128,17 @@ describe("2026-09 write validation attribution", () => {
     expect(associations.kind).toBe("EDIT_ASSOCIATIONS_PERMISSION");
   });
 
+  it("does not label unmatched/malformed 400 as portal write validation", () => {
+    const malformed = classifyHubSpotWriteValidation({
+      status: 400,
+      message: "INVALID_PROPERTY_VALUE: property 'email' had value that was not valid",
+    });
+    expect(malformed.failureClass).toBe("INTEGRATION_FAILURE");
+    expect(malformed.attribution).toBe("OTHER");
+    expect(malformed.kind).toBe("GENERIC_VALIDATION");
+    expect(malformed.neverModelFailure).toBe(true);
+  });
+
   it("keeps UI checklist and detects metadata gaps from property catalogs", () => {
     expect(HUBSPOT_WRITE_VALIDATION_UI_CHECKLIST.length).toBeGreaterThanOrEqual(3);
 

@@ -4,7 +4,7 @@
 **Status:** approval packet only — **Service Key must not be modified in this mission**  
 **Retrieval date:** 2026-09-17  
 **Portal (non-secret):** `247381023` / `CanAIYet CAP-001 Lab`  
-**Service Key name (non-secret):** `CanAIYet CAP-001 Commissioning`
+**Service Key name (non-secret):** `CanAIYet CAP-001 Lab Commissioning`
 **Portal identity (2026-09-17):** validated with the **new** local Service Key via read-only preflight — HubSpot `account-info` + blocked-scope error bodies all name **`247381023`**. Prior readiness preflight that saw `247380908` was the **old** wrong-portal key (credential mismatch, not model failure). Evidence: `docs/reviews/CAY-20260917-hubspot-portal-identity-validation.md`.
 
 ## Current granted scopes
@@ -39,7 +39,7 @@ Do **not** add any of the following to the steady-state runtime Service Key for 
 ## Exact next human action
 
 1. Independent review accepts this packet + readiness refresh PR.
-2. Human opens HubSpot → Service Key `CanAIYet CAP-001 Commissioning` → add **only** `crm.objects.deals.read` and `crm.objects.deals.write`.
+2. Human opens HubSpot → Service Key `CanAIYet CAP-001 Lab Commissioning` → add **only** `crm.objects.deals.read` and `crm.objects.deals.write`.
 3. Post acceptance on Issue #1 naming the exact scopes granted and the new non-secret key rotation metadata if rotated.
 4. Only then authorize one-time `cay_*` metadata provisioning (if not already done) and no-model complete-graph commissioning.
 

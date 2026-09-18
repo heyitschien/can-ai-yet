@@ -2,10 +2,18 @@
 
 Short scan log. Newest first.
 
+## CAY-20260917-HUBSPOT-READINESS-REFRESH — CHANGES_REQUESTED cleanup
+
+STATUS: READY_FOR_REVIEW
+What: PR #31 review fixes only — Service Key name → `CanAIYet CAP-001 Lab Commissioning`; unmatched 400/422 attribution → OTHER; shared-desk protocol removed from this PR (follow-up PR); PR body updated for resolved portal identity. No HubSpot live work.
+Branch: `feature/cay-20260917-hubspot-readiness-refresh`
+Tip: (pending) · PR: https://github.com/heyitschien/can-ai-yet/pull/31
+Base: `afe3fd9b738b7b4b27362b8d77cee46ef35b5197`
+
 ## CAY-20260917-HUBSPOT-PORTAL-IDENTITY-VALIDATION — New lab key binds to 247381023
 
 STATUS: READY_FOR_REVIEW
-What: Read-only validation of replaced local Service Key. HubSpot `account-info` + deals/emails schema 403 bodies all name portal **247381023** (CanAIYet CAP-001 Lab, DEVELOPER_TEST). Prior readiness preflight `247380908` = old wrong-portal key (credential mismatch, not model failure). Original readiness receipt preserved. Mission Control shared-desk rule strengthened in AGENTS.md / COMMUNICATION_PROTOCOL §0 / AGENT_SYSTEM_INDEX. Mutations/scopes/models = 0.
+What: Read-only validation of replaced local Service Key. HubSpot `account-info` + deals/emails schema 403 bodies all name portal **247381023** (CanAIYet CAP-001 Lab, DEVELOPER_TEST). Prior readiness preflight `247380908` = old wrong-portal key (credential mismatch, not model failure). Original readiness receipt preserved. Mutations/scopes/models = 0.
 Branch: `feature/cay-20260917-hubspot-readiness-refresh`
 Tip: `214153edb7ab614af4018215f797a55b44d7b4e3` · PR: https://github.com/heyitschien/can-ai-yet/pull/31
 Base: `e8fbc747baebc50982fc8a16f415f367f548a427`

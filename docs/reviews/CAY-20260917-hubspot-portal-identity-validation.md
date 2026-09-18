@@ -36,8 +36,10 @@ Preserve original readiness receipt (`docs/reviews/CAY-20260917-hubspot-readonly
 | Credential | Portal HubSpot named | Account |
 | --- | --- | --- |
 | Old local Service Key (pre-replacement) | `247380908` | CanAIYet (wrong binding for CAP-001 Lab) |
-| New local Service Key (this validation) | `247381023` | **CanAIYet CAP-001 Lab** |
+| New local Service Key (this validation) | `247381023` | **CanAIYet CAP-001 Lab** · UI name **`CanAIYet CAP-001 Lab Commissioning`** |
 
 **Classification:** credential / environment identity mismatch — **not** HubSpot instability, **not** model failure.
 
-`HUBSPOT_LAB_PORTAL_ID=247381023` remains correct for the intended lab. Old wrong-portal key retirement is a **human** decision after independent review (not authorized in this mission).
+`HUBSPOT_LAB_PORTAL_ID=247381023` remains correct for the intended lab. Current constant `HUBSPOT_SERVICE_KEY_NAME` matches the new UI name. Old wrong-portal key retirement is a **human** decision after independent review (not authorized in this mission).
+
+**Receipt name correction:** the machine JSON initially stamped the stale constant `CanAIYet CAP-001 Commissioning` while validating the **new** key; `serviceKeyName` was corrected to `CanAIYet CAP-001 Lab Commissioning` with an explicit correction note. The prior readiness JSON is untouched.

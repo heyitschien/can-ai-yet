@@ -28,14 +28,14 @@
 | --- | --- |
 | Test account | `CanAIYet CAP-001 Lab` |
 | Portal / test account ID | `247381023` |
-| Auth | Service Key `CanAIYet CAP-001 Commissioning` |
+| Auth | Service Key `CanAIYet CAP-001 Lab Commissioning` |
 | Scopes | `crm.objects.contacts.read`, `crm.objects.contacts.write` |
 | API version | `2026-03` |
 | Adapter version | `hubspot-commissioning-live-v1` |
 | Hubs (creation snapshot) | Sales Enterprise; other hubs Free |
 | Trial note | 90-day Enterprise window refreshes on API activity (dynamic) |
 
-**Portal binding proof (2026-09-17):** after the human replaced local `.env.local` `HUBSPOT_SERVICE_KEY`, read-only validation observed HubSpot `portalId=247381023` (`DEVELOPER_TEST`) via `GET /account-info/v3/details` and matching portal IDs on deals/emails schema `403` bodies. An earlier readiness preflight that reported `247380908` used the **previous** local key — treat as credential/environment mismatch, not HubSpot instability or model failure. See `docs/reviews/CAY-20260917-hubspot-portal-identity-validation.md`.
+**Portal binding proof (2026-09-17):** after the human replaced local `.env.local` `HUBSPOT_SERVICE_KEY`, read-only validation observed HubSpot `portalId=247381023` (`DEVELOPER_TEST`) via `GET /account-info/v3/details` and matching portal IDs on deals/emails schema `403` bodies. An earlier readiness preflight that reported `247380908` used the **previous** local key — treat as credential/environment mismatch, not HubSpot instability or model failure. Current HubSpot UI key name: **`CanAIYet CAP-001 Lab Commissioning`**. See `docs/reviews/CAY-20260917-hubspot-portal-identity-validation.md`.
 
 Secrets stay in local `.env.local` as `HUBSPOT_SERVICE_KEY` only — never paste into Linear/GitHub/chat.
 
